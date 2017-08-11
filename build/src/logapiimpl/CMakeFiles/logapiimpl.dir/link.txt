@@ -1,1 +1,0 @@
-/usr/bin/c++  -fPIC -Wall -Wextra -Werror -std=c++14   -shared -Wl,-soname,liblogapiimpl.so -o ../../bin/liblogapiimpl.so CMakeFiles/logapiimpl.dir/logapiimpl.cpp.o 

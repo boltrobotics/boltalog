@@ -1,0 +1,19 @@
+.template 1
+.ignorecase = 0
+.for logapi.event
+.if defined(event->doc)
+/**
+ * $(event->doc)
+ */
+.endif
+#define $(event.name)(\
+.   for event.param
+.       if index(param) > 1
+, \
+.       endif
+$(param.name)\
+.   endfor
+) 
+
+.endfor
+.endtemplate

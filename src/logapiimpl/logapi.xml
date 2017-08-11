@@ -1,0 +1,21 @@
+<?xml vesion="1.0" ?>
+<logapi copyright="Copyright" version="2.5" script="logapi.hpp">
+    <event name="onLogEventA" id="1" severity="info">
+        <doc>Log is emitted when so and so occurs.</doc>
+        <param name="param1" type="int32_t" doc="description"/>
+        <param name="param2" type="const string&" doc="description"/>
+        <param name="param3" type="string&&" doc="description"/>
+    </event>
+    <event name="onLogEventB" id="2" severity="warn">
+        <doc>Log is emitted when so and so occurs.</doc>
+        <param name="param1" type="uint16_t" doc="description"/>
+        <param name="param2" type="const string&" doc="description"/>
+    </event>
+    <event name="onLogEventC" id="3" severity="trace">
+        <doc>Log is emitted when so and so occurs.</doc>
+        <param name="p1" type="uint64_t"/>
+        <param name="p2" type="uint8_t"/>
+        <param name="p3" type="string&&"/>
+        <param name="p4" type="const string&"/>
+    </event>
+</logapi>

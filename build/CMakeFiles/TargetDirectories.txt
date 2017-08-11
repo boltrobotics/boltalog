@@ -1,0 +1,2 @@
+/home/sergey/dev/apps/strong-log.git/build/src/logapi/CMakeFiles/logapi.dir
+/home/sergey/dev/apps/strong-log.git/build/src/logapiimpl/CMakeFiles/logapiimpl.dir

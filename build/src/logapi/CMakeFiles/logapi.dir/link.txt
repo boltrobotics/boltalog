@@ -1,0 +1,1 @@
+/usr/bin/c++   -Wall -Wextra -Werror -std=c++14    CMakeFiles/logapi.dir/main.cpp.o  -o ../../bin/logapi -rdynamic ../../bin/liblogapiimpl.so -Wl,-rpath,/home/sergey/dev/apps/strong-log.git/build/bin 

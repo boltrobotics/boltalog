@@ -1,7 +1,27 @@
-/*
- * License
- */
+.template 1
+.ignorecase = 0
 
+.for logapi.event
+.if defined(event->doc)
+/**
+ * $(event->doc)
+ */
+.endif
+#define $(event.name)(\
+.   for event.param
+.       if index(param) > 1
+, \
+.       endif
+$(param.name)\
+.   endfor
+) 
+
+.endfor
+.endtemplate
+
+/**
+ * 
+ */
 #ifndef _logger_hpp_
 #define _logger_hpp_
 
@@ -11,7 +31,7 @@
 
 using namespace std;
 
-class logger
+class Logger
 {
 public:
     enum Severity {

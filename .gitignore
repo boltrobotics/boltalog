@@ -1,0 +1,4 @@
+# Generated files
+include/logger.hpp
+src/logger.cpp
+build

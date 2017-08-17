@@ -1,0 +1,81 @@
+.output "logger.hpp"
+.template 1
+.ignorecase = 0
+\
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this      
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
+
+#ifndef _Logger_hpp_
+#define _Logger_hpp_
+
+// SYSTEM INCLUDES
+#include <cstdint>
+#include <array>
+#include <memory>
+
+.for log.event
+.   if defined(event->doc)
+/**
+ * $(event->doc)
+ */
+.   endif
+#define $(event.name)(\
+.   for event.param
+.       if index(param) > 1
+, \
+.       endif
+$(param.name)\
+.   endfor
+) \\
+	if (Logger::instance()->filter($(event.id))) { \\
+		Logger::instance()->$(event.name)(\
+.       for event.param
+.           if index(param) > 1
+, \
+.           endif
+$(param.name)\
+.       endfor
+); \\
+    }
+
+.endfor
+.endtemplate
+\
+
+/**
+ * Short description.
+ */
+class Logger
+{
+public:
+    enum Severity {
+        TRACE,
+        DEBUG,
+        INFO,
+        WARNING,
+        ERROR,
+        CRITICAL
+    };
+
+    // OPERATIONS
+
+    static void init();
+
+    static Logger* instance();
+
+    bool filter(int id) const;
+
+private:
+
+    // LIFECYCLE
+
+    Logger();
+
+    // ATTRIBUTES
+
+    std::array<int, 3> severities_;
+    int severity_;
+};
+
+#endif // _Logger_hpp_

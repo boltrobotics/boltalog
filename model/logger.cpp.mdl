@@ -1,0 +1,59 @@
+.output "logger.cpp"
+.template 1
+.endtemplate
+\
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this      
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
+
+// PROJECT INCLUDES
+#include "logger.hpp"
+
+static std::unique_ptr<Logger> logger_;
+
+void Logger::init()
+{
+    if (!logger_) {
+        logger_.reset(new Logger());
+    }
+}
+
+Logger* Logger::instance()
+{
+    return logger_.get();
+}
+
+Logger::Logger() :
+    severities_(),
+    severity_(DEBUG)
+{
+    severities_[0] = INFO;
+    severities_[1] = WARNING;
+    severities_[2] = TRACE;
+}
+
+bool Logger::filter(int id) const
+{
+    int severity = severities_[id];
+
+    if (severity >= severity_) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+#if 0
+void Logger::onLogEvent1Impl(
+        int32_t param1,
+        const std::string& param2,
+        std::string&& param3)
+{
+    std::cout
+        << 0 << ","
+        << param1 << ","
+        << param2 << ","
+        << param3
+        << std::endl;
+}
+#endif

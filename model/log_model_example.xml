@@ -1,5 +1,11 @@
+<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this      
+file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
+-->
+
 <?xml vesion="1.0" ?>
-<logapi copyright="Copyright" version="2.5" script="logapi.hpp">
+<log copyright="Copyright" version="2.0">
     <event name="onLogEventA" id="1" severity="info">
         <doc>Log is emitted when so and so occurs.</doc>
         <param name="param1" type="int32_t" doc="description"/>
@@ -18,4 +24,4 @@
         <param name="p3" type="string&&"/>
         <param name="p4" type="const string&"/>
     </event>
-</logapi>
+</log>

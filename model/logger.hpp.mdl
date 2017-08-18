@@ -6,30 +6,42 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this      
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
 
-#ifndef _Logger_hpp_
-#define _Logger_hpp_
+#ifndef _slog_Logger_hpp_
+#define _slog_Logger_hpp_
 
 // SYSTEM INCLUDES
 #include <cstdint>
 #include <array>
 #include <memory>
+#include <syslog.h>
+
+namespace slog {
+
+$("/" * 80)
 
 .for log.event
 .   if defined(event->doc)
 /**
  * $(event->doc)
- */
+ *
+. else
+/**
 .   endif
+.for event.param
+ * @param $(param.name) $(param.doc?)
+.endfor
+ */
+\
 #define $(event.name)(\
-.   for event.param
-.       if index(param) > 1
+.for event.param
+.   if index(param) > 1
 , \
-.       endif
+.   endif
 $(param.name)\
-.   endfor
+.endfor
 ) \\
-	if (Logger::instance()->filter($(event.id))) { \\
-		Logger::instance()->$(event.name)(\
+    if (Logger::instance()->filter($(event.id))) { \\
+        Logger::instance()->$(event.name)Impl(\
 .       for event.param
 .           if index(param) > 1
 , \
@@ -40,42 +52,95 @@ $(param.name)\
     }
 
 .endfor
-.endtemplate
 \
+$("/" * 80)
 
 /**
- * Short description.
+ * Logging interface for reporting runtime events and metrics.
+ *
+ * The events are to be logged through the macros defined above.
  */
 class Logger
 {
 public:
-    enum Severity {
-        TRACE,
-        DEBUG,
-        INFO,
-        WARNING,
-        ERROR,
-        CRITICAL
-    };
 
-    // OPERATIONS
+// LIFECYCLE
 
-    static void init();
+    /**
+     * Ctor.
+     *
+     * @param ident - the program name
+     * @param ident_inst - the program instance name
+     * @param facility - the syslog facility
+     * @param severity - the minimum log severity to allow through
+     */
+    Logger(
+        const std::string& ident,
+        const std::string& ident_inst,
+        int facility = LOG_LOCAL0,
+        int severity = LOG_DEBUG);
 
+    /**
+     * Dtor.
+     */
+    ~Logger();
+
+// OPERATIONS
+
+    /**
+     * Factory function to create global logger instance. Call only once at
+     * start-up.
+     *
+     * @param ident - the program name
+     * @param ident_inst - the program instance name
+     * @param facility - the syslog facility
+     * @param severity - the minimum log severity to allow through
+     * @return global logger instance
+     */
+    static Logger* make(
+        const std::string& ident,
+        const std::string& ident_inst,
+        int facility = LOG_LOCAL0,
+        int severity = LOG_DEBUG);
+
+    /**
+     * @return global logger instance
+     */
     static Logger* instance();
 
-    bool filter(int id) const;
+    /**
+     * @param eventId - the event ID
+     * @return true if event is allowed to pass through, false otherwise
+     */
+    bool filter(int eventId) const;
+
+    //$("-" * 74)
+
+.for log.event
+    void $(event.name)Impl(
+.    for event.param
+.       if last()
+        $(param.type) $(param.name)) const;
+
+.       else
+        $(param.type) $(param.name),
+.       endif
+.    endfor
+.endfor
+    //$("-" * 74)
 
 private:
 
-    // LIFECYCLE
+// ATTRIBUTES
 
-    Logger();
-
-    // ATTRIBUTES
-
-    std::array<int, 3> severities_;
+    std::string ident_;
+    std::string ident_inst_;
+    int facility_;
     int severity_;
+    std::array<int, $(count(log.event))> severities_;
 };
 
-#endif // _Logger_hpp_
+} // namespace slog
+
+#endif // _slog_Logger_hpp_
+.endtemplate

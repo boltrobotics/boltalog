@@ -1,40 +1,68 @@
 .output "logger.cpp"
 .template 1
-.endtemplate
+.ignorecase = 0
 \
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this      
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
 
 // PROJECT INCLUDES
-#include "logger.hpp"
+#include "logger.hpp" // class implemented
+
+namespace slog {
 
 static std::unique_ptr<Logger> logger_;
+static const uint16_t log_buff_size_ = 512;
 
-void Logger::init()
-{
-    if (!logger_) {
-        logger_.reset(new Logger());
-    }
+///////////////////////////////////// PUBLIC ///////////////////////////////////
+
+//=================================== LIFECYCLE ================================
+
+Logger::Logger(
+        const std::string& ident,
+        const std::string& ident_inst,
+        int facility,
+        int severity) :
+    ident_(ident),
+    ident_inst_(ident_inst),
+    facility_(facility),
+    severity_(severity),
+    severities_() {
+
+.for log.event
+    severities_[$(event.id)] = $(event.severity);
+.endfor
+
+    openlog(ident_.c_str(), 0, facility_);
 }
 
-Logger* Logger::instance()
-{
+Logger::~Logger() {
+    closelog();
+}
+
+//=================================== OPERATIONS ===============================
+
+// static
+Logger* Logger::make(
+    const std::string& ident,
+    const std::string& ident_inst,
+    int facility,
+    int severity) {
+
+    if (!logger_) {
+        logger_.reset(new Logger(ident, ident_inst, facility, severity));
+    }
+
+    return instance();
+}
+
+// static
+Logger* Logger::instance() {
     return logger_.get();
 }
 
-Logger::Logger() :
-    severities_(),
-    severity_(DEBUG)
-{
-    severities_[0] = INFO;
-    severities_[1] = WARNING;
-    severities_[2] = TRACE;
-}
-
-bool Logger::filter(int id) const
-{
-    int severity = severities_[id];
+bool Logger::filter(int eventId) const {
+    int severity = severities_[eventId];
 
     if (severity >= severity_) {
         return true;
@@ -43,17 +71,51 @@ bool Logger::filter(int id) const
     }
 }
 
-#if 0
-void Logger::onLogEvent1Impl(
-        int32_t param1,
-        const std::string& param2,
-        std::string&& param3)
-{
-    std::cout
-        << 0 << ","
-        << param1 << ","
-        << param2 << ","
-        << param3
-        << std::endl;
+.for log.event
+void Logger::$(event.name)Impl(
+.for event.param
+.   if last()
+    $(param.type) $(param.name)) const {
+.   else
+    $(param.type) $(param.name),
+.   endif
+.endfor
+
+    char buff[log_buff_size_] = {0};
+    snprintf(buff, log_buff_size_, "%s: {0x%04X}\
+.for event.param
+.   if param.type = "uint8_t"
+ %hhu\
+.   elsif param.type = "uint16_t"
+ %hu\
+.   elsif param.type = "int16_t"
+ %h\
+.   elsif param.type = "uint32_t"
+ %u\
+.   elsif param.type = "int32_t"
+ %d\
+.   elsif param.type = "uint64_t"
+ %llu\
+.   elsif param.type = "int64_t"
+ %ll\
+.   elsif param.type = "const std::string&"
+ %s\
+.   endif
+.endfor
+",
+        ident_inst_.c_str(), 123\
+.for event.param
+.  if param.type = "const std::string&"
+, $(param.name).c_str()\
+.  else
+, $(param.name)\
+.  endif
+.endfor
+);
+    syslog(severities_[$(event.id)], "%s", buff);
 }
-#endif
+
+.endfor
+\
+} // namespace slog
+.endtemplate

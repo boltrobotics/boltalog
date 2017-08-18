@@ -1,0 +1,14 @@
+cmake_minimum_required(VERSION 3.5.1)
+project(gsl-download NONE)
+
+include(ExternalProject)
+ExternalProject_Add(gsl
+  GIT_REPOSITORY    https://github.com/imatix/gsl
+  GIT_TAG           master
+  SOURCE_DIR        "src"
+  BINARY_DIR        "src/src"
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND     make
+  INSTALL_COMMAND   ""
+  TEST_COMMAND      ""
+)

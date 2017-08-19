@@ -23,6 +23,8 @@ if (NOT GSL)
     if (result)
         message(FATAL_ERROR "Build step for GSL failed: ${result}")
     endif()
+
+    set(GSL ${GSL_ROOT}/src/src/gsl)
 else()
     message("GSL found: ${GSL}")
 endif()

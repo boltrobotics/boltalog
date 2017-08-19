@@ -13,13 +13,13 @@ namespace slog {
 
 TEST(TestCase, TestName)
 {
-    Logger::make("", LOG_LOCAL2, LOG_DEBUG);
+    Logger::make("logger");
     onLogEventA(32, 8);
     onLogEventB(16, "param2");
     onLogEventC(64, "p2", "p3", 4);
 }
 
-TEST(TestCase, TestName2)
+TEST(DISABLED_TestCase, TestName2)
 {
     EXPECT_EQ(1, 0);
 }

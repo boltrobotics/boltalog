@@ -62,7 +62,7 @@ void Logger::level(int level) {
 }
 
 bool Logger::filter(int eventId) const {
-    if (levels_[eventId] >= levels_[0]) {
+    if (levels_[eventId] <= levels_[0]) {
         return true;
     } else {
         return false;

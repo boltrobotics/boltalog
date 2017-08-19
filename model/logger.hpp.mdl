@@ -3,7 +3,7 @@
 .ignorecase = 0
 \
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this      
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
 
 #ifndef _slog_Logger_hpp_
@@ -96,20 +96,20 @@ public:
      */
     static Logger* make(
         const std::string& ident = "",
-		int facility = LOG_USER,
-		int level = LOG_DEBUG);
+        int facility = LOG_USER,
+        int level = LOG_DEBUG);
 
     /**
      * @return global logger instance
      */
     static Logger* instance();
 
-	/**
-	 * Set log level.
-	 *
-	 * @param level - the level
-	 */
-	void level(int level);
+    /**
+     * Set log level.
+     *
+     * @param level - the level
+     */
+    void level(int level);
 
     /**
      * @param eventId - the event ID

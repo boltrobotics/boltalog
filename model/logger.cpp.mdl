@@ -6,13 +6,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
 
+// SYSTEM INCLUDES
+#include <cinttypes>
+
 // PROJECT INCLUDES
 #include "logger.hpp" // class implemented
 
 namespace slog {
 
 static std::unique_ptr<Logger> logger_;
-static const uint16_t log_buff_size_ = 512;
 
 ///////////////////////////////////// PUBLIC ///////////////////////////////////
 
@@ -20,37 +22,30 @@ static const uint16_t log_buff_size_ = 512;
 
 Logger::Logger(
         const std::string& ident,
-        const std::string& ident_inst,
         int facility,
-        int severity) :
+        int level) :
     ident_(ident),
-    ident_inst_(ident_inst),
-    facility_(facility),
-    severity_(severity),
-    severities_() {
+    levels_() {
 
+    levels_[0] = level;
 .for log.event
-    severities_[$(event.id)] = $(event.severity);
+    levels_[$(event.id)] = $(event.level);
 .endfor
 
-    openlog(ident_.c_str(), 0, facility_);
+    openlog(ident_.c_str(), LOG_PID | LOG_NDELAY, facility);
 }
 
 Logger::~Logger() {
-    closelog();
 }
 
 //=================================== OPERATIONS ===============================
 
 // static
 Logger* Logger::make(
-    const std::string& ident,
-    const std::string& ident_inst,
-    int facility,
-    int severity) {
+    const std::string& ident, int facility, int level) {
 
     if (!logger_) {
-        logger_.reset(new Logger(ident, ident_inst, facility, severity));
+        logger_.reset(new Logger(ident, facility, level));
     }
 
     return instance();
@@ -61,10 +56,13 @@ Logger* Logger::instance() {
     return logger_.get();
 }
 
-bool Logger::filter(int eventId) const {
-    int severity = severities_[eventId];
+void Logger::level(int level) {
+    levels_[0] = level;
+    setlogmask(LOG_UPTO(level));
+}
 
-    if (severity >= severity_) {
+bool Logger::filter(int eventId) const {
+    if (levels_[eventId] >= levels_[0]) {
         return true;
     } else {
         return false;
@@ -81,38 +79,43 @@ void Logger::$(event.name)Impl(
 .   endif
 .endfor
 
-    char buff[log_buff_size_] = {0};
-    snprintf(buff, log_buff_size_, "%s: {0x%04X}\
+    syslog(levels_[$(event.id)], "$(event.id)\
 .for event.param
+,%\
 .   if param.type = "uint8_t"
- %hhu\
+" PRIu8 "\
+.   elsif param.type = "int8_t"
+" PRId8 "\
 .   elsif param.type = "uint16_t"
- %hu\
+" PRIu16 "\
 .   elsif param.type = "int16_t"
- %h\
+" PRId16 "\
 .   elsif param.type = "uint32_t"
- %u\
+" PRIu32 "\
 .   elsif param.type = "int32_t"
- %d\
+" PRId32 "\
 .   elsif param.type = "uint64_t"
- %llu\
+" PRIu64 "\
 .   elsif param.type = "int64_t"
- %ll\
+" PRId64 "\
 .   elsif param.type = "const std::string&"
- %s\
+s\
 .   endif
 .endfor
 ",
-        ident_inst_.c_str(), 123\
 .for event.param
-.  if param.type = "const std::string&"
-, $(param.name).c_str()\
-.  else
-, $(param.name)\
-.  endif
+.   if index(param) > 1
+, \
+.   else
+        \
+.   endif
+.   if param.type = "const std::string&"
+$(param.name).c_str()\
+.   else
+$(param.name)\
+.   endif
 .endfor
 );
-    syslog(severities_[$(event.id)], "%s", buff);
 }
 
 .endfor

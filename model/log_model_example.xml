@@ -6,19 +6,20 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
 
 <?xml vesion="1.0" ?>
 <log>
-    <event name="onLogEventA" id="0" severity="LOG_INFO">
+    <event id="1" name="onLogEventA" level="LOG_INFO">
         <doc>Log is emitted when so and so occurs.</doc>
         <param name="param1" type="int32_t" doc="description"/>
-        <param name="param2" type="const std::string&" />
+        <param name="param2" type="int8_t" />
     </event>
-    <event name="onLogEventB" id="1" severity="LOG_WARNING">
+    <event id="2" name="onLogEventB" level="LOG_WARNING">
         <param name="param1" type="uint16_t" doc="- description"/>
         <param name="param2" type="const std::string&" doc="+ description"/>
     </event>
-    <event name="onLogEventC" id="2" severity="LOG_DEBUG">
+    <event id="3" name="onLogEventC" level="LOG_DEBUG">
         <doc>Log is emitted when so and so occurs.</doc>
         <param name="p1" type="uint64_t"/>
-        <param name="p2" type="uint8_t"/>
+        <param name="p2" type="const std::string&"/>
         <param name="p3" type="const std::string&"/>
+        <param name="p4" type="uint8_t"/>
     </event>
 </log>

@@ -70,15 +70,13 @@ public:
      * Ctor.
      *
      * @param ident - the program name
-     * @param ident_inst - the program instance name
      * @param facility - the syslog facility
-     * @param severity - the minimum log severity to allow through
+     * @param level - the minimum log level to allow through
      */
     Logger(
-        const std::string& ident,
-        const std::string& ident_inst,
-        int facility = LOG_LOCAL0,
-        int severity = LOG_DEBUG);
+        const std::string& ident = "",
+        int facility = LOG_USER,
+        int level = LOG_DEBUG);
 
     /**
      * Dtor.
@@ -92,21 +90,26 @@ public:
      * start-up.
      *
      * @param ident - the program name
-     * @param ident_inst - the program instance name
      * @param facility - the syslog facility
-     * @param severity - the minimum log severity to allow through
+     * @param level - the minimum log level to allow through
      * @return global logger instance
      */
     static Logger* make(
-        const std::string& ident,
-        const std::string& ident_inst,
-        int facility = LOG_LOCAL0,
-        int severity = LOG_DEBUG);
+        const std::string& ident = "",
+		int facility = LOG_USER,
+		int level = LOG_DEBUG);
 
     /**
      * @return global logger instance
      */
     static Logger* instance();
+
+	/**
+	 * Set log level.
+	 *
+	 * @param level - the level
+	 */
+	void level(int level);
 
     /**
      * @param eventId - the event ID
@@ -134,10 +137,7 @@ private:
 // ATTRIBUTES
 
     std::string ident_;
-    std::string ident_inst_;
-    int facility_;
-    int severity_;
-    std::array<int, $(count(log.event))> severities_;
+    std::array<int, $(count(log.event) + 1)> levels_;
 };
 
 } // namespace slog

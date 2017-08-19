@@ -34,5 +34,5 @@ endif()
 
 file(GLOB SOURCES "*.cpp")
 add_executable(logger_test ${SOURCES})
-target_link_libraries(logger_test gtest_main)
+target_link_libraries(logger_test logger gtest_main)
 add_test(logger_test logger_test)

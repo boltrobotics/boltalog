@@ -1,4 +1,5 @@
 # Generated files
 include/logger.hpp
 src/logger.cpp
+scripts/log_viewer.py
 build

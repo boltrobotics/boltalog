@@ -45,6 +45,17 @@ add_custom_command(
     COMMENT "Generating logger.cpp from ${LOG_MODEL}" VERBATIM
     DEPENDS ${LOG_MODEL} ${MODEL_DIR}/logger.cpp.mdl
 )
+add_custom_command(
+    OUTPUT ${SCRIPT_DIR}/log_viewer.py
+    COMMAND ${GSL} -script:${MODEL_DIR}/log_viewer.py.mdl ${LOG_MODEL}
+    WORKING_DIRECTORY ${SCRIPT_DIR}
+    COMMENT "Generating log_viewer.py from ${LOG_MODEL}" VERBATIM
+    DEPENDS ${LOG_MODEL} ${MODEL_DIR}/log_viewer.py.mdl
+)
+add_custom_target(
+    log_viewer ALL
+    DEPENDS ${SCRIPT_DIR}/log_viewer.py
+)
 
 list(APPEND SOURCES ${INCLUDE_DIR}/logger.hpp logger.cpp)
 add_library(logger SHARED ${SOURCES})

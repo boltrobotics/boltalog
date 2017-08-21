@@ -1,0 +1,41 @@
+.output "log_viewer.py"
+.template 1
+.ignorecase = 0
+\
+import sys
+
+.for log.event
+def $(event.name)(header, values):
+    print(header, " $(event.name)",
+.   for event.param
+.       if last()
+        ", $(param.name): ", values[$(index(param))], sep='')
+.       else
+        ", $(param.name): ", values[$(index(param))], 
+.       endif
+.   endfor
+
+.endfor
+\
+#$("/" * 79)
+
+if (len(sys.argv) == 1):
+    events_in = sys.stdin
+else:
+    events_in = open(sys.argv[1])
+
+for event in events_in:
+    tokens = event.split()
+    values = tokens[3].split(",")
+
+.for log.event
+.   if first()
+    if \
+.   else
+    elif \
+.   endif
+values[0] == "$(index(event))":
+        $(event.name)(" ".join(tokens[0:3]), values)
+.endfor
+
+.endtemplate

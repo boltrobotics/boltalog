@@ -14,29 +14,9 @@
 
 namespace slog {
 
-static std::unique_ptr<Logger> logger_;
+std::unique_ptr<Logger> Logger::logger_;
 
 ///////////////////////////////////// PUBLIC ///////////////////////////////////
-
-//=================================== LIFECYCLE ================================
-
-Logger::Logger(
-        const std::string& ident,
-        int facility,
-        int level) :
-    ident_(ident),
-    levels_() {
-
-    levels_[0] = level;
-.for log.event
-    levels_[$(event.id)] = $(event.level);
-.endfor
-
-    openlog(ident_.c_str(), LOG_PID | LOG_NDELAY, facility);
-}
-
-Logger::~Logger() {
-}
 
 //=================================== OPERATIONS ===============================
 
@@ -56,13 +36,23 @@ Logger* Logger::instance() {
     return logger_.get();
 }
 
-void Logger::level(int level) {
-    levels_[0] = level;
-    setlogmask(LOG_UPTO(level));
+int Logger::level(int eventId, int level) {
+    int event_id = -1;
+
+    if (std::size_t(eventId) < levels_.size()) {
+        event_id = levels_[eventId];
+        levels_[eventId] = level;
+
+        if (eventId == 0) {
+            setlogmask(LOG_UPTO(level));
+        }
+    }
+    return event_id;
 }
 
 bool Logger::filter(int eventId) const {
-    if (levels_[eventId] <= levels_[0]) {
+    if (std::size_t(eventId) < levels_.size()
+            && levels_[eventId] <= levels_[0]) {
         return true;
     } else {
         return false;
@@ -120,5 +110,24 @@ $(param.name)\
 
 .endfor
 \
+///////////////////////////////////// PRIVATE //////////////////////////////////
+
+//=================================== LIFECYCLE ================================
+ 
+Logger::Logger(
+        const std::string& ident,
+        int facility,
+        int level) :
+    ident_(ident),
+    levels_() {
+
+    levels_[0] = level;
+    levels_[1] = LOG_INFO;
+    levels_[2] = LOG_WARNING;
+    levels_[3] = LOG_DEBUG;
+
+    openlog(ident_.c_str(), LOG_PID | LOG_NDELAY, facility);
+}
+
 } // namespace slog
 .endtemplate

@@ -66,22 +66,7 @@ public:
 
 // LIFECYCLE
 
-    /**
-     * Ctor.
-     *
-     * @param ident - the program name
-     * @param facility - the syslog facility
-     * @param level - the minimum log level to allow through
-     */
-    Logger(
-        const std::string& ident = "",
-        int facility = LOG_USER,
-        int level = LOG_DEBUG);
-
-    /**
-     * Dtor.
-     */
-    ~Logger();
+    ~Logger() = default;
 
 // OPERATIONS
 
@@ -105,11 +90,13 @@ public:
     static Logger* instance();
 
     /**
-     * Set log level.
+     * Set the log level of a given event ID or the base allowed level (event ID 0).
      *
+     * @param eventId - the event ID
      * @param level - the level
+     * @return the previous level of the event or -1 when given event didn't exist
      */
-    void level(int level);
+    int level(int eventId, int level);
 
     /**
      * @param eventId - the event ID
@@ -134,8 +121,23 @@ public:
 
 private:
 
+// OPERATIONS
+
+    /**
+     * Ctor.
+     *
+     * @param ident - the program name
+     * @param facility - the syslog facility
+     * @param level - the minimum log level to allow through
+     */
+    Logger(
+        const std::string& ident = "",
+        int facility = LOG_USER,
+        int level = LOG_DEBUG);
+
 // ATTRIBUTES
 
+    static std::unique_ptr<Logger> logger_;
     std::string ident_;
     std::array<int, $(count(log.event) + 1)> levels_;
 };

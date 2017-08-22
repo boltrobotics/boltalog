@@ -12,7 +12,7 @@ The project enables to:
 * pcre package (e.g. libpcre3-dev)
 
 ## Building
-Note: GSL and Goggletest are retrieved and built from github during build process
+Note: GSL and Goggletest are retrieved from github during the build process
 
     git clone git://github.com/svkapustin/strong-log
     mkdir strong-log/build

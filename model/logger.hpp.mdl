@@ -24,7 +24,7 @@ $("/" * 80)
 /**
  * $(event->doc)
  *
-. else
+.   else
 /**
 .   endif
 .for event.param
@@ -60,8 +60,7 @@ $("/" * 80)
  *
  * The events are to be logged through the macros defined above.
  */
-class Logger
-{
+class Logger {
 public:
 
 // LIFECYCLE

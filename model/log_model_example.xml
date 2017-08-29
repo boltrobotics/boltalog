@@ -8,8 +8,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
 <log>
     <event id="1" name="onLogEventA" level="LOG_INFO">
         <doc>Log is emitted when so and so occurs.</doc>
-        <param name="param1" type="int32_t" doc="description"/>
-        <param name="param2" type="int8_t" />
+        <param name="param1" type="int32_t" doc="signed 32-bit number"/>
+        <param name="param2" type="int8_t" doc="describe me"/>
     </event>
     <event id="2" name="onLogEventB" level="LOG_WARNING">
         <param name="param1" type="uint16_t" doc="- description"/>

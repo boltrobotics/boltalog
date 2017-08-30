@@ -40,8 +40,8 @@ $("/" * 80)
 $(param.name)\
 .endfor
 ) \\
-    if (Logger::instance()->filter($(event.id))) { \\
-        Logger::instance()->$(event.name)Impl(\
+    if (slog::Logger::instance()->filter($(event.id))) { \\
+        slog::Logger::instance()->$(event.name)Impl(\
 .       for event.param
 .           if index(param) > 1
 , \

@@ -5,8 +5,8 @@ include(ExternalProject)
 ExternalProject_Add(gsl
   GIT_REPOSITORY    https://github.com/imatix/gsl
   GIT_TAG           master
-  SOURCE_DIR        "src"
-  BINARY_DIR        "src/src"
+  SOURCE_DIR        "${CMAKE_BINARY_DIR}/gsl-download/src"
+  BINARY_DIR        "${CMAKE_BINARY_DIR}/gsl-download/src/src"
   CONFIGURE_COMMAND ""
   BUILD_COMMAND     make
   INSTALL_COMMAND   ""

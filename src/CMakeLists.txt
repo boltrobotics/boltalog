@@ -1,15 +1,15 @@
 set(GSL_ROOT ${CMAKE_BINARY_DIR}/gsl-download)
-find_program(GSL gsl PATHS ${GSL_ROOT}/src/src)
+find_program(GSL gsl PATHS "${GSL_ROOT}/src/src")
 
 if (NOT GSL)
     message("GSL not found")
 
     # Configure
-    configure_file(CMakeListsGSL.txt ${GSL_ROOT}/CMakeLists.txt)
+    configure_file(CMakeListsGSL.txt "${GSL_ROOT}/CMakeLists.txt")
 
 	execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
 		RESULT_VARIABLE result
-        WORKING_DIRECTORY ${GSL_ROOT})
+        WORKING_DIRECTORY "${GSL_ROOT}")
 
 	if (result)
         message(FATAL_ERROR "CMake step for GSL failed: ${result}")
@@ -18,18 +18,19 @@ if (NOT GSL)
     # Download and unpack
 	execute_process(COMMAND ${CMAKE_COMMAND} --build .
     	RESULT_VARIABLE result
-        WORKING_DIRECTORY ${GSL_ROOT})
+        WORKING_DIRECTORY "${GSL_ROOT}")
 
     if (result)
         message(FATAL_ERROR "Build step for GSL failed: ${result}")
     endif()
 
-    set(GSL ${GSL_ROOT}/src/src/gsl)
+    set(GSL "${GSL_ROOT}/src/src/gsl")
 else()
     message("GSL found: ${GSL}")
 endif()
 
 file(GLOB SOURCES "*.cpp")
+message("Using log model: ${LOG_MODEL}")
 
 add_custom_command(
     OUTPUT ${INCLUDE_DIR}/logger.hpp

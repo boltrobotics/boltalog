@@ -21,7 +21,7 @@ std::unique_ptr<Logger> Logger::logger_;
 //=================================== OPERATIONS ===============================
 
 // static
-Logger* Logger::make(
+Logger* Logger::init(
     const std::string& ident, int facility, int level) {
 
     if (!logger_) {
@@ -126,7 +126,11 @@ Logger::Logger(
     levels_[2] = LOG_WARNING;
     levels_[3] = LOG_DEBUG;
 
-    openlog(ident_.c_str(), LOG_PID | LOG_NDELAY, facility);
+    if (ident_.empty()) {
+        openlog(NULL, LOG_PID | LOG_NDELAY, facility);
+    } else {
+        openlog(ident_.c_str(), LOG_PID | LOG_NDELAY, facility);
+    }
 }
 
 } // namespace slog

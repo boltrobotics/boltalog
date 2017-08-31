@@ -78,7 +78,7 @@ public:
      * @param level - the minimum log level to allow through
      * @return global logger instance
      */
-    static Logger* make(
+    static Logger* init(
         const std::string& ident = "",
         int facility = LOG_USER,
         int level = LOG_DEBUG);

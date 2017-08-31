@@ -33,12 +33,12 @@ std::vector<std::string> readLastLines(
 }
 
 TEST(LoggerTest, instance) {
-    Logger* logger = Logger::make("logger_test");
+    Logger* logger = Logger::init("logger_test");
     EXPECT_EQ(logger, Logger::instance());
 }
 
 TEST(LoggerTest, Level) {
-    Logger* logger = Logger::make("logger_test");
+    Logger* logger = Logger::init("logger_test");
 
     for (int i = 0; i < 4; i++) {
         EXPECT_EQ(logger->filter(i), true);
@@ -63,7 +63,7 @@ TEST(LoggerTest, Level) {
 TEST(LoggerTest, Output) {
     // Make sure rsyslog is configured to output LOG_USER logs to /var/log/user.log
     // and the file is readable.
-    Logger::make("logger_test");
+    Logger::init("logger_test");
     onLogEventA(32, 8);
     onLogEventB(16, "param2");
     onLogEventC(64, "p2", "p3", 4);

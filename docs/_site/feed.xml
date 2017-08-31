@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-08-29T13:50:22-04:00</updated><id>http://localhost:4000/</id><title type="html">svkapustin.github.io</title><subtitle></subtitle><entry><title type="html">Log and metric reporting. Part 4</title><link href="http://localhost:4000/Logger4/" rel="alternate" type="text/html" title="Log and metric reporting. Part 4" /><published>2017-08-29T00:00:00-04:00</published><updated>2017-08-29T00:00:00-04:00</updated><id>http://localhost:4000/Logger4</id><content type="html" xml:base="http://localhost:4000/Logger4/">&lt;p&gt;When the program emits an example event as described previously, the syslog records the following:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;2017-08-28T11:45:40.523085-04:00 vmu logger_test[19706]: 1,32,8
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;There is a small problem here - readability. When inspecting program events, I want the information to include event and parameter names to describe the values. This is easy to fix.&lt;/p&gt;
+
+&lt;p&gt;Using the same approach as for generating header and source files, I should be able to generate a user-friendly log viewer script. Here is a &lt;a href=&quot;https://github.com/svkapustin/strong-log/blob/master/model/log_viewer.py.mdl&quot;&gt;template&lt;/a&gt; for it:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;output&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;log_viewer.py&quot;&lt;/span&gt;
+  &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;template&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+  &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ignorecase&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+  &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt; \
+  &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sys&lt;/span&gt;
+  &lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt; 
+  &lt;span class=&quot;mi&quot;&gt;7&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;
+  &lt;span class=&quot;mi&quot;&gt;8&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;header&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+  &lt;span class=&quot;mi&quot;&gt;9&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;header&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot; $(event.name)&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;   &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;11&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;       &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;last&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;         &lt;span class=&quot;s&quot;&gt;&quot;, $(param.name): &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sep&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;       &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;14&lt;/span&gt;         &lt;span class=&quot;s&quot;&gt;&quot;, $(param.name): &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))],&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;15&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;       &lt;span class=&quot;n&quot;&gt;endif&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;16&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;   &lt;span class=&quot;n&quot;&gt;endfor&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;17&lt;/span&gt; 
+ &lt;span class=&quot;mi&quot;&gt;18&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;endfor&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;19&lt;/span&gt; \
+ &lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;#$(&quot;/&quot; * 79)&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;21&lt;/span&gt; 
+ &lt;span class=&quot;mi&quot;&gt;22&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;23&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;events_in&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stdin&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;24&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;25&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;events_in&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;26&lt;/span&gt; 
+ &lt;span class=&quot;mi&quot;&gt;27&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;events_in&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;tokens&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;29&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tokens&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;,&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;30&lt;/span&gt; 
+ &lt;span class=&quot;mi&quot;&gt;31&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;32&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;first&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;33&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; \
+ &lt;span class=&quot;mi&quot;&gt;34&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;   &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;35&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;elif&lt;/span&gt; \
+ &lt;span class=&quot;mi&quot;&gt;36&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;   &lt;span class=&quot;n&quot;&gt;endif&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;37&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;$(index(event))&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;38&lt;/span&gt;         &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot; &quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tokens&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;39&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;endfor&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;40&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;41&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;endtemplate&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;And this is the generated code:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sys&lt;/span&gt;
+  &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; 
+  &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;onLogEventA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;header&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+  &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;header&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot; onLogEventA&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;         &lt;span class=&quot;s&quot;&gt;&quot;, param1: &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+  &lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;         &lt;span class=&quot;s&quot;&gt;&quot;, param2: &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sep&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;mi&quot;&gt;7&lt;/span&gt; 
+  &lt;span class=&quot;mi&quot;&gt;8&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;onLogEventB&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;header&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+  &lt;span class=&quot;mi&quot;&gt;9&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;header&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot; onLogEventB&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;         &lt;span class=&quot;s&quot;&gt;&quot;, param1: &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;11&lt;/span&gt;         &lt;span class=&quot;s&quot;&gt;&quot;, param2: &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sep&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;         
+ &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;onLogEventC&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;header&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;14&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;header&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot; onLogEventC&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;15&lt;/span&gt;         &lt;span class=&quot;s&quot;&gt;&quot;, p1: &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;16&lt;/span&gt;         &lt;span class=&quot;s&quot;&gt;&quot;, p2: &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;17&lt;/span&gt;         &lt;span class=&quot;s&quot;&gt;&quot;, p3: &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;18&lt;/span&gt;         &lt;span class=&quot;s&quot;&gt;&quot;, p4: &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sep&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;19&lt;/span&gt; 
+ &lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;#///////////////////////////////////////////////////////////&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;21&lt;/span&gt; 
+ &lt;span class=&quot;mi&quot;&gt;22&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;23&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;events_in&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stdin&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;24&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;25&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;events_in&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;26&lt;/span&gt; 
+ &lt;span class=&quot;mi&quot;&gt;27&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;events_in&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;tokens&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;29&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tokens&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;,&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;30&lt;/span&gt; 
+ &lt;span class=&quot;mi&quot;&gt;31&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;32&lt;/span&gt;         &lt;span class=&quot;n&quot;&gt;onLogEventA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot; &quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tokens&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;33&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;elif&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;34&lt;/span&gt;         &lt;span class=&quot;n&quot;&gt;onLogEventB&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot; &quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tokens&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;35&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;elif&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;3&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;36&lt;/span&gt;         &lt;span class=&quot;n&quot;&gt;onLogEventC&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot; &quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tokens&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;37&lt;/span&gt; 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;When CSV logs are piped through this script, I get:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;2017-08-29T09:29:45.489459-04:00 vmu logger_test[16643]: onLogEventA, param1: 32, param2: 8
+2017-08-29T09:29:45.489729-04:00 vmu logger_test[16643]: onLogEventB, param1: 16, param2: param2
+2017-08-29T09:29:45.489919-04:00 vmu logger_test[16643]: onLogEventC, p1: 64, p2: p2, p3: p3, p4: 4
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The result is significatnly easier to interpret than before. The format can be adjusted to one’s preferences by changing only a small block of the template. Even the values of doc attributes for each parameter of the model can be embedded for maximum clarity.&lt;/p&gt;
+
+&lt;p&gt;The output from this script will be useful to a developer or sys admin. Tech writers, on the other hand, may benefit from the information formatted for release notes or other documentation, and output to a non-text type of file. Using the same model, a different transformation script could be generated that will produce the desired result.&lt;/p&gt;
+
+&lt;h4 id=&quot;in-conclusion&quot;&gt;In conclusion&lt;/h4&gt;
+&lt;p&gt;The approach described in these pages may help in solving certain issues related to software maintenance. The biggest of which is  communicating of information between different team members. For me, as a developer, documentation is one of the least exciting parts of the job, but there is no way around it. By spending time more effectively on this and other boring tasks, I’ll have more time to do what I like. A simple model-driven development may help me do just that.&lt;/p&gt;
+
+&lt;h4 id=&quot;links&quot;&gt;Links&lt;/h4&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/svkapustin/strong-log&quot;&gt;Project at github&lt;/a&gt;&lt;/p&gt;</content><author><name></name></author><summary type="html">When the program emits an example event as described previously, the syslog records the following:</summary></entry><entry><title type="html">Log and metric reporting. Part 3</title><link href="http://localhost:4000/Logger3/" rel="alternate" type="text/html" title="Log and metric reporting. Part 3" /><published>2017-08-28T00:00:00-04:00</published><updated>2017-08-28T00:00:00-04:00</updated><id>http://localhost:4000/Logger3</id><content type="html" xml:base="http://localhost:4000/Logger3/">&lt;p&gt;&lt;a href=&quot;/Logger2&quot;&gt;Part 2&lt;/a&gt; described a data model of events that a hypothetical program emits. &lt;a href=&quot;https://github.com/imatix/gsl#overview&quot;&gt;GSL&lt;/a&gt; would use that model and a template to generate C++ header and source files, ready to compile.&lt;br /&gt;
+Here is a snippet of the generated header file:&lt;/p&gt;
+
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;mi&quot;&gt;18&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/**
+ 19  * Log is emitted when so and so occurs.
+ 20  *
+ 21  * @param param1 signed 32-bit number
+ 22  * @param param2 describe me
+ 23  */&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;24&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;#&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;define&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;onLogEventA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; \
+ &lt;span class=&quot;mi&quot;&gt;25&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;instance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; \
+ &lt;span class=&quot;mi&quot;&gt;26&lt;/span&gt;         &lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;instance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;onLogEventAImpl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; \
+ &lt;span class=&quot;mi&quot;&gt;27&lt;/span&gt;     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;58&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Logger&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;59&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;60&lt;/span&gt; 
+&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;103&lt;/span&gt;     &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;onLogEventAImpl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;104&lt;/span&gt;         &lt;span class=&quot;kt&quot;&gt;int32_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;105&lt;/span&gt;         &lt;span class=&quot;kt&quot;&gt;int8_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This is an excerpt from a template to generate the header snippet above:&lt;/p&gt;
+
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;mi&quot;&gt;22&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;23&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;defined&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;doc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;24&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/**
+ 25  * $(event-&amp;gt;doc)
+ 26  *
+ 27 .   else
+ 28 /**
+ 29 .   endif
+ 30 .for event.param
+ 31  * @param $(param.name) $(param.doc?)
+ 32 .endfor
+ 33  */&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;34&lt;/span&gt; \
+ &lt;span class=&quot;mi&quot;&gt;35&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;#&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;define&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)(&lt;/span&gt;\
+ &lt;span class=&quot;mi&quot;&gt;36&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;37&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;38&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; \
+ &lt;span class=&quot;mi&quot;&gt;39&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;   &lt;span class=&quot;n&quot;&gt;endif&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;40&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;\
+ &lt;span class=&quot;mi&quot;&gt;41&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;endfor&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;42&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;\&lt;/span&gt;\
+ &lt;span class=&quot;mi&quot;&gt;43&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;instance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;\&lt;/span&gt;\
+ &lt;span class=&quot;mi&quot;&gt;44&lt;/span&gt;         &lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;instance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Impl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;\
+ &lt;span class=&quot;mi&quot;&gt;45&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;       &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;46&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;           &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;47&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; \
+ &lt;span class=&quot;mi&quot;&gt;48&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;           &lt;span class=&quot;n&quot;&gt;endif&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;49&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;\
+ &lt;span class=&quot;mi&quot;&gt;50&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;       &lt;span class=&quot;n&quot;&gt;endfor&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;51&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;\&lt;/span&gt;\
+ &lt;span class=&quot;mi&quot;&gt;52&lt;/span&gt;     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;53&lt;/span&gt; 
+ &lt;span class=&quot;mi&quot;&gt;54&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;endfor&lt;/span&gt;
+ &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;63&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Logger&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;64&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
+ &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;108&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;109&lt;/span&gt;     &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Impl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;110&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;111&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;       &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;last&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;112&lt;/span&gt;         &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;113&lt;/span&gt; 
+&lt;span class=&quot;mi&quot;&gt;114&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;       &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;115&lt;/span&gt;         &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;116&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;       &lt;span class=&quot;n&quot;&gt;endif&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;117&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;endfor&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;118&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;endfor&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;A line that starts with a dot begins a GSL instruction. The other lines are output as is but $(placeholder) tokens are replaced with the data from the model. Here is a break-down:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Line 22&lt;/strong&gt;: starts a loop for every element &amp;lt;log&amp;gt;&amp;lt;event&amp;gt; in the model&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Lines 24-33&lt;/strong&gt;: outputs JavaDoc-style Doxygen comments. A brief description is taken from element &amp;lt;event&amp;gt;&amp;lt;doc&amp;gt;. Each parameter’s name and associated documentation is output next&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Lines 35-42&lt;/strong&gt;: outputs macro’s identifier and parameter list. It results in line 24 of the header snippet above&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Lines 43-52&lt;/strong&gt;: outputs macro’s replacement tokens, which result in header’s lines 25-27. Here the macro would check if an event is allowed to pass through given event’s identifier and the associated priority level&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Line 54&lt;/strong&gt;: completes the “for” loop for events&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Lines 63-64&lt;/strong&gt;: outputs the beginning of Logger class declaration&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Lines 108-118&lt;/strong&gt;: outputs a member function declaration (header lines 103-105)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;As defined in cmake build script, once GSL completes generating the header file (logger.hpp), it proceeds to generate Logger class implementation (logger.cpp) from the same model, but using a different template - &lt;a href=&quot;https://github.com/svkapustin/strong-log/blob/master/model/logger.cpp.mdl&quot;&gt;logger.cpp.mdl&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;GSL outputs most of the template as is where the Logger class implementation is defined. That includes Logger singleton maker and access functions, priority level updating and filtering functions and other housekeeping. The translation of model definitions to the source code is defined by &lt;a href=&quot;https://github.com/svkapustin/strong-log/blob/master/model/logger.cpp.mdl#L62-L111&quot;&gt;lines 62-111&lt;/a&gt; of the template:&lt;/p&gt;
+
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;mi&quot;&gt;62&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;63&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Impl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;64&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;65&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;last&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;66&lt;/span&gt;     &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;67&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;   &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;68&lt;/span&gt;     &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;69&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;   &lt;span class=&quot;n&quot;&gt;endif&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;70&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;endfor&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;71&lt;/span&gt; 
+ &lt;span class=&quot;mi&quot;&gt;72&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;syslog&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;levels_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)],&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;$(event.id)\
+ 73 .for event.param&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; 74 ,%\
+ 75 .   if param.type = &quot;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;uint8_t&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; 76 &quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PRIu8&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;\
+ 77 .   elsif param.type = &quot;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int8_t&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; 78 &quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PRId8&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;\
+ 79 .   elsif param.type = &quot;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;uint16_t&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; 80 &quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PRIu16&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;\
+ 81 .   elsif param.type = &quot;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int16_t&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; 82 &quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PRId16&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;\
+ 83 .   elsif param.type = &quot;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;uint32_t&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; 84 &quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PRIu32&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;\
+ 85 .   elsif param.type = &quot;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int32_t&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; 86 &quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PRId32&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;\
+ 87 .   elsif param.type = &quot;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;uint64_t&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; 88 &quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PRIu64&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;\
+ 89 .   elsif param.type = &quot;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int64_t&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; 90 &quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PRId64&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;\
+ 91 .   elsif param.type = &quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; 92 s\
+ 93 .   endif&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; 94 .endfor&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; 95 &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;96&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;97&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;98&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; \
+ &lt;span class=&quot;mi&quot;&gt;99&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;   &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;100&lt;/span&gt;         \
+&lt;span class=&quot;mi&quot;&gt;101&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;   &lt;span class=&quot;n&quot;&gt;endif&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;102&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;const std::string&amp;amp;&quot;&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;103&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;\
+&lt;span class=&quot;mi&quot;&gt;104&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;   &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;105&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;\
+&lt;span class=&quot;mi&quot;&gt;106&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;   &lt;span class=&quot;n&quot;&gt;endif&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;107&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;endfor&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;108&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;109&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;mi&quot;&gt;110&lt;/span&gt; 
+&lt;span class=&quot;mi&quot;&gt;111&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;endfor&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Here is an example of GSL-generated implementation in the source file:&lt;/p&gt;
+
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;mi&quot;&gt;58&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;onLogEventAImpl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;59&lt;/span&gt;     &lt;span class=&quot;kt&quot;&gt;int32_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;60&lt;/span&gt;     &lt;span class=&quot;kt&quot;&gt;int8_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;61&lt;/span&gt; 
+ &lt;span class=&quot;mi&quot;&gt;62&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;syslog&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;levels_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;1,%&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PRId32&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;,%&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PRId8&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;63&lt;/span&gt;         &lt;span class=&quot;n&quot;&gt;param1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;64&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Similar logic to generating header file applies here as well. In addition to function signature, the generator outputs a call to syslog with the data formatted using comma-delimited string.&lt;/p&gt;
+
+&lt;p&gt;The purpose for using comma-delimited format to contain only values as opposed to including name tags and other supporting text is to:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Use less CPU resources to generate&lt;/li&gt;
+  &lt;li&gt;Occupy smaller space in memory&lt;/li&gt;
+  &lt;li&gt;Use less bandwidth to transmit the message&lt;/li&gt;
+  &lt;li&gt;Make it easier and more efficient to process&lt;/li&gt;
+  &lt;li&gt;Have ability to represent the information in different ways. This will be explored further in &lt;a href=&quot;/Logger4&quot;&gt;Part 4&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The program event captured and stored by syslog daemon is similar to the following:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;2017-08-28T11:45:40.523085-04:00 vmu logger_test[19706]: 1,32,8
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;The event text consists of string “1,32,8” where “1” is an event identifier, “32” is first parameter’s value, “8” is second parameter’s value.&lt;/p&gt;
+
+&lt;p&gt;One of the main advantages of auto-generating the code like described above is that if system requirements change (e.g., use standard output instead of syslog, use different format than CSV, etc.), only a single line/block of template will need to be changed. All other events will be replicated from that.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;/Logger4&quot;&gt;Part 4&lt;/a&gt; will describe a log viewer script generated from the model, and provide concluding notes&lt;/p&gt;</content><author><name></name></author><summary type="html">Part 2 described a data model of events that a hypothetical program emits. GSL would use that model and a template to generate C++ header and source files, ready to compile. Here is a snippet of the generated header file:</summary></entry><entry><title type="html">Log and metric reporting. Part 2</title><link href="http://localhost:4000/Logger2/" rel="alternate" type="text/html" title="Log and metric reporting. Part 2" /><published>2017-08-25T00:00:00-04:00</published><updated>2017-08-25T00:00:00-04:00</updated><id>http://localhost:4000/Logger2</id><content type="html" xml:base="http://localhost:4000/Logger2/">&lt;p&gt;In &lt;a href=&quot;/Logger&quot;&gt;Part 1&lt;/a&gt;, I decided to use macros to optimize log calls. Instead of typing the macros manually, I wanted to have them auto-generated. The code generator will require event definitions such as event name, parameters, priority level and others. That information is stored in a model. Code generation will help me to:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Save time&lt;/strong&gt;&lt;br /&gt;
+My program emits quite a few events. Each event uses similar processing steps, i.e. check priority level, format the values, pass the event to the next stage. By having those common steps generated, my initial effort multiplies in value&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Eliminate errors in code and log format&lt;/strong&gt;&lt;br /&gt;
+After I debugged my first generated macro and corresponding implementation, the subsequent ones will be replicated from the working code&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Keep event definition and documentation co-located and in sync&lt;/strong&gt;&lt;br /&gt;
+Since I’ll use a model to define events, I might as well use that same model to describe them. The close proximity of the definition and documentation lowers the barrier of keeping the documentation up to date. A source that holds that information in one place is easier and more useful to deal with for reference and generating other artefacts from&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;code-generator&quot;&gt;Code Generator&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/imatix/gsl#overview&quot;&gt;GSL Universal Code Generator&lt;/a&gt; exists for the purpose of code generation. Its documentation is clear, the tool is flexible and easy to use. GSL uses XML for defining models and its own scripting language for code templates.&lt;/p&gt;
+
+&lt;h3 id=&quot;model&quot;&gt;Model&lt;/h3&gt;
+
+&lt;p&gt;Here is an example model I’ll use for prototyping (&lt;a href=&quot;https://github.com/svkapustin/strong-log/blob/master/model/log_model_example.xml#L7-L25&quot;&gt;Github&lt;/a&gt;):&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; ?&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;log&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;event&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;1&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;onLogEventA&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;level=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;LOG_INFO&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;doc&amp;gt;&lt;/span&gt;Log is emitted when so and so occurs.&lt;span class=&quot;nt&quot;&gt;&amp;lt;/doc&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;param&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;param1&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;int32_t&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;doc=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;description&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;param&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;param2&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;int8_t&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/event&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;event&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;2&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;onLogEventB&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;level=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;LOG_WARNING&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;param&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;param1&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;uint16_t&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;doc=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;- description&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;param&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;param2&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;const std::string&amp;amp;&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;doc=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;+ description&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/event&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;event&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;3&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;onLogEventC&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;level=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;LOG_DEBUG&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;doc&amp;gt;&lt;/span&gt;Log is emitted when so and so occurs.&lt;span class=&quot;nt&quot;&gt;&amp;lt;/doc&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;param&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;p1&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;uint64_t&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;param&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;p2&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;const std::string&amp;amp;&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;param&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;p3&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;const std::string&amp;amp;&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;param&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;p4&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;uint8_t&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/event&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/log&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;The model can be structured any way you want. I target simplicity as a primary criteria. This model should:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Borrow concepts&lt;/strong&gt;&lt;br /&gt;
+It is too easy to invent new concepts, the problem is that there are already so many to remember. So, instead of defining my own parameter types, I’ll use C/C++ types. For priority levels I’ll use syslog’s definitions&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Define directly translatable components&lt;/strong&gt;&lt;br /&gt;
+For example, C++ can use STL’s string type, in the source code I’ll use it as “const std::string&amp;amp;” per my coding style. Therefore, I chose to specify it in the model exactly how it will be used in the code. But this is a personal preference. Differently-skilled users of this model may get puzzled. A compromise has to be made. After all, the code will be auto-generated&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Add only the minimum required&lt;/strong&gt;&lt;br /&gt;
+More stuff require more time and effort to maintain. Who wants that?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Here are more specifics:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;log&lt;/em&gt;&lt;/strong&gt; - the root of XML document&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;event&lt;/em&gt;&lt;/strong&gt; - encapsulates a definition of an event&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;event id&lt;/em&gt;&lt;/strong&gt; - Each event needs to be identified uniquely and compactly. The ID is an integer and will be used as an index into an array that will hold priority levels for each event. Compactness requirement is aimed for more efficient RAM/network bandwidth/storage usage, log parsing speed, etc. Note that event ID 0 will be used to define program’s priority level so as to filter out events that have lower priority than that&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;event name&lt;/em&gt;&lt;/strong&gt; - The name as it will appear in the code, macro name. This will also be used to convert compact log representation to user-friendly format&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;event level&lt;/em&gt;&lt;/strong&gt; - The priority level as defined in syslog(3) documentation&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;doc&lt;/em&gt;&lt;/strong&gt; - This standalone element should describe the event’s purpose. For example, what program conditions exist at the moment the event is emitted, etc. The contents will also be added to source code comments&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;param&lt;/em&gt;&lt;/strong&gt; - a parameter encapsulates information about a single parameter&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;param name&lt;/em&gt;&lt;/strong&gt; - the name that will appear in the source code as a function parameter and in the comments. It will also be used to transform the format from compact to user-friendly&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;param type&lt;/em&gt;&lt;/strong&gt; - the parameter’s C/C++ type. My requirement is to use numeric types and a constant std string reference&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;param doc&lt;/em&gt;&lt;/strong&gt; - this is to describe what the parameter represents in the context of the event. It is added to source code comments&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;That’s it. I could also add XML schema to validate the content of this model, but only when it becomes needed.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;/Logger3&quot;&gt;Part 3&lt;/a&gt; will describe output templates that the code generator will use during data-to-code transformation&lt;/p&gt;</content><author><name></name></author><summary type="html">In Part 1, I decided to use macros to optimize log calls. Instead of typing the macros manually, I wanted to have them auto-generated. The code generator will require event definitions such as event name, parameters, priority level and others. That information is stored in a model. Code generation will help me to:</summary></entry><entry><title type="html">Log and metric reporting. Part 1</title><link href="http://localhost:4000/Logger/" rel="alternate" type="text/html" title="Log and metric reporting. Part 1" /><published>2017-08-24T00:00:00-04:00</published><updated>2017-08-24T00:00:00-04:00</updated><id>http://localhost:4000/Logger</id><content type="html" xml:base="http://localhost:4000/Logger/">&lt;h2 id=&quot;problem&quot;&gt;Problem&lt;/h2&gt;
+&lt;p&gt;Every time I want to add or change a log line in the source code, the same thoughts start creeping in:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;SVV will need my help to fix a failing automated test because of my changes&lt;/li&gt;
+  &lt;li&gt;Tech writer will need questions answered to create release notes&lt;/li&gt;
+  &lt;li&gt;Sys admins will want easy-to-reach document to make use of the log event&lt;/li&gt;
+  &lt;li&gt;The modified log call may cause degradation during runtime&lt;/li&gt;
+  &lt;li&gt;The change may trigger a debate about the log format&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;It might be a good idea to:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Add such details to code submission so that along with the code history, there won’t be many questions from SVV and tech writer&lt;/li&gt;
+  &lt;li&gt;Create, share and follow the log format standard to avoid style-related discussions&lt;/li&gt;
+  &lt;li&gt;Ensure that log changes don’t affect the performance negatively by using better techniques&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Quite often things don’t turn out as planned:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;It takes a lot of time to make clear and descriptive comments. Some duplication between the code and comments is unavoidable, that gets annoying fast&lt;/li&gt;
+  &lt;li&gt;It is hard to agree on a standard: one wants square brackets, another curly braces, and so on. After agreement, the format still gets messed up&lt;/li&gt;
+  &lt;li&gt;Optimized code may be inconvenient to use, it may just look like needless clutter after a while&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Still, I want to improve the process, be more efficient so that I have more time to do other things. What if I automate something and move stuff around so it is easier for everybody to use?&lt;/p&gt;
+
+&lt;h2 id=&quot;improvements&quot;&gt;Improvements&lt;/h2&gt;
+&lt;p&gt;Let’s consider them one at a time.&lt;/p&gt;
+
+&lt;h4 id=&quot;optimizing-log-calls&quot;&gt;Optimizing Log Calls&lt;/h4&gt;
+&lt;p&gt;The code below has two tests. The goal is to measure the cost of calling log function while trying to log an event with LOG_INFO level when program is instructed to output only LOG_WARNING and above (&lt;a href=&quot;https://github.com/svkapustin/strong-log/blob/master/src/test/doc_log_call.cpp#L1-L30&quot;&gt;Github&lt;/a&gt;):&lt;/p&gt;
+
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;#&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gtest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gtest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;h&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;#&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;syslog&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;h&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;#&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;iostream&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;     
+  &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;log_level_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;LOG_WARNING&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt; 
+  &lt;span class=&quot;mi&quot;&gt;7&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;mi&quot;&gt;8&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LOG_INFO&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;log_level_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;mi&quot;&gt;9&lt;/span&gt;         &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cout&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Event is output&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;endl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;11&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt; 
+ &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;getStuffSlowly&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;14&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;blah&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;hmmm... blah blah&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;15&lt;/span&gt;     
+ &lt;span class=&quot;mi&quot;&gt;16&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;27&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;17&lt;/span&gt;         &lt;span class=&quot;n&quot;&gt;blah&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;blah&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;18&lt;/span&gt;     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;19&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;blah&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;21&lt;/span&gt; 
+ &lt;span class=&quot;mi&quot;&gt;22&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Doc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BadLogCall&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;23&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getStuffSlowly&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;24&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;25&lt;/span&gt; 
+ &lt;span class=&quot;mi&quot;&gt;26&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Doc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GoodLogCall&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;27&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LOG_INFO&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;log_level_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;28&lt;/span&gt;         &lt;span class=&quot;n&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getStuffSlowly&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;29&lt;/span&gt;     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;30&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;On my machine, the result is:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[ RUN      ] Doc.BadLogCall
+[       OK ] Doc.BadLogCall (2680 ms)
+[ RUN      ] Doc.GoodLogCall
+[       OK ] Doc.GoodLogCall (0 ms)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Given the speed advantage, I’d want to check the log level before even gathering the data for the log call.&lt;/p&gt;
+
+&lt;p&gt;However, there is a new problem: these checks will clutter my code. Even worse, I can mess up the comparison operator at a first lapse of concentration. And of course, the problem will be discovered in production later.&lt;/p&gt;
+
+&lt;p&gt;To reduce the clutter, I can use macros (&lt;a href=&quot;https://github.com/svkapustin/strong-log/blob/master/src/test/doc_log_call.cpp#L32-L39&quot;&gt;Github&lt;/a&gt;):&lt;/p&gt;
+
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;mi&quot;&gt;32&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;#&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;define&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;onLogEvent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;slow_stuff&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; \
+ &lt;span class=&quot;mi&quot;&gt;33&lt;/span&gt;     &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LOG_INFO&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;log_level_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; \
+ &lt;span class=&quot;mi&quot;&gt;34&lt;/span&gt;         &lt;span class=&quot;n&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;slow_stuff&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; \
+ &lt;span class=&quot;mi&quot;&gt;35&lt;/span&gt;     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;36&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;37&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Doc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GoodLogCallMacro&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;38&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;onLogEvent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getStuffSlowly&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+ &lt;span class=&quot;mi&quot;&gt;39&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;With this code, only one log statement is used in the vicinity of other logic. So far so good. But what about the time spent typing the macro? What about the rest? Let’s dig deeper in &lt;a href=&quot;/Logger2&quot;&gt;Part 2&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Problem Every time I want to add or change a log line in the source code, the same thoughts start creeping in:</summary></entry></feed>

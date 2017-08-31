@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Log and metric reporting. Part 4 – Sergey Kapustin – </title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="When the program emits an example event as described previously, the syslog records the following:
+
+" />
+    <meta property="og:description" content="When the program emits an example event as described previously, the syslog records the following:
+
+" />
+    
+    <meta name="author" content="Sergey Kapustin" />
+
+    
+    <meta property="og:title" content="Log and metric reporting. Part 4" />
+    <meta property="twitter:title" content="Log and metric reporting. Part 4" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Sergey Kapustin - " href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="http://github.com/svkapustin.png?size=128" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Sergey Kapustin</a></h1>
+            <p class="site-description"></p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Log and metric reporting. Part 4</h1>
+
+  <div class="entry">
+    <p>When the program emits an example event as described previously, the syslog records the following:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>2017-08-28T11:45:40.523085-04:00 vmu logger_test[19706]: 1,32,8
+</code></pre>
+</div>
+
+<p>There is a small problem here - readability. When inspecting program events, I want the information to include event and parameter names to describe the values. This is easy to fix.</p>
+
+<p>Using the same approach as for generating header and source files, I should be able to generate a user-friendly log viewer script. Here is a <a href="https://github.com/svkapustin/strong-log/blob/master/model/log_viewer.py.mdl">template</a> for it:</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code>  <span class="mi">1</span> <span class="o">.</span><span class="n">output</span> <span class="s">"log_viewer.py"</span>
+  <span class="mi">2</span> <span class="o">.</span><span class="n">template</span> <span class="mi">1</span>
+  <span class="mi">3</span> <span class="o">.</span><span class="n">ignorecase</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="mi">4</span> \
+  <span class="mi">5</span> <span class="kn">import</span> <span class="nn">sys</span>
+  <span class="mi">6</span> 
+  <span class="mi">7</span> <span class="o">.</span><span class="k">for</span> <span class="n">log</span><span class="o">.</span><span class="n">event</span>
+  <span class="mi">8</span> <span class="k">def</span> <span class="err">$(</span><span class="nf">event</span><span class="o">.</span><span class="n">name</span><span class="p">)(</span><span class="n">header</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+  <span class="mi">9</span>     <span class="k">print</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="s">" $(event.name)"</span><span class="p">,</span>
+ <span class="mi">10</span> <span class="o">.</span>   <span class="k">for</span> <span class="n">event</span><span class="o">.</span><span class="n">param</span>
+ <span class="mi">11</span> <span class="o">.</span>       <span class="k">if</span> <span class="n">last</span><span class="p">()</span>
+ <span class="mi">12</span>         <span class="s">", $(param.name): "</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="err">$</span><span class="p">(</span><span class="n">index</span><span class="p">(</span><span class="n">param</span><span class="p">))],</span> <span class="n">sep</span><span class="o">=</span><span class="s">''</span><span class="p">)</span>
+ <span class="mi">13</span> <span class="o">.</span>       <span class="k">else</span>
+ <span class="mi">14</span>         <span class="s">", $(param.name): "</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="err">$</span><span class="p">(</span><span class="n">index</span><span class="p">(</span><span class="n">param</span><span class="p">))],</span>
+ <span class="mi">15</span> <span class="o">.</span>       <span class="n">endif</span>
+ <span class="mi">16</span> <span class="o">.</span>   <span class="n">endfor</span>
+ <span class="mi">17</span> 
+ <span class="mi">18</span> <span class="o">.</span><span class="n">endfor</span>
+ <span class="mi">19</span> \
+ <span class="mi">20</span> <span class="c">#$("/" * 79)</span>
+ <span class="mi">21</span> 
+ <span class="mi">22</span> <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+ <span class="mi">23</span>     <span class="n">events_in</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span>
+ <span class="mi">24</span> <span class="k">else</span><span class="p">:</span>
+ <span class="mi">25</span>     <span class="n">events_in</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+ <span class="mi">26</span> 
+ <span class="mi">27</span> <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events_in</span><span class="p">:</span>
+ <span class="mi">28</span>     <span class="n">tokens</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+ <span class="mi">29</span>     <span class="n">values</span> <span class="o">=</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">","</span><span class="p">)</span>
+ <span class="mi">30</span> 
+ <span class="mi">31</span> <span class="o">.</span><span class="k">for</span> <span class="n">log</span><span class="o">.</span><span class="n">event</span>
+ <span class="mi">32</span> <span class="o">.</span>   <span class="k">if</span> <span class="n">first</span><span class="p">()</span>
+ <span class="mi">33</span>     <span class="k">if</span> \
+ <span class="mi">34</span> <span class="o">.</span>   <span class="k">else</span>
+ <span class="mi">35</span>     <span class="k">elif</span> \
+ <span class="mi">36</span> <span class="o">.</span>   <span class="n">endif</span>
+ <span class="mi">37</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">"$(index(event))"</span><span class="p">:</span>
+ <span class="mi">38</span>         <span class="err">$</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">name</span><span class="p">)(</span><span class="s">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]),</span> <span class="n">values</span><span class="p">)</span>
+ <span class="mi">39</span> <span class="o">.</span><span class="n">endfor</span>
+ <span class="mi">40</span>
+ <span class="mi">41</span> <span class="o">.</span><span class="n">endtemplate</span>
+</code></pre>
+</div>
+
+<p>And this is the generated code:</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code>  <span class="mi">1</span> <span class="kn">import</span> <span class="nn">sys</span>
+  <span class="mi">2</span> 
+  <span class="mi">3</span> <span class="k">def</span> <span class="nf">onLogEventA</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+  <span class="mi">4</span>     <span class="k">print</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="s">" onLogEventA"</span><span class="p">,</span>
+  <span class="mi">5</span>         <span class="s">", param1: "</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+  <span class="mi">6</span>         <span class="s">", param2: "</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">sep</span><span class="o">=</span><span class="s">''</span><span class="p">)</span>
+  <span class="mi">7</span> 
+  <span class="mi">8</span> <span class="k">def</span> <span class="nf">onLogEventB</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+  <span class="mi">9</span>     <span class="k">print</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="s">" onLogEventB"</span><span class="p">,</span>
+ <span class="mi">10</span>         <span class="s">", param1: "</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+ <span class="mi">11</span>         <span class="s">", param2: "</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">sep</span><span class="o">=</span><span class="s">''</span><span class="p">)</span>
+ <span class="mi">12</span>         
+ <span class="mi">13</span> <span class="k">def</span> <span class="nf">onLogEventC</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+ <span class="mi">14</span>     <span class="k">print</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="s">" onLogEventC"</span><span class="p">,</span>
+ <span class="mi">15</span>         <span class="s">", p1: "</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+ <span class="mi">16</span>         <span class="s">", p2: "</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+ <span class="mi">17</span>         <span class="s">", p3: "</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+ <span class="mi">18</span>         <span class="s">", p4: "</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">sep</span><span class="o">=</span><span class="s">''</span><span class="p">)</span>
+ <span class="mi">19</span> 
+ <span class="mi">20</span> <span class="c">#///////////////////////////////////////////////////////////</span>
+ <span class="mi">21</span> 
+ <span class="mi">22</span> <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+ <span class="mi">23</span>     <span class="n">events_in</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span>
+ <span class="mi">24</span> <span class="k">else</span><span class="p">:</span>
+ <span class="mi">25</span>     <span class="n">events_in</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+ <span class="mi">26</span> 
+ <span class="mi">27</span> <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events_in</span><span class="p">:</span>
+ <span class="mi">28</span>     <span class="n">tokens</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+ <span class="mi">29</span>     <span class="n">values</span> <span class="o">=</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">","</span><span class="p">)</span>
+ <span class="mi">30</span> 
+ <span class="mi">31</span>     <span class="k">if</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">"1"</span><span class="p">:</span>
+ <span class="mi">32</span>         <span class="n">onLogEventA</span><span class="p">(</span><span class="s">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]),</span> <span class="n">values</span><span class="p">)</span>
+ <span class="mi">33</span>     <span class="k">elif</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">"2"</span><span class="p">:</span>
+ <span class="mi">34</span>         <span class="n">onLogEventB</span><span class="p">(</span><span class="s">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]),</span> <span class="n">values</span><span class="p">)</span>
+ <span class="mi">35</span>     <span class="k">elif</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">"3"</span><span class="p">:</span>
+ <span class="mi">36</span>         <span class="n">onLogEventC</span><span class="p">(</span><span class="s">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]),</span> <span class="n">values</span><span class="p">)</span>
+ <span class="mi">37</span> 
+</code></pre>
+</div>
+
+<p>When CSV logs are piped through this script, I get:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>2017-08-29T09:29:45.489459-04:00 vmu logger_test[16643]: onLogEventA, param1: 32, param2: 8
+2017-08-29T09:29:45.489729-04:00 vmu logger_test[16643]: onLogEventB, param1: 16, param2: param2
+2017-08-29T09:29:45.489919-04:00 vmu logger_test[16643]: onLogEventC, p1: 64, p2: p2, p3: p3, p4: 4
+</code></pre>
+</div>
+
+<p>The result is significatnly easier to interpret than before. The format can be adjusted to one’s preferences by changing only a small block of the template. Even the values of doc attributes for each parameter of the model can be embedded for maximum clarity.</p>
+
+<p>The output from this script will be useful to a developer or sys admin. Tech writers, on the other hand, may benefit from the information formatted for release notes or other documentation, and output to a non-text type of file. Using the same model, a different transformation script could be generated that will produce the desired result.</p>
+
+<h4 id="in-conclusion">In conclusion</h4>
+<p>The approach described in these pages may help in solving certain issues related to software maintenance. The biggest of which is  communicating of information between different team members. For me, as a developer, documentation is one of the least exciting parts of the job, but there is no way around it. By spending time more effectively on this and other boring tasks, I’ll have more time to do what I like. A simple model-driven development may help me do just that.</p>
+
+<h4 id="links">Links</h4>
+<p><a href="https://github.com/svkapustin/strong-log">Project at github</a></p>
+
+  </div>
+
+  <div class="date">
+    Written on August 29, 2017
+  </div>
+
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'www-svkapustin-com';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            dsq.setAttribute('data-timestamp', +new Date());
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/svkapustin"><i class="svg-icon github"></i></a>
+
+
+
+
+
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

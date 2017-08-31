@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Log and metric reporting. Part 3 – Sergey Kapustin – </title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="Part 2 described a data model of events that a hypothetical program emits. GSL would use that model and a template to generate C++ header and source files, ready to compile.
+Here is a snippet of the generated header file:
+
+" />
+    <meta property="og:description" content="Part 2 described a data model of events that a hypothetical program emits. GSL would use that model and a template to generate C++ header and source files, ready to compile.
+Here is a snippet of the generated header file:
+
+" />
+    
+    <meta name="author" content="Sergey Kapustin" />
+
+    
+    <meta property="og:title" content="Log and metric reporting. Part 3" />
+    <meta property="twitter:title" content="Log and metric reporting. Part 3" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Sergey Kapustin - " href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="http://github.com/svkapustin.png?size=128" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Sergey Kapustin</a></h1>
+            <p class="site-description"></p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Log and metric reporting. Part 3</h1>
+
+  <div class="entry">
+    <p><a href="/Logger2">Part 2</a> described a data model of events that a hypothetical program emits. <a href="https://github.com/imatix/gsl#overview">GSL</a> would use that model and a template to generate C++ header and source files, ready to compile.<br />
+Here is a snippet of the generated header file:</p>
+
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code> <span class="mi">18</span> <span class="cm">/**
+ 19  * Log is emitted when so and so occurs.
+ 20  *
+ 21  * @param param1 signed 32-bit number
+ 22  * @param param2 describe me
+ 23  */</span>
+ <span class="mi">24</span> <span class="err">#</span><span class="n">define</span> <span class="n">onLogEventA</span><span class="p">(</span><span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="p">)</span> \
+ <span class="mi">25</span>     <span class="k">if</span> <span class="p">(</span><span class="n">Logger</span><span class="o">::</span><span class="n">instance</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">filter</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="p">{</span> \
+ <span class="mi">26</span>         <span class="n">Logger</span><span class="o">::</span><span class="n">instance</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">onLogEventAImpl</span><span class="p">(</span><span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="p">);</span> \
+ <span class="mi">27</span>     <span class="p">}</span>
+<span class="p">...</span>
+ <span class="mi">58</span> <span class="k">class</span> <span class="nc">Logger</span> <span class="p">{</span>
+ <span class="mi">59</span> <span class="k">public</span><span class="o">:</span>
+ <span class="mi">60</span> 
+<span class="p">...</span>
+<span class="mi">103</span>     <span class="kt">void</span> <span class="n">onLogEventAImpl</span><span class="p">(</span>
+<span class="mi">104</span>         <span class="kt">int32_t</span> <span class="n">param1</span><span class="p">,</span>
+<span class="mi">105</span>         <span class="kt">int8_t</span> <span class="n">param2</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+</code></pre>
+</div>
+
+<p>This is an excerpt from a template to generate the header snippet above:</p>
+
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code> <span class="mi">22</span> <span class="p">.</span><span class="k">for</span> <span class="n">log</span><span class="p">.</span><span class="n">event</span>
+ <span class="mi">23</span> <span class="p">.</span>   <span class="k">if</span> <span class="n">defined</span><span class="p">(</span><span class="n">event</span><span class="o">-&gt;</span><span class="n">doc</span><span class="p">)</span>
+ <span class="mi">24</span> <span class="cm">/**
+ 25  * $(event-&gt;doc)
+ 26  *
+ 27 .   else
+ 28 /**
+ 29 .   endif
+ 30 .for event.param
+ 31  * @param $(param.name) $(param.doc?)
+ 32 .endfor
+ 33  */</span>
+ <span class="mi">34</span> \
+ <span class="mi">35</span> <span class="err">#</span><span class="n">define</span> <span class="err">$</span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="n">name</span><span class="p">)(</span>\
+ <span class="mi">36</span> <span class="p">.</span><span class="k">for</span> <span class="n">event</span><span class="p">.</span><span class="n">param</span>
+ <span class="mi">37</span> <span class="p">.</span>   <span class="k">if</span> <span class="n">index</span><span class="p">(</span><span class="n">param</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+ <span class="mi">38</span> <span class="p">,</span> \
+ <span class="mi">39</span> <span class="p">.</span>   <span class="n">endif</span>
+ <span class="mi">40</span> <span class="err">$</span><span class="p">(</span><span class="n">param</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>\
+ <span class="mi">41</span> <span class="p">.</span><span class="n">endfor</span>
+ <span class="mi">42</span> <span class="p">)</span> <span class="err">\</span>\
+ <span class="mi">43</span>     <span class="k">if</span> <span class="p">(</span><span class="n">Logger</span><span class="o">::</span><span class="n">instance</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">filter</span><span class="p">(</span><span class="err">$</span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="n">id</span><span class="p">)))</span> <span class="p">{</span> <span class="err">\</span>\
+ <span class="mi">44</span>         <span class="n">Logger</span><span class="o">::</span><span class="n">instance</span><span class="p">()</span><span class="o">-&gt;</span><span class="err">$</span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="n">name</span><span class="p">)</span><span class="n">Impl</span><span class="p">(</span>\
+ <span class="mi">45</span> <span class="p">.</span>       <span class="k">for</span> <span class="n">event</span><span class="p">.</span><span class="n">param</span>
+ <span class="mi">46</span> <span class="p">.</span>           <span class="k">if</span> <span class="n">index</span><span class="p">(</span><span class="n">param</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+ <span class="mi">47</span> <span class="p">,</span> \
+ <span class="mi">48</span> <span class="p">.</span>           <span class="n">endif</span>
+ <span class="mi">49</span> <span class="err">$</span><span class="p">(</span><span class="n">param</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>\
+ <span class="mi">50</span> <span class="p">.</span>       <span class="n">endfor</span>
+ <span class="mi">51</span> <span class="p">);</span> <span class="err">\</span>\
+ <span class="mi">52</span>     <span class="p">}</span>
+ <span class="mi">53</span> 
+ <span class="mi">54</span> <span class="p">.</span><span class="n">endfor</span>
+ <span class="p">...</span>
+ <span class="mi">63</span> <span class="k">class</span> <span class="nc">Logger</span> <span class="p">{</span>
+ <span class="mi">64</span> <span class="k">public</span><span class="o">:</span>
+ <span class="p">...</span>
+<span class="mi">108</span> <span class="p">.</span><span class="k">for</span> <span class="n">log</span><span class="p">.</span><span class="n">event</span>
+<span class="mi">109</span>     <span class="kt">void</span> <span class="err">$</span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="n">name</span><span class="p">)</span><span class="n">Impl</span><span class="p">(</span>
+<span class="mi">110</span> <span class="p">.</span>    <span class="k">for</span> <span class="n">event</span><span class="p">.</span><span class="n">param</span>
+<span class="mi">111</span> <span class="p">.</span>       <span class="k">if</span> <span class="n">last</span><span class="p">()</span>
+<span class="mi">112</span>         <span class="err">$</span><span class="p">(</span><span class="n">param</span><span class="p">.</span><span class="n">type</span><span class="p">)</span> <span class="err">$</span><span class="p">(</span><span class="n">param</span><span class="p">.</span><span class="n">name</span><span class="p">))</span> <span class="k">const</span><span class="p">;</span>
+<span class="mi">113</span> 
+<span class="mi">114</span> <span class="p">.</span>       <span class="k">else</span>
+<span class="mi">115</span>         <span class="err">$</span><span class="p">(</span><span class="n">param</span><span class="p">.</span><span class="n">type</span><span class="p">)</span> <span class="err">$</span><span class="p">(</span><span class="n">param</span><span class="p">.</span><span class="n">name</span><span class="p">),</span>
+<span class="mi">116</span> <span class="p">.</span>       <span class="n">endif</span>
+<span class="mi">117</span> <span class="p">.</span>    <span class="n">endfor</span>
+<span class="mi">118</span> <span class="p">.</span><span class="n">endfor</span>
+</code></pre>
+</div>
+
+<p>A line that starts with a dot begins a GSL instruction. The other lines are output as is but $(placeholder) tokens are replaced with the data from the model. Here is a break-down:</p>
+
+<ul>
+  <li><strong>Line 22</strong>: starts a loop for every element &lt;log&gt;&lt;event&gt; in the model</li>
+  <li><strong>Lines 24-33</strong>: outputs JavaDoc-style Doxygen comments. A brief description is taken from element &lt;event&gt;&lt;doc&gt;. Each parameter’s name and associated documentation is output next</li>
+  <li><strong>Lines 35-42</strong>: outputs macro’s identifier and parameter list. It results in line 24 of the header snippet above</li>
+  <li><strong>Lines 43-52</strong>: outputs macro’s replacement tokens, which result in header’s lines 25-27. Here the macro would check if an event is allowed to pass through given event’s identifier and the associated priority level</li>
+  <li><strong>Line 54</strong>: completes the “for” loop for events</li>
+  <li><strong>Lines 63-64</strong>: outputs the beginning of Logger class declaration</li>
+  <li><strong>Lines 108-118</strong>: outputs a member function declaration (header lines 103-105)</li>
+</ul>
+
+<p>As defined in cmake build script, once GSL completes generating the header file (logger.hpp), it proceeds to generate Logger class implementation (logger.cpp) from the same model, but using a different template - <a href="https://github.com/svkapustin/strong-log/blob/master/model/logger.cpp.mdl">logger.cpp.mdl</a>.</p>
+
+<p>GSL outputs most of the template as is where the Logger class implementation is defined. That includes Logger singleton maker and access functions, priority level updating and filtering functions and other housekeeping. The translation of model definitions to the source code is defined by <a href="https://github.com/svkapustin/strong-log/blob/master/model/logger.cpp.mdl#L62-L111">lines 62-111</a> of the template:</p>
+
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code> <span class="mi">62</span> <span class="p">.</span><span class="k">for</span> <span class="n">log</span><span class="p">.</span><span class="n">event</span>
+ <span class="mi">63</span> <span class="kt">void</span> <span class="n">Logger</span><span class="o">::</span><span class="err">$</span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="n">name</span><span class="p">)</span><span class="n">Impl</span><span class="p">(</span>
+ <span class="mi">64</span> <span class="p">.</span><span class="k">for</span> <span class="n">event</span><span class="p">.</span><span class="n">param</span>
+ <span class="mi">65</span> <span class="p">.</span>   <span class="k">if</span> <span class="n">last</span><span class="p">()</span>
+ <span class="mi">66</span>     <span class="err">$</span><span class="p">(</span><span class="n">param</span><span class="p">.</span><span class="n">type</span><span class="p">)</span> <span class="err">$</span><span class="p">(</span><span class="n">param</span><span class="p">.</span><span class="n">name</span><span class="p">))</span> <span class="k">const</span> <span class="p">{</span>
+ <span class="mi">67</span> <span class="p">.</span>   <span class="k">else</span>
+ <span class="mi">68</span>     <span class="err">$</span><span class="p">(</span><span class="n">param</span><span class="p">.</span><span class="n">type</span><span class="p">)</span> <span class="err">$</span><span class="p">(</span><span class="n">param</span><span class="p">.</span><span class="n">name</span><span class="p">),</span>
+ <span class="mi">69</span> <span class="p">.</span>   <span class="n">endif</span>
+ <span class="mi">70</span> <span class="p">.</span><span class="n">endfor</span>
+ <span class="mi">71</span> 
+ <span class="mi">72</span>     <span class="n">syslog</span><span class="p">(</span><span class="n">levels_</span><span class="p">[</span><span class="err">$</span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="n">id</span><span class="p">)],</span> <span class="s">"$(event.id)\
+ 73 .for event.param</span><span class="err">
+</span><span class="s"> 74 ,%\
+ 75 .   if param.type = "</span><span class="kt">uint8_t</span><span class="s">"</span><span class="err">
+</span><span class="s"> 76 "</span> <span class="n">PRIu8</span> <span class="s">"\
+ 77 .   elsif param.type = "</span><span class="kt">int8_t</span><span class="s">"</span><span class="err">
+</span><span class="s"> 78 "</span> <span class="n">PRId8</span> <span class="s">"\
+ 79 .   elsif param.type = "</span><span class="kt">uint16_t</span><span class="s">"</span><span class="err">
+</span><span class="s"> 80 "</span> <span class="n">PRIu16</span> <span class="s">"\
+ 81 .   elsif param.type = "</span><span class="kt">int16_t</span><span class="s">"</span><span class="err">
+</span><span class="s"> 82 "</span> <span class="n">PRId16</span> <span class="s">"\
+ 83 .   elsif param.type = "</span><span class="kt">uint32_t</span><span class="s">"</span><span class="err">
+</span><span class="s"> 84 "</span> <span class="n">PRIu32</span> <span class="s">"\
+ 85 .   elsif param.type = "</span><span class="kt">int32_t</span><span class="s">"</span><span class="err">
+</span><span class="s"> 86 "</span> <span class="n">PRId32</span> <span class="s">"\
+ 87 .   elsif param.type = "</span><span class="kt">uint64_t</span><span class="s">"</span><span class="err">
+</span><span class="s"> 88 "</span> <span class="n">PRIu64</span> <span class="s">"\
+ 89 .   elsif param.type = "</span><span class="kt">int64_t</span><span class="s">"</span><span class="err">
+</span><span class="s"> 90 "</span> <span class="n">PRId64</span> <span class="s">"\
+ 91 .   elsif param.type = "</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="s">"</span><span class="err">
+</span><span class="s"> 92 s\
+ 93 .   endif</span><span class="err">
+</span><span class="s"> 94 .endfor</span><span class="err">
+</span><span class="s"> 95 "</span><span class="p">,</span>
+ <span class="mi">96</span> <span class="p">.</span><span class="k">for</span> <span class="n">event</span><span class="p">.</span><span class="n">param</span>
+ <span class="mi">97</span> <span class="p">.</span>   <span class="k">if</span> <span class="n">index</span><span class="p">(</span><span class="n">param</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+ <span class="mi">98</span> <span class="p">,</span> \
+ <span class="mi">99</span> <span class="p">.</span>   <span class="k">else</span>
+<span class="mi">100</span>         \
+<span class="mi">101</span> <span class="p">.</span>   <span class="n">endif</span>
+<span class="mi">102</span> <span class="p">.</span>   <span class="k">if</span> <span class="n">param</span><span class="p">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">"const std::string&amp;"</span>
+<span class="mi">103</span> <span class="err">$</span><span class="p">(</span><span class="n">param</span><span class="p">.</span><span class="n">name</span><span class="p">).</span><span class="n">c_str</span><span class="p">()</span>\
+<span class="mi">104</span> <span class="p">.</span>   <span class="k">else</span>
+<span class="mi">105</span> <span class="err">$</span><span class="p">(</span><span class="n">param</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>\
+<span class="mi">106</span> <span class="p">.</span>   <span class="n">endif</span>
+<span class="mi">107</span> <span class="p">.</span><span class="n">endfor</span>
+<span class="mi">108</span> <span class="p">);</span>
+<span class="mi">109</span> <span class="p">}</span>
+<span class="mi">110</span> 
+<span class="mi">111</span> <span class="p">.</span><span class="n">endfor</span>
+</code></pre>
+</div>
+
+<p>Here is an example of GSL-generated implementation in the source file:</p>
+
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code> <span class="mi">58</span> <span class="kt">void</span> <span class="n">Logger</span><span class="o">::</span><span class="n">onLogEventAImpl</span><span class="p">(</span>
+ <span class="mi">59</span>     <span class="kt">int32_t</span> <span class="n">param1</span><span class="p">,</span>
+ <span class="mi">60</span>     <span class="kt">int8_t</span> <span class="n">param2</span><span class="p">)</span> <span class="k">const</span> <span class="p">{</span>
+ <span class="mi">61</span> 
+ <span class="mi">62</span>     <span class="n">syslog</span><span class="p">(</span><span class="n">levels_</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s">"1,%"</span> <span class="n">PRId32</span> <span class="s">",%"</span> <span class="n">PRId8</span> <span class="s">""</span><span class="p">,</span>
+ <span class="mi">63</span>         <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="p">);</span>
+ <span class="mi">64</span> <span class="p">}</span>
+</code></pre>
+</div>
+
+<p>Similar logic to generating header file applies here as well. In addition to function signature, the generator outputs a call to syslog with the data formatted using comma-delimited string.</p>
+
+<p>The purpose for using comma-delimited format to contain only values as opposed to including name tags and other supporting text is to:</p>
+
+<ul>
+  <li>Use less CPU resources to generate</li>
+  <li>Occupy smaller space in memory</li>
+  <li>Use less bandwidth to transmit the message</li>
+  <li>Make it easier and more efficient to process</li>
+  <li>Have ability to represent the information in different ways. This will be explored further in <a href="/Logger4">Part 4</a></li>
+</ul>
+
+<p>The program event captured and stored by syslog daemon is similar to the following:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>2017-08-28T11:45:40.523085-04:00 vmu logger_test[19706]: 1,32,8
+</code></pre>
+</div>
+<p>The event text consists of string “1,32,8” where “1” is an event identifier, “32” is first parameter’s value, “8” is second parameter’s value.</p>
+
+<p>One of the main advantages of auto-generating the code like described above is that if system requirements change (e.g., use standard output instead of syslog, use different format than CSV, etc.), only a single line/block of template will need to be changed. All other events will be replicated from that.</p>
+
+<p><a href="/Logger4">Part 4</a> will describe a log viewer script generated from the model, and provide concluding notes</p>
+
+
+  </div>
+
+  <div class="date">
+    Written on August 28, 2017
+  </div>
+
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'www-svkapustin-com';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            dsq.setAttribute('data-timestamp', +new Date());
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/svkapustin"><i class="svg-icon github"></i></a>
+
+
+
+
+
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

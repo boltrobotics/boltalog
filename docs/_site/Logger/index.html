@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Log and metric reporting. Part 1 – Sergey Kapustin – </title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="Problem
+Every time I want to add or change a log line in the source code, the same thoughts start creeping in:
+
+" />
+    <meta property="og:description" content="Problem
+Every time I want to add or change a log line in the source code, the same thoughts start creeping in:
+
+" />
+    
+    <meta name="author" content="Sergey Kapustin" />
+
+    
+    <meta property="og:title" content="Log and metric reporting. Part 1" />
+    <meta property="twitter:title" content="Log and metric reporting. Part 1" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Sergey Kapustin - " href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="http://github.com/svkapustin.png?size=128" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Sergey Kapustin</a></h1>
+            <p class="site-description"></p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Log and metric reporting. Part 1</h1>
+
+  <div class="entry">
+    <h2 id="problem">Problem</h2>
+<p>Every time I want to add or change a log line in the source code, the same thoughts start creeping in:</p>
+
+<ul>
+  <li>SVV will need my help to fix a failing automated test because of my changes</li>
+  <li>Tech writer will need questions answered to create release notes</li>
+  <li>Sys admins will want easy-to-reach document to make use of the log event</li>
+  <li>The modified log call may cause degradation during runtime</li>
+  <li>The change may trigger a debate about the log format</li>
+</ul>
+
+<p>It might be a good idea to:</p>
+
+<ul>
+  <li>Add such details to code submission so that along with the code history, there won’t be many questions from SVV and tech writer</li>
+  <li>Create, share and follow the log format standard to avoid style-related discussions</li>
+  <li>Ensure that log changes don’t affect the performance negatively by using better techniques</li>
+</ul>
+
+<p>Quite often things don’t turn out as planned:</p>
+
+<ul>
+  <li>It takes a lot of time to make clear and descriptive comments. Some duplication between the code and comments is unavoidable, that gets annoying fast</li>
+  <li>It is hard to agree on a standard: one wants square brackets, another curly braces, and so on. After agreement, the format still gets messed up</li>
+  <li>Optimized code may be inconvenient to use, it may just look like needless clutter after a while</li>
+</ul>
+
+<p>Still, I want to improve the process, be more efficient so that I have more time to do other things. What if I automate something and move stuff around so it is easier for everybody to use?</p>
+
+<h2 id="improvements">Improvements</h2>
+<p>Let’s consider them one at a time.</p>
+
+<h4 id="optimizing-log-calls">Optimizing Log Calls</h4>
+<p>The code below has two tests. The goal is to measure the cost of calling log function while trying to log an event with LOG_INFO level when program is instructed to output only LOG_WARNING and above (<a href="https://github.com/svkapustin/strong-log/blob/master/src/test/doc_log_call.cpp#L1-L30">Github</a>):</p>
+
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code>  <span class="mi">1</span> <span class="err">#</span><span class="n">include</span> <span class="o">&lt;</span><span class="n">gtest</span><span class="o">/</span><span class="n">gtest</span><span class="p">.</span><span class="n">h</span><span class="o">&gt;</span>
+  <span class="mi">2</span> <span class="err">#</span><span class="n">include</span> <span class="o">&lt;</span><span class="n">syslog</span><span class="p">.</span><span class="n">h</span><span class="o">&gt;</span>
+  <span class="mi">3</span> <span class="err">#</span><span class="n">include</span> <span class="o">&lt;</span><span class="n">iostream</span><span class="o">&gt;</span>
+  <span class="mi">4</span>     
+  <span class="mi">5</span> <span class="kt">int</span> <span class="n">log_level_</span> <span class="o">=</span> <span class="n">LOG_WARNING</span><span class="p">;</span>
+  <span class="mi">6</span> 
+  <span class="mi">7</span> <span class="kt">void</span> <span class="nf">log</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="p">)</span> <span class="p">{</span>
+  <span class="mi">8</span>     <span class="k">if</span> <span class="p">(</span><span class="n">LOG_INFO</span> <span class="o">&lt;=</span> <span class="n">log_level_</span><span class="p">)</span> <span class="p">{</span>
+  <span class="mi">9</span>         <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"Event is output"</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+ <span class="mi">10</span>     <span class="p">}</span>
+ <span class="mi">11</span> <span class="p">}</span>
+ <span class="mi">12</span> 
+ <span class="mi">13</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">getStuffSlowly</span><span class="p">()</span> <span class="p">{</span>
+ <span class="mi">14</span>     <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">blah</span> <span class="o">=</span> <span class="s">"hmmm... blah blah"</span><span class="p">;</span>
+ <span class="mi">15</span>     
+ <span class="mi">16</span>     <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">27</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+ <span class="mi">17</span>         <span class="n">blah</span> <span class="o">+=</span> <span class="n">blah</span><span class="p">;</span>
+ <span class="mi">18</span>     <span class="p">}</span>
+ <span class="mi">19</span>     <span class="k">return</span> <span class="n">blah</span><span class="p">;</span>
+ <span class="mi">20</span> <span class="p">}</span>
+ <span class="mi">21</span> 
+ <span class="mi">22</span> <span class="n">TEST</span><span class="p">(</span><span class="n">Doc</span><span class="p">,</span> <span class="n">BadLogCall</span><span class="p">)</span> <span class="p">{</span>
+ <span class="mi">23</span>     <span class="n">log</span><span class="p">(</span><span class="n">getStuffSlowly</span><span class="p">());</span>
+ <span class="mi">24</span> <span class="p">}</span>
+ <span class="mi">25</span> 
+ <span class="mi">26</span> <span class="n">TEST</span><span class="p">(</span><span class="n">Doc</span><span class="p">,</span> <span class="n">GoodLogCall</span><span class="p">)</span> <span class="p">{</span>
+ <span class="mi">27</span>     <span class="k">if</span> <span class="p">(</span><span class="n">LOG_INFO</span> <span class="o">&lt;=</span> <span class="n">log_level_</span><span class="p">)</span> <span class="p">{</span>
+ <span class="mi">28</span>         <span class="n">log</span><span class="p">(</span><span class="n">getStuffSlowly</span><span class="p">());</span>
+ <span class="mi">29</span>     <span class="p">}</span>
+ <span class="mi">30</span> <span class="p">}</span>
+</code></pre>
+</div>
+<p>On my machine, the result is:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>[ RUN      ] Doc.BadLogCall
+[       OK ] Doc.BadLogCall (2680 ms)
+[ RUN      ] Doc.GoodLogCall
+[       OK ] Doc.GoodLogCall (0 ms)
+</code></pre>
+</div>
+
+<p>Given the speed advantage, I’d want to check the log level before even gathering the data for the log call.</p>
+
+<p>However, there is a new problem: these checks will clutter my code. Even worse, I can mess up the comparison operator at a first lapse of concentration. And of course, the problem will be discovered in production later.</p>
+
+<p>To reduce the clutter, I can use macros (<a href="https://github.com/svkapustin/strong-log/blob/master/src/test/doc_log_call.cpp#L32-L39">Github</a>):</p>
+
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code> <span class="mi">32</span> <span class="err">#</span><span class="n">define</span> <span class="n">onLogEvent</span><span class="p">(</span><span class="n">slow_stuff</span><span class="p">)</span> \
+ <span class="mi">33</span>     <span class="k">if</span> <span class="p">(</span><span class="n">LOG_INFO</span> <span class="o">&lt;=</span> <span class="n">log_level_</span><span class="p">)</span> <span class="p">{</span> \
+ <span class="mi">34</span>         <span class="n">log</span><span class="p">(</span><span class="n">slow_stuff</span><span class="p">);</span> \
+ <span class="mi">35</span>     <span class="p">}</span>
+ <span class="mi">36</span>
+ <span class="mi">37</span> <span class="n">TEST</span><span class="p">(</span><span class="n">Doc</span><span class="p">,</span> <span class="n">GoodLogCallMacro</span><span class="p">)</span> <span class="p">{</span>
+ <span class="mi">38</span>     <span class="n">onLogEvent</span><span class="p">(</span><span class="n">getStuffSlowly</span><span class="p">());</span>
+ <span class="mi">39</span> <span class="p">}</span>
+</code></pre>
+</div>
+
+<p>With this code, only one log statement is used in the vicinity of other logic. So far so good. But what about the time spent typing the macro? What about the rest? Let’s dig deeper in <a href="/Logger2">Part 2</a>.</p>
+
+  </div>
+
+  <div class="date">
+    Written on August 24, 2017
+  </div>
+
+  
+<div class="comments">
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+
+	    var disqus_shortname = 'www-svkapustin-com';
+
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            dsq.setAttribute('data-timestamp', +new Date());
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/svkapustin"><i class="svg-icon github"></i></a>
+
+
+
+
+
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

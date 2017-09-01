@@ -6,7 +6,7 @@
 name: Project strong-log
 
 # Short bio or description (displayed in the header)
-description: ""
+description: "Log and metric reporting library"
 
 # URL of your avatar or profile pic (you could use your GitHub profile pic)
 avatar: http://github.com/svkapustin.png?size=128

@@ -16,16 +16,18 @@ set(SCRIPT_DIR ${PROJECT_SOURCE_DIR}/scripts)
 set(LOGGER_VERSION_MAJOR 1)
 set(LOGGER_VERSION_MINOR 0)
 
+enable_testing()
+
 include_directories(${INCLUDE_DIR})
 add_subdirectory(${SOURCE_DIR})
-enable_testing()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR
         "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(warnings "-Wall -Wextra -Werror")
+
+    if (NOT CONFIGURED_ONCE)
+        set(CMAKE_CXX_FLAGS "${warnings} -g -std=c++14" CACHE STRING "C++ flags" FORCE)
+        set(CONFIGURED_ONCE TRUE CACHE INTERNAL "CMake is configured at least once")
+    endif()
 endif()
 
-if (NOT CONFIGURED_ONCE)
-    set(CMAKE_CXX_FLAGS "${warnings} -g -std=c++14" CACHE STRING "C++ flags" FORCE)
-    set(CONFIGURED_ONCE TRUE CACHE INTERNAL "CMake is configured at least once")
-endif()

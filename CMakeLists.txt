@@ -10,6 +10,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 set(SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
+set(TEST_DIR ${PROJECT_SOURCE_DIR}/test)
 set(MODEL_DIR ${PROJECT_SOURCE_DIR}/model)
 set(SCRIPT_DIR ${PROJECT_SOURCE_DIR}/scripts)
 
@@ -20,6 +21,7 @@ enable_testing()
 
 include_directories(${INCLUDE_DIR})
 add_subdirectory(${SOURCE_DIR})
+add_subdirectory(${TEST_DIR})
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR
         "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

@@ -60,5 +60,3 @@ add_custom_target(
 
 list(APPEND SOURCES ${INCLUDE_DIR}/logger.hpp logger.cpp)
 add_library(logger SHARED ${SOURCES})
-
-add_subdirectory(test)

@@ -62,7 +62,13 @@ TEST(LoggerTest, Level) {
     EXPECT_EQ(-1, logger->level(4, LOG_INFO));
 }
 
-TEST(LoggerTest, Output) {
+TEST(DISABLED_LoggerTest, Output) {
+    // The test is disabled because it refers to example log events, and when it is
+    // built as part of other project, the referred-to events are not defined. This
+    // would cause compilation problems.
+
+#if 0
+
     // Make sure rsyslog is configured to output LOG_USER logs to /var/log/user.log
     // and the file is readable.
     Logger::init("logger_test");
@@ -83,6 +89,7 @@ TEST(LoggerTest, Output) {
         std::size_t found = lines[start_idx % count].find(expected[i]);
         EXPECT_NE(std::string::npos, found) << "Not found: " << expected[i];
     }
+#endif
 }
 
 } // namespace slog

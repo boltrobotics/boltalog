@@ -15,9 +15,9 @@ The project enables to:
 Note: GSL and Goggletest are retrieved from github during the build process
 
     git clone git://github.com/svkapustin/strong-log
-    mkdir strong-log/build
-    cd strong-log/build
-    cmake -DLOG_MODEL=model/log_model_example.xml ..
+    cd strong-log
+    export MODELS_DIR=${PWD}/model
+    mkdir build
+    cd build
+    cmake -DLOG_MODEL=${MODELS_DIR}/log_model_example.xml ..
     make
-    
-    

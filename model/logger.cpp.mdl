@@ -124,9 +124,12 @@ Logger::Logger(
     levels_() {
 
     levels_[0] = level;
-    levels_[1] = LOG_INFO;
-    levels_[2] = LOG_WARNING;
-    levels_[3] = LOG_DEBUG;
+
+    {
+.for log.event
+        levels_[$(event.id)] = $(event.level);
+.endfor
+    }
 
     if (ident_.empty()) {
         openlog(NULL, LOG_PID | LOG_NDELAY, facility);

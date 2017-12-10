@@ -2,10 +2,6 @@
 .template 1
 .ignorecase = 0
 \
-/* Copyright (c) 2017, Sergey V. Kapustin <svkapustin.com>
- *
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.  */
 
 #ifndef _slog_Logger_hpp_
 #define _slog_Logger_hpp_

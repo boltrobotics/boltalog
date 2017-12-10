@@ -14,7 +14,7 @@ The project enables to:
 ## Building
 Note: GSL and Goggletest are retrieved from github during the build process
 
-    git clone git://github.com/svkapustin/strong-log
+    git clone git://github.com/boltrobotics/strong-log
     cd strong-log
     export MODELS_DIR=${PWD}/model
     mkdir build

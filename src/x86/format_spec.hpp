@@ -90,11 +90,9 @@ inline INT_32 FormatSpec::Handler(CDT* argv, const UINT_32 argc, CDT& cdt, Logge
       cdt = "PRIu64";
     } else if (s == "double") {
       cdt = "\"f\"";
-    } else if (s == "string") {
-      cdt = "\"s\"";
     } else {
-      std::string t("int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t, "
-          "double, string");
+      std::string t(
+          "int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t, double");
       logger.Error("Type unsupported: %s. Supported: %s\n", s.c_str(), t.c_str());
       rc = -1;
     }

@@ -2,17 +2,40 @@
 'namespace':'example',
 'events': [
   {
-    'id':'1', 'name':'eventx', 'level':'INFO', 'desc':'event description',
+    'id':'1', 'name':'event1', 'level':'INFO', 'desc':'Event1 description',
     'params': [
-      { 'name':'u8', 'type':'uint8_t', 'desc':'parameter description' },
-      { 'name':'d64', 'type':'int64_t', 'desc':'parameter description' },
-      { 'name':'u16', 'type':'uint16_t', 'desc':'parameter description' },
-      { 'name':'d32', 'type':'int32_t', 'desc':'parameter description' },
-      { 'name':'u32', 'type':'uint32_t', 'desc':'parameter description' },
-      { 'name':'d16', 'type':'int16_t', 'desc':'parameter description' },
-      { 'name':'u64', 'type':'uint64_t', 'desc':'parameter description' },
-      { 'name':'d8', 'type':'int8_t', 'desc':'parameter description' },
-      { 'name':'dbl', 'type':'double', 'desc':'parameter description' }
+      { 'name':'param1', 'type':'int32_t' },
+      { 'name':'param2', 'type':'int8_t' }
+    ]
+  },
+  {
+    'id':'2', 'name':'event2', 'level':'WARN', 'desc':'Event2 description',
+    'params': [
+      { 'name':'param1', 'type':'uint16_t' },
+      { 'name':'param2', 'type':'double' }
+    ]
+  },
+  {
+    'id':'3', 'name':'event3', 'level':'DEBUG', 'desc':'Event3 description',
+    'params': [
+      { 'name':'p1', 'type':'uint64_t' },
+      { 'name':'p2', 'type':'int16_t' },
+      { 'name':'p3', 'type':'double' },
+      { 'name':'p4', 'type':'uint8_t' }
+    ]
+  },
+  {
+    'id':'4', 'name':'event4', 'level':'TRACE', 'desc':'Event4 description',
+    'params': [
+      { 'name':'u8', 'type':'uint8_t', 'desc':'u8 description' },
+      { 'name':'d64', 'type':'int64_t' },
+      { 'name':'u16', 'type':'uint16_t' },
+      { 'name':'d32', 'type':'int32_t' },
+      { 'name':'u32', 'type':'uint32_t' },
+      { 'name':'d16', 'type':'int16_t' },
+      { 'name':'u64', 'type':'uint64_t' },
+      { 'name':'d8', 'type':'int8_t' },
+      { 'name':'dbl', 'type':'double', 'desc':'dbl description' }
     ]
   }
 ]

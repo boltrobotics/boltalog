@@ -24,8 +24,8 @@ class LoggerImpl;
 
 namespace <TMPL_var namespace>
 {
-<TMPL_foreach events as e>
-<-TMPL_if DEFINED(e.desc)>
+<-TMPL_foreach events as e>
+<TMPL_if DEFINED(e.desc)>
 /**
  * <TMPL_var e.desc>
  *
@@ -47,6 +47,8 @@ namespace <TMPL_var namespace>
   }
 <-/TMPL_foreach>
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Logging interface for reporting runtime events and metrics.
  *
@@ -57,22 +59,28 @@ public:
 
 // LIFECYCLE
 
+  /**
+   * Ctor.
+   */
+  Logger(btr::log::LoggerImpl* logger_impl, btr::log::LOG_LEVEL level);
+
+  /**
+   * Dtor.
+   */
   ~Logger() = default;
 
 // OPERATIONS
 
   /**
-   * Factory function to create global logger instance. Call only once at
-   * start-up.
-   *
-   * @param logger_impl - logger implementation
-   */
-  static Logger* init(btr::log::LoggerImpl* logger_impl, btr::log::LOG_LEVEL level);
-
-  /**
    * @return global logger instance
    */
   static Logger* instance();
+
+  /**
+   * @param logger - the global logger instance to set
+   * @return any previous logger instance
+   */
+  static Logger* instance(Logger* logger);
 
   /**
    * @param errnum - the error number
@@ -95,23 +103,18 @@ public:
    */
   bool filter(int event_id) const;
 
+  //------------------------------------------------------------------------------------------------
+
   <TMPL_foreach events as e->
-  <TMPL_var COUNT(1)->
+  <-TMPL_var COUNT(1)->
   int <TMPL_var e.name>Impl(
     <TMPL_foreach params as p->
     <TMPL_if p.__last__-><TMPL_var p.type> <TMPL_var p.name>);
     <TMPL_else><TMPL_var p.type> <TMPL_var p.name>,
     </TMPL_if>
-    <-/TMPL_foreach->
-  <-/TMPL_foreach>
+    <-/TMPL_foreach>
+  </TMPL_foreach>
 private:
-
-// OPERATIONS
-
-  /**
-   * Ctor.
-   */
-  Logger(btr::log::LoggerImpl* logger_impl, btr::log::LOG_LEVEL level);
 
 // ATTRIBUTES
 

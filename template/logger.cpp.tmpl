@@ -19,21 +19,32 @@ Logger* Logger::logger_ = nullptr;
 
 /////////////////////////////////////////////// PUBLIC /////////////////////////////////////////////
 
-//============================================= OPERATIONS =========================================
+//============================================= LIFECYCLE ==========================================
 
-// static
-Logger* Logger::init(btr::log::LoggerImpl* logger_impl, btr::log::LOG_LEVEL level)
+Logger::Logger(btr::log::LoggerImpl* logger_impl, btr::log::LOG_LEVEL level) :
+  logger_impl_(logger_impl)
 {
-  if (!logger_) {
-    logger_ = new Logger(logger_impl, level);
-  }
-  return instance();
+  levels_[0] = level;
+
+  <TMPL_foreach events as e->
+  levels_[<TMPL_var e.id>] = btr::log::<TMPL_var e.level>;
+  </TMPL_foreach>
 }
+
+//============================================= OPERATIONS =========================================
 
 // static
 Logger* Logger::instance()
 {
   return logger_;
+}
+
+// static
+Logger* Logger::instance(Logger* logger)
+{
+  Logger* prev_logger = logger_;
+  logger_ = logger;
+  return prev_logger;
 }
 
 const char* Logger::strerror(int errnum)
@@ -54,7 +65,7 @@ int Logger::level(int event_id, btr::log::LOG_LEVEL level)
 
 bool Logger::filter(int event_id) const
 {
-  if (event_id < (int)(sizeof(levels_) / sizeof(int)) && levels_[event_id] <= levels_[0]) {
+  if (event_id < (int)(sizeof(levels_) / sizeof(int)) && levels_[event_id] >= levels_[0]) {
     return true;
   } else {
     return false;
@@ -98,20 +109,6 @@ int Logger::<TMPL_var e.name>Impl(
   return -1;
 }
 
-<-/TMPL_foreach>
-
-/////////////////////////////////////////////// PUBLIC /////////////////////////////////////////////
-
-//============================================= LIFECYCLE ==========================================
-
-Logger::Logger(btr::log::LoggerImpl* logger_impl, btr::log::LOG_LEVEL level) :
-  logger_impl_(logger_impl)
-{
-  levels_[0] = level;
-
-  <TMPL_foreach events as e->
-  levels_[<TMPL_var e.id>] = btr::log::<TMPL_var e.level>;
-  <-/TMPL_foreach>
-}
+</TMPL_foreach->
 
 } // namespace <TMPL_var namespace>

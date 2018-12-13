@@ -75,6 +75,12 @@ public:
   static Logger* instance();
 
   /**
+   * @param errnum - the error number
+   * @return error string corresponding to errnum
+   */
+  static const char* strerror(int errnum);
+
+  /**
    * Set the log level of a given event ID.
    *
    * @param event_id

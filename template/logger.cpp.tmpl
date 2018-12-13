@@ -36,6 +36,11 @@ Logger* Logger::instance()
   return logger_;
 }
 
+const char* Logger::strerror(int errnum)
+{
+  return btr::log::LoggerImpl::strerror(errnum);
+}
+
 int Logger::level(int event_id, btr::log::LOG_LEVEL level)
 {
   int prev_event_id = -1;

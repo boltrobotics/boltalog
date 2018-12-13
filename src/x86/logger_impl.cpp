@@ -11,16 +11,15 @@ namespace btr
 namespace log
 {
 
+#define LOG_ENOBASE   23000
+#define EBADLOGLEVEL  (LOG_ENOBASE + 1)
+
 /////////////////////////////////////////////// PUBLIC /////////////////////////////////////////////
 
 //============================================= LIFECYCLE ==========================================
 
-LoggerImpl::LoggerImpl() :
-  logger_()
-{
-}
-
-LoggerImpl::~LoggerImpl()
+LoggerImpl::LoggerImpl(std::shared_ptr<spdlog::logger> logger) :
+  logger_(logger)
 {
 }
 
@@ -28,27 +27,37 @@ LoggerImpl::~LoggerImpl()
 
 const char* LoggerImpl::strerror(int errnum)
 {
-  (void)errnum;
-  //return Device::strerror(errnum);
-  return nullptr;
+  switch (errnum) {
+  case EBADLOGLEVEL:
+    return "Bad log level";
+  default:
+    return "Unknown";
+  }
 }
 
 int LoggerImpl::log(int level, const char* msg)
 {
   switch (level) {
   case TRACE:
-    logger_->trace(msg); break;
+    logger_->trace(msg);
+    break;
   case DEBUG:
-    logger_->debug(msg); break;
+    logger_->debug(msg);
+    break;
   case INFO:
-    logger_->info(msg); break;
+    logger_->info(msg);
+    break;
   case WARN:
-    logger_->warn(msg); break;
+    logger_->warn(msg);
+    break;
   case ERROR:
-    logger_->error(msg); break;
+    logger_->error(msg);
+    break;
   case CRITICAL:
-    logger_->critical(msg); break;
+    logger_->critical(msg);
+    break;
   default:
+    errno = EBADLOGLEVEL;
     return -1;
   };
   return 0;

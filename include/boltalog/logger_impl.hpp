@@ -27,17 +27,13 @@ public:
 
 // LIFECYCLE
 
+#if defined(x86)
   /**
    * Ctor.
-   *
-   * @param config - log access configuration
+   * @param logger - spdlog logger
    */
-  LoggerImpl();
-
-  /**
-   * Dtor.
-   */
-  ~LoggerImpl();
+  LoggerImpl(std::shared_ptr<spdlog::logger> logger);
+#endif
 
 // OPERATIONS
 

@@ -72,7 +72,7 @@ int Logger::<TMPL_var e.name>Impl(
   char buff[MAX_LOG_SIZE];
   int cx = snprintf(buff, MAX_LOG_SIZE, "<TMPL_var e.id>"
     <TMPL_foreach params as p->
-    ",%" <TMPL_var PRINTFFORMATTER(p.type)> ""
+    ",%" <TMPL_var FORMATSPEC(p.type)> ""
     </TMPL_foreach->
     ,
     <-TMPL_foreach params as p>

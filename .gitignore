@@ -1,6 +1,7 @@
 # Generated files
 test/logger.cpp
 test/logger.hpp
+template/*.ct2
 scripts/log_viewer.py
 
 # Cmake

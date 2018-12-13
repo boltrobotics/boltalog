@@ -1,10 +1,11 @@
 /* Copyright (C) 2018 Bolt Robotics <info@boltrobotics.com> */
 
-#ifndef _btr_log_PrintfFormatters_hpp_
-#define _btr_log_PrintfFormatters_hpp_
+#ifndef _btr_log_FormatSpec_hpp_
+#define _btr_log_FormatSpec_hpp_
 
 // SYSTEM INCLUDES
 #include "CTPP2VMSyscall.hpp"
+#include <string>
 
 // PROJECT INCLUDES
 
@@ -19,7 +20,7 @@ using namespace CTPP;
 /**
  * The class encapsulates a set of servers and registers to poll once or periodically.
  */
-class PrintfFormatters : public SyscallHandler
+class FormatSpec : public SyscallHandler
 {
 public:
 
@@ -28,12 +29,12 @@ public:
   /**
    * Ctor.
    */
-  PrintfFormatters() = default;
+  FormatSpec() = default;
 
   /**
    * Dtor.
    */
-  ~PrintfFormatters() = default;;
+  ~FormatSpec() = default;;
 
 private:
 
@@ -63,7 +64,7 @@ private:
 
 //============================================= OPERATIONS =========================================
 
-inline INT_32 PrintfFormatters::Handler(CDT* argv, const UINT_32 argc, CDT& cdt, Logger& logger)
+inline INT_32 FormatSpec::Handler(CDT* argv, const UINT_32 argc, CDT& cdt, Logger& logger)
 {
   (void)logger;
   int rc = 0;
@@ -92,21 +93,25 @@ inline INT_32 PrintfFormatters::Handler(CDT* argv, const UINT_32 argc, CDT& cdt,
     } else if (s == "string") {
       cdt = "\"s\"";
     } else {
+      std::string t("int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t, "
+          "double, string");
+      logger.Error("Type unsupported: %s. Supported: %s\n", s.c_str(), t.c_str());
       rc = -1;
     }
   } else {
+    logger.Emerg("Usage: FORMATSPEC(type)"); 
     rc = -1;
   }
   return rc;
 }
 
-inline CCHAR_P PrintfFormatters::GetName() const
+inline CCHAR_P FormatSpec::GetName() const
 {
-  return "printfformatter";
+  return "formatspec";
 }
 
 } // namespace log
 
 } // namespace btr
 
-#endif // _btr_log_PrintfFormatters_hpp_
+#endif // _btr_log_FormatSpec_hpp_

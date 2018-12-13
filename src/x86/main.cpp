@@ -29,7 +29,7 @@
 
 // PROJECT INCLUDES
 #include "count.hpp"
-#include "printf_formatters.hpp"
+#include "format_spec.hpp"
 
 using namespace CTPP;
 
@@ -66,7 +66,7 @@ int main(int argc, char** argv)
   SyscallFactory syscall_factory(100);
   btr::log::Count count;
   syscall_factory.RegisterHandler(&count);
-  btr::log::PrintfFormatters pf;
+  btr::log::FormatSpec pf;
   syscall_factory.RegisterHandler(&pf);
 
   STDLibInitializer::InitLibrary(syscall_factory);

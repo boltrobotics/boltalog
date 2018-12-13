@@ -1,18 +1,3 @@
-/* Copyright (C) 2017 Bolt Robotics <info@boltrobotics.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 // SYSTEM INCLUDES
 #include <gtest/gtest.h>
 #include <iostream>
@@ -21,7 +6,14 @@
 // PROJECT INCLUDES
 #include "logger.hpp"
 
-namespace slog {
+namespace btr
+{
+namespace log
+{
+
+#if 0
+namespace slog
+{
 
 std::vector<std::string> readLastLines(
         uint8_t& start_idx,
@@ -100,5 +92,8 @@ TEST(DISABLED_LoggerTest, Output) {
     }
 #endif
 }
+#endif
 
-} // namespace slog
+} // namespace log
+
+} // namespace btr

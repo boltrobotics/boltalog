@@ -1,6 +1,6 @@
 # Generated files
-include/logger.hpp
-src/logger.cpp
+test/logger.cpp
+test/logger.hpp
 scripts/log_viewer.py
 
 # Cmake

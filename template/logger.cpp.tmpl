@@ -1,0 +1,112 @@
+<TMPL_verbose>
+<TMPL_comment>/* Copyright (C) 2018 Bolt Robotics <info@boltrobotics.com> */</TMPL_comment>
+<TMPL_include "license.tmpl">
+</TMPL_verbose>
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// WARNING: The code is auto-generated. Any changes will be overwritten.
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// SYSTEM INCLUDES
+
+// PROJECT INCLUDES
+#include "logger.hpp" // class implemented
+#include "boltalog/logger_impl.hpp"
+
+namespace <TMPL_var namespace>
+{
+
+Logger* Logger::logger_ = nullptr;
+
+/////////////////////////////////////////////// PUBLIC /////////////////////////////////////////////
+
+//============================================= OPERATIONS =========================================
+
+// static
+Logger* Logger::init(btr::log::LoggerImpl* logger_impl, btr::log::LOG_LEVEL level)
+{
+  if (!logger_) {
+    logger_ = new Logger(logger_impl, level);
+  }
+  return instance();
+}
+
+// static
+Logger* Logger::instance()
+{
+  return logger_;
+}
+
+int Logger::level(int event_id, btr::log::LOG_LEVEL level)
+{
+  int prev_event_id = -1;
+
+  if (event_id < (int)(sizeof(levels_) / sizeof(int))) {
+    prev_event_id = levels_[event_id];
+    levels_[event_id] = level;
+  }
+  return prev_event_id;
+}
+
+bool Logger::filter(int event_id) const
+{
+  if (event_id < (int)(sizeof(levels_) / sizeof(int)) && levels_[event_id] <= levels_[0]) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+<TMPL_foreach events as e->
+
+<TMPL_var COUNT(1)->
+int Logger::<TMPL_var e.name>Impl(
+  <TMPL_foreach params as p->
+  <TMPL_if p.__last__->
+  <TMPL_var p.type> <TMPL_var p.name>)
+{
+  <-TMPL_else>
+  <-TMPL_var p.type> <TMPL_var p.name>,
+  <-/TMPL_if>
+  </TMPL_foreach->
+
+  char buff[MAX_LOG_SIZE];
+  int cx = snprintf(buff, MAX_LOG_SIZE, "<TMPL_var e.id>"
+    <TMPL_foreach params as p->
+    ",%" <TMPL_var PRINTFFORMATTER(p.type)> ""
+    </TMPL_foreach->
+    ,
+    <-TMPL_foreach params as p>
+    <-TMPL_if !p.__first__>,</TMPL_if><TMPL_var p.name>
+    <-/TMPL_foreach>);
+
+  int rc = -1;
+
+  if (cx >= 0) {
+    logger_impl_->log(levels_[<TMPL_var e.id>], buff);
+
+    if (cx < MAX_LOG_SIZE) {
+      rc = 0;
+    } else {
+      errno = EOVERFLOW;
+    }
+  }
+  return -1;
+}
+
+<-/TMPL_foreach>
+
+/////////////////////////////////////////////// PUBLIC /////////////////////////////////////////////
+
+//============================================= LIFECYCLE ==========================================
+
+Logger::Logger(btr::log::LoggerImpl* logger_impl, btr::log::LOG_LEVEL level) :
+  logger_impl_(logger_impl)
+{
+  levels_[0] = level;
+
+  <TMPL_foreach events as e->
+  levels_[<TMPL_var e.id>] = btr::log::<TMPL_var e.level>;
+  <-/TMPL_foreach>
+}
+
+} // namespace <TMPL_var namespace>

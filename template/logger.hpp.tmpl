@@ -1,0 +1,119 @@
+<TMPL_verbose>
+<TMPL_comment>/* Copyright (C) 2018 Bolt Robotics <info@boltrobotics.com> */</TMPL_comment>
+<TMPL_include "license.tmpl">
+</TMPL_verbose>
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// WARNING: The code is auto-generated. Any changes will be overwritten.
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#ifndef _<TMPL_var namespace>_Logger_hpp_
+#define _<TMPL_var namespace>_Logger_hpp_
+
+// PROJECT INCLUDES
+#include <boltalog/defines.hpp>
+
+namespace btr
+{
+namespace log
+{
+
+class LoggerImpl;
+
+} // namespace btr
+} // namespace log
+
+namespace <TMPL_var namespace>
+{
+<TMPL_foreach events as e>
+<-TMPL_if DEFINED(e.desc)>
+/**
+ * <TMPL_var e.desc>
+ *
+<-TMPL_else>
+/**
+<-/TMPL_if>
+<-TMPL_foreach params as p>
+ * @param <TMPL_var p.name> <TMPL_var p.desc>
+<-/TMPL_foreach>
+ */
+#define <TMPL_var e.name>(
+  <-TMPL_foreach params as p->
+  <TMPL_if !p.__first__>, </TMPL_if><TMPL_var p.name>
+  <-/TMPL_foreach>) \
+  if (Logger::instance()->filter(<TMPL_var e.id>)) { \
+    Logger::instance()-><TMPL_var e.name>Impl( \
+      <TMPL_foreach params as p><TMPL_if !p.__first__>, </TMPL_if><TMPL_var p.name>
+      <-/TMPL_foreach>); \
+  }
+<-/TMPL_foreach>
+
+/**
+ * Logging interface for reporting runtime events and metrics.
+ *
+ * The events are to be logged through the macros defined above.
+ */
+class Logger {
+public:
+
+// LIFECYCLE
+
+  ~Logger() = default;
+
+// OPERATIONS
+
+  /**
+   * Factory function to create global logger instance. Call only once at
+   * start-up.
+   *
+   * @param logger_impl - logger implementation
+   */
+  static Logger* init(btr::log::LoggerImpl* logger_impl, btr::log::LOG_LEVEL level);
+
+  /**
+   * @return global logger instance
+   */
+  static Logger* instance();
+
+  /**
+   * Set the log level of a given event ID.
+   *
+   * @param event_id
+   * @param level
+   * @return the previous level of the event or -1 when given event didn't exist
+   */
+  int level(int event_id, btr::log::LOG_LEVEL level);
+
+  /**
+   * @param event_id - the event ID
+   * @return true if event is allowed to pass through, false otherwise
+   */
+  bool filter(int event_id) const;
+
+  <TMPL_foreach events as e->
+  <TMPL_var COUNT(1)->
+  int <TMPL_var e.name>Impl(
+    <TMPL_foreach params as p->
+    <TMPL_if p.__last__-><TMPL_var p.type> <TMPL_var p.name>);
+    <TMPL_else><TMPL_var p.type> <TMPL_var p.name>,
+    </TMPL_if>
+    <-/TMPL_foreach->
+  <-/TMPL_foreach>
+private:
+
+// OPERATIONS
+
+  /**
+   * Ctor.
+   */
+  Logger(btr::log::LoggerImpl* logger_impl, btr::log::LOG_LEVEL level);
+
+// ATTRIBUTES
+
+  static Logger* logger_;
+  btr::log::LoggerImpl* logger_impl_;
+  int levels_[<TMPL_var (COUNT() + 1)>];
+};
+
+} // namespace <TMPL_var namespace>
+
+#endif // _<TMPL_var namespace>_Logger_hpp_

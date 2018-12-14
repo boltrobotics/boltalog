@@ -12,8 +12,11 @@
 #include "logger.hpp" // class implemented
 #include "boltalog/logger_impl.hpp"
 
-namespace <TMPL_var namespace>
+<TMPL_foreach namespace as n->
+namespace <TMPL_var n>
 {
+
+</TMPL_foreach->
 
 Logger* Logger::logger_ = nullptr;
 
@@ -21,10 +24,10 @@ Logger* Logger::logger_ = nullptr;
 
 //============================================= LIFECYCLE ==========================================
 
-Logger::Logger(btr::log::LoggerImpl* logger_impl, btr::log::LOG_LEVEL level) :
+Logger::Logger(btr::log::LoggerImpl* logger_impl, int log_level) :
   logger_impl_(logger_impl)
 {
-  levels_[0] = level;
+  levels_[0] = log_level;
 
   <TMPL_foreach events as e->
   levels_[<TMPL_var e.id>] = btr::log::<TMPL_var e.level>;
@@ -64,13 +67,13 @@ const char* Logger::strerror(int errnum)
   return btr::log::LoggerImpl::strerror(errnum);
 }
 
-int Logger::level(int event_id, btr::log::LOG_LEVEL level)
+int Logger::level(int event_id, int log_level)
 {
   int prev_event_id = -1;
 
   if (event_id < (int)(sizeof(levels_) / sizeof(int))) {
     prev_event_id = levels_[event_id];
-    levels_[event_id] = level;
+    levels_[event_id] = log_level;
   }
   return prev_event_id;
 }
@@ -139,5 +142,6 @@ int Logger::log(int cx, int level, const char* msg)
   }
   return rc;
 }
-
-} // namespace <TMPL_var namespace>
+<TMPL_foreach namespace as n>
+} // namespace <TMPL_var n>
+</TMPL_foreach>

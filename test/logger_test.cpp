@@ -8,7 +8,7 @@
 #include "logger.hpp"
 #include "boltalog/logger_impl.hpp"
 
-using namespace example;
+using namespace log::test;
 
 namespace btr
 {

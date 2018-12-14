@@ -1,5 +1,5 @@
 {
-'namespace':'example',
+'namespace': [ 'log','test' ],
 'events': [
   {
     'id':'1', 'name':'event1', 'level':'INFO', 'desc':'Event1 description',

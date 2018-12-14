@@ -29,6 +29,8 @@ public:
     logger_(new Logger(logger_impl_.get(), LOG_LEVEL::TRACE))
   {
     spd_logger_->set_level(spdlog::level::trace);
+    // 2017-08-28T11:45:40.523085-04:00
+    spd_logger_->set_pattern("%Y-%m-%dT%T.%f%z %L [%t]: %v");
     Logger::instance(logger_.get());
   }
 

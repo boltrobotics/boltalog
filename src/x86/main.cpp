@@ -30,6 +30,7 @@
 // PROJECT INCLUDES
 #include "count.hpp"
 #include "format_spec.hpp"
+#include "type_mapper.hpp"
 
 using namespace CTPP;
 
@@ -68,6 +69,8 @@ int main(int argc, char** argv)
   syscall_factory.RegisterHandler(&count);
   btr::log::FormatSpec pf;
   syscall_factory.RegisterHandler(&pf);
+  btr::log::TypeMapper tm;
+  syscall_factory.RegisterHandler(&tm);
 
   STDLibInitializer::InitLibrary(syscall_factory);
 

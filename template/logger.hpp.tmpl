@@ -109,8 +109,8 @@ public:
   <-TMPL_var COUNT(1)->
   int <TMPL_var e.name>Impl(
     <TMPL_foreach params as p->
-    <TMPL_if p.__last__-><TMPL_var p.type> <TMPL_var p.name>);
-    <TMPL_else><TMPL_var p.type> <TMPL_var p.name>,
+    <TMPL_if p.__last__-><TMPL_var TYPEMAPPER(p.type)> <TMPL_var p.name>);
+    <TMPL_else><TMPL_var TYPEMAPPER(p.type)> <TMPL_var p.name>,
     </TMPL_if>
     <-/TMPL_foreach>
   </TMPL_foreach>

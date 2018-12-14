@@ -108,15 +108,15 @@ TEST_F(LoggerTest, Output)
 
   event1(32, 8);
   event2(65535, 3.03);
-  event3(64, 32323, 12.01, 4);
-  event4(8, 64, 16, 32, 32, 16, 64, 8, 8.8);
+  event3(64, 32323, "string", 4);
+  event4(8, 64, 16, 32, 32, 16, 64, 8, 8.8, "text");
   spd_logger_->flush();
 
   std::vector<std::string> expected;
   expected.push_back("1,32,8");
   expected.push_back("2,65535,3.030000");
-  expected.push_back("3,64,32323,12.010000,4");
-  expected.push_back("4,8,64,16,32,32,16,64,8,8.800000");
+  expected.push_back("3,64,32323,string,4");
+  expected.push_back("4,8,64,16,32,32,16,64,8,8.800000,text");
 
   uint8_t start_idx = 0;
   uint8_t count = 4;

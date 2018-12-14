@@ -20,7 +20,7 @@
     'params': [
       { 'name':'p1', 'type':'uint64_t' },
       { 'name':'p2', 'type':'int16_t' },
-      { 'name':'p3', 'type':'double' },
+      { 'name':'p3', 'type':'string' },
       { 'name':'p4', 'type':'uint8_t' }
     ]
   },
@@ -35,7 +35,8 @@
       { 'name':'d16', 'type':'int16_t' },
       { 'name':'u64', 'type':'uint64_t' },
       { 'name':'d8', 'type':'int8_t' },
-      { 'name':'dbl', 'type':'double', 'desc':'dbl description' }
+      { 'name':'dbl', 'type':'double', 'desc':'dbl description' },
+      { 'name':'str', 'type':'string', 'desc':'string description' }
     ]
   }
 ]

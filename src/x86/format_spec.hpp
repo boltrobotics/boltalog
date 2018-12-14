@@ -89,7 +89,8 @@ inline INT_32 FormatSpec::Handler(CDT* argv, const UINT_32 argc, CDT& cdt, Logge
     } else if (s == "uint64_t") {
       cdt = "PRIu64";
     } else if (s == "double") {
-      cdt = "\"f\"";
+      //cdt = "\".4f\"";
+      cdt = "\".6f\"";
     } else if (s == "string") {
       cdt = "\"s\"";
     } else {

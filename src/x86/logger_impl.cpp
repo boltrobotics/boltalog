@@ -24,9 +24,31 @@ namespace log
 LoggerImpl::LoggerImpl(std::shared_ptr<spdlog::logger> logger) :
   logger_(logger)
 {
+  if (logger_) {
+    logger_->set_level(spdlog::level::trace);
+    // 2017-08-28T11:45:40.523085-04:00
+    logger_->set_pattern("%Y-%m-%dT%T.%f%z %L [%t]: %v");
+  }
+}
+
+LoggerImpl::LoggerImpl() :
+  LoggerImpl(spdlog::stderr_logger_st("default"))
+{
+}
+
+LoggerImpl::~LoggerImpl()
+{
+  if (logger_) {
+    spdlog::drop(logger_->name());
+  }
 }
 
 //============================================= OPERATIONS =========================================
+
+std::shared_ptr<spdlog::logger> LoggerImpl::backend()
+{
+  return logger_;
+}
 
 const char* LoggerImpl::strerror(int errnum)
 {

@@ -47,6 +47,18 @@ Logger* Logger::instance(Logger* logger)
   return prev_logger;
 }
 
+btr::log::LoggerImpl* Logger::impl()
+{
+  return logger_impl_;
+}
+
+btr::log::LoggerImpl* Logger::impl(btr::log::LoggerImpl* impl)
+{
+  btr::log::LoggerImpl* prev_logger_impl = logger_impl_;
+  logger_impl_ = impl;
+  return prev_logger_impl;
+}
+
 const char* Logger::strerror(int errnum)
 {
   return btr::log::LoggerImpl::strerror(errnum);
@@ -76,24 +88,32 @@ bool Logger::filter(int event_id) const
 
 <TMPL_var COUNT(1)->
 int Logger::<TMPL_var e.name>Impl(
+  <-TMPL_if DEFINED(params)->
+
   <TMPL_foreach params as p->
-  <TMPL_if p.__last__->
+  <TMPL_if p.__last__>
   <TMPL_var TYPEMAPPER(p.type)> <TMPL_var p.name>)
-{
-  <-TMPL_else>
-  <-TMPL_var TYPEMAPPER(p.type)> <TMPL_var p.name>,
-  <-/TMPL_if>
+  <TMPL_else>
+  <TMPL_var TYPEMAPPER(p.type)> <TMPL_var p.name>,
+  <-/TMPL_if->
   </TMPL_foreach->
 
+  <-TMPL_else->)
+  <-/TMPL_if>
+{
   char buff[MAX_LOG_SIZE];
   int cx = snprintf(buff, MAX_LOG_SIZE, "<TMPL_var e.id>"
+    <TMPL_if DEFINED(params)->
+
     <TMPL_foreach params as p->
     ",%" <TMPL_var FORMATSPEC(p.type)> ""
-    </TMPL_foreach->
+    <-/TMPL_foreach->
     ,
-    <-TMPL_foreach params as p>
-    <-TMPL_if !p.__first__>,</TMPL_if><TMPL_var p.name>
-    <-/TMPL_foreach>);
+    <TMPL_foreach params as p->
+    <TMPL_if !p.__first__>,</TMPL_if><TMPL_var p.name>
+    <-/TMPL_foreach>
+
+    <-/TMPL_if>);
 
   return log(cx, levels_[<TMPL_var e.id>], buff);
 }

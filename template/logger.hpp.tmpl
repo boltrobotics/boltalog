@@ -62,7 +62,7 @@ public:
   /**
    * Ctor.
    */
-  Logger(btr::log::LoggerImpl* logger_impl, btr::log::LOG_LEVEL level);
+  Logger(btr::log::LoggerImpl* impl, btr::log::LOG_LEVEL level);
 
   /**
    * Dtor.
@@ -81,6 +81,17 @@ public:
    * @return any previous logger instance
    */
   static Logger* instance(Logger* logger);
+
+  /**
+   * @return logger implementation
+   */
+  btr::log::LoggerImpl* impl();
+
+  /**
+   * @param impl - the logger implementation instance
+   * @return any previous logger implementation instance
+   */
+  btr::log::LoggerImpl* impl(btr::log::LoggerImpl* impl);
 
   /**
    * @param errnum - the error number
@@ -109,10 +120,10 @@ public:
   <-TMPL_var COUNT(1)->
   int <TMPL_var e.name>Impl(
     <TMPL_foreach params as p->
-    <TMPL_if p.__last__-><TMPL_var TYPEMAPPER(p.type)> <TMPL_var p.name>);
+    <TMPL_if p.__last__-><TMPL_var TYPEMAPPER(p.type)> <TMPL_var p.name>
     <TMPL_else><TMPL_var TYPEMAPPER(p.type)> <TMPL_var p.name>,
     </TMPL_if>
-    <-/TMPL_foreach>
+    <-/TMPL_foreach>);
   </TMPL_foreach>
 private:
 

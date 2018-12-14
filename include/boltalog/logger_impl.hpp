@@ -35,13 +35,26 @@ public:
 
 #if defined(x86)
   /**
-   * Ctor.
    * @param logger - spdlog logger
    */
   LoggerImpl(std::shared_ptr<spdlog::logger> logger);
 #endif
 
+  /**
+   * Create a stderr console logger as default.
+   */
+  LoggerImpl();
+
+  /**
+   * Deregister a logger.
+   */
+  ~LoggerImpl();
+
 // OPERATIONS
+
+#if defined(x86)
+  std::shared_ptr<spdlog::logger> backend();
+#endif
 
   /**
    * @param errnum - the error number

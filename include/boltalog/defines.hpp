@@ -21,8 +21,7 @@ enum LOG_LEVEL {
   INFO      = 2,
   WARN      = 3,
   ERROR     = 4,
-  CRITICAL  = 5,
-  OFF       = 6
+  CRITICAL  = 5
 };
 
 } // namespace log

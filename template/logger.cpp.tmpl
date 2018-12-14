@@ -94,12 +94,12 @@ int Logger::<TMPL_var e.name>Impl(
   <-TMPL_if DEFINED(params)->
 
   <TMPL_foreach params as p->
-  <TMPL_if p.__last__>
-  <TMPL_var TYPEMAPPER(p.type)> <TMPL_var p.name>)
+  <TMPL_if !(p.__first__)->,
+  <TMPL_var TYPEMAPPER(p.type)> <TMPL_var p.name->
   <TMPL_else>
-  <TMPL_var TYPEMAPPER(p.type)> <TMPL_var p.name>,
-  <-/TMPL_if->
-  </TMPL_foreach->
+  <TMPL_var TYPEMAPPER(p.type)> <TMPL_var p.name->
+  </TMPL_if->
+  </TMPL_foreach->)
 
   <-TMPL_else->)
   <-/TMPL_if>

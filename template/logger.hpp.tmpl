@@ -40,7 +40,7 @@ namespace <TMPL_var namespace>
   <-TMPL_foreach params as p->
   <TMPL_if !p.__first__>, </TMPL_if><TMPL_var p.name>
   <-/TMPL_foreach>) \
-  if (Logger::instance()->filter(<TMPL_var e.id>)) { \
+  if (Logger::instance() && Logger::instance()->filter(<TMPL_var e.id>)) { \
     Logger::instance()-><TMPL_var e.name>Impl( \
       <TMPL_foreach params as p><TMPL_if !p.__first__>, </TMPL_if><TMPL_var p.name>
       <-/TMPL_foreach>); \

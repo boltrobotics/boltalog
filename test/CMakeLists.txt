@@ -28,7 +28,7 @@ add_custom_command(
   COMMAND ${TMPL_VM} ${TMPL_DIR}/logger.hpp.ct2 ${MODEL} logger.hpp 0 102400
   WORKING_DIRECTORY ${AUTOGEN_DST}
   COMMENT "Generating logger.hpp from ${MODEL}" VERBATIM
-  DEPENDS templates ${MODEL} ${TMPL_VM} ${TMPL_DIR}/logger.hpp.ct2
+  DEPENDS ${TMPL_VM} ${TMPL_DIR}/logger.hpp.ct2 ${MODEL}
   )
 
 add_custom_command(
@@ -36,7 +36,7 @@ add_custom_command(
   COMMAND ${TMPL_VM} ${TMPL_DIR}/logger.cpp.ct2 ${MODEL} logger.cpp 0 102400
   WORKING_DIRECTORY ${AUTOGEN_DST}
   COMMENT "Generating logger.cpp from ${MODEL}" VERBATIM
-  DEPENDS templates ${MODEL} ${TMPL_VM} ${TMPL_DIR}/logger.cpp.ct2
+  DEPENDS ${TMPL_VM} ${TMPL_DIR}/logger.cpp.ct2 ${MODEL}
   )
 
 include_directories(

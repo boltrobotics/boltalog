@@ -1,6 +1,9 @@
 /* Copyright (C) 2018 Bolt Robotics <info@boltrobotics.com> */
 
 // SYSTEM INCLUDES
+#if defined(x86)
+#include <spdlog/spdlog.h>
+#endif
 
 // PROJECT INCLUDES
 #include "boltalog/logger_impl.hpp"

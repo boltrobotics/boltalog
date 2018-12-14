@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <fstream>
+#include <spdlog/spdlog.h>
 
 // PROJECT INCLUDES
 #include "logger.hpp"

@@ -46,7 +46,7 @@ add_custom_command(
   COMMAND ${CTPP2C} ${PREFIX}.hpp.tmpl ${PREFIX}.hpp.ct2
   WORKING_DIRECTORY ${TMPL_DIR}
   COMMENT "Generating ${PREFIX}.hpp.ct2 from ${PREFIX}.hpp.tmpl" VERBATIM
-  DEPENDS ${PREFIX}.hpp.tmpl ctpp2c
+  DEPENDS ${PREFIX}.hpp.tmpl
   )
 
 add_custom_command(
@@ -54,13 +54,12 @@ add_custom_command(
   COMMAND ${CTPP2C} ${PREFIX}.cpp.tmpl ${PREFIX}.cpp.ct2
   WORKING_DIRECTORY ${TMPL_DIR}
   COMMENT "Generating ${PREFIX}.cpp.ct2 from ${PREFIX}.cpp.tmpl" VERBATIM
-  DEPENDS ${PREFIX}.cpp.tmpl ctpp2c
+  DEPENDS ${PREFIX}.cpp.tmpl
   )
 
 add_custom_target(
-  templates ALL
+  boltalog_templates
   DEPENDS ${PREFIX}.cpp.ct2 ${PREFIX}.cpp.tmpl ${PREFIX}.hpp.ct2 ${PREFIX}.hpp.tmpl
-    ${PROJECT_NAME}_autogen ctpp2c
   )
 
 # } autogen
@@ -90,6 +89,7 @@ if (SOURCES_LEN GREATER 0)
 
   add_executable(${PROJECT_NAME}_autogen ${MAIN_CPP})
   target_link_libraries(${PROJECT_NAME}_autogen ${PROJECT_NAME} ${ctpp2_LIB_NAME})
+  add_dependencies(${PROJECT_NAME}_autogen ctpp2c boltalog_templates)
 endif ()
 
 # } boltalog

@@ -6,11 +6,17 @@
 // SYSTEM INCLUDES
 #if defined(x86)
 #include <memory>
-#include <spdlog/spdlog.h>
 #endif
 
 // PROJECT INCLUDES
 #include "boltalog/defines.hpp"
+
+namespace spdlog
+{
+
+class logger;
+
+}
 
 namespace btr
 {

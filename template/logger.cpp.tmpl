@@ -95,10 +95,21 @@ int Logger::<TMPL_var e.name>Impl(
     <-TMPL_if !p.__first__>,</TMPL_if><TMPL_var p.name>
     <-/TMPL_foreach>);
 
+  return log(cx, levels_[<TMPL_var e.id>], buff);
+}
+
+</TMPL_foreach->
+
+/////////////////////////////////////////////// PRIVATE ////////////////////////////////////////////
+
+//============================================= OPERATIONS =========================================
+
+int Logger::log(int cx, int level, const char* msg)
+{
   int rc = -1;
 
   if (cx >= 0) {
-    logger_impl_->log(levels_[<TMPL_var e.id>], buff);
+    logger_impl_->log(level, msg);
 
     if (cx < MAX_LOG_SIZE) {
       rc = 0;
@@ -106,9 +117,7 @@ int Logger::<TMPL_var e.name>Impl(
       errno = EOVERFLOW;
     }
   }
-  return -1;
+  return rc;
 }
-
-</TMPL_foreach->
 
 } // namespace <TMPL_var namespace>

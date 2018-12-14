@@ -116,6 +116,17 @@ public:
   </TMPL_foreach>
 private:
 
+// OPERATIONS
+
+  /**
+   * Common code for logging.
+   *
+   * @param cx - characters would be used by log message, which can be more than MAX_LOG_SIZE
+   * @param level - log level
+   * @param msg - log message
+   */
+  int log(int cx, int level, const char* msg);
+
 // ATTRIBUTES
 
   static Logger* logger_;

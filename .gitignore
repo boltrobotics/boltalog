@@ -2,7 +2,7 @@
 test/logger.cpp
 test/logger.hpp
 template/*.ct2
-scripts/log_viewer.py
+script/log_viewer.py
 
 # Cmake
 build/

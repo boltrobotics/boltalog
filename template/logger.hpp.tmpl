@@ -81,16 +81,17 @@ public:
 // OPERATIONS
 
   /**
-   * Initialize default instance if none already set.
-   *
-   * @param log_level - the log level to set on the instance
-   */
-  static void init(int log_level);
-
-  /**
    * @return true if logger instance is set
    */
   static bool isInstance();
+
+  /**
+   * Initialize default instance if none already set.
+   *
+   * @param log_level - the log level to set on the instance
+   * @return Logger::instance()
+   */
+  static btr::SharedPtr<Logger> init(int log_level);
 
   /**
    * @return global logger instance

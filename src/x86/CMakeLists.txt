@@ -40,6 +40,7 @@ include_directories(${spdlog_INC_DIR})
 
 set(TMPL_DIR "${PROJECT_SOURCE_DIR}/template")
 set(PREFIX "${TMPL_DIR}/logger")
+set(SCRIPT_PRE "${TMPL_DIR}/log_viewer")
 
 add_custom_command(
   OUTPUT ${PREFIX}.hpp.ct2
@@ -57,9 +58,18 @@ add_custom_command(
   DEPENDS ${PREFIX}.cpp.tmpl
   )
 
+add_custom_command(
+  OUTPUT ${SCRIPT_PRE}.py.ct2
+  COMMAND ${CTPP2C} ${SCRIPT_PRE}.py.tmpl ${SCRIPT_PRE}.py.ct2
+  WORKING_DIRECTORY ${TMPL_DIR}
+  COMMENT "Generating ${SCRIPT_PRE}.py.ct2 from ${SCRIPT_PRE}.py.tmpl" VERBATIM
+  DEPENDS ${SCRIPT_PRE}.py.tmpl
+  )
+
 add_custom_target(
   boltalog_templates
   DEPENDS ${PREFIX}.cpp.ct2 ${PREFIX}.cpp.tmpl ${PREFIX}.hpp.ct2 ${PREFIX}.hpp.tmpl
+    ${SCRIPT_PRE}.py.ct2 ${SCRIPT_PRE}.py.tmpl
   )
 
 # } autogen

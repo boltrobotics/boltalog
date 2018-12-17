@@ -33,24 +33,37 @@ include_directories(${spdlog_INC_DIR})
 set(TMPL_VM "${PROJECT_NAME}_autogen")
 set(TMPL_DIR "${PROJECT_SOURCE_DIR}/template")
 set(MODEL "${TMPL_DIR}/model_example.mdl")
-set(AUTOGEN_DST "${PROJECT_SOURCE_DIR}/test")
+set(SRC_DST "${PROJECT_SOURCE_DIR}/test")
+set(SCRIPT_DST "${PROJECT_SOURCE_DIR}/script")
 
 add_custom_command(
-  OUTPUT ${AUTOGEN_DST}/logger.hpp
+  OUTPUT ${SRC_DST}/logger.hpp
   COMMAND ${TMPL_VM} ${TMPL_DIR}/logger.hpp.ct2 ${MODEL} logger.hpp 0 102400
-  WORKING_DIRECTORY ${AUTOGEN_DST}
+  WORKING_DIRECTORY ${SRC_DST}
   COMMENT "Generating logger.hpp from ${MODEL}" VERBATIM
   DEPENDS ${TMPL_VM} ${TMPL_DIR}/logger.hpp.ct2 ${MODEL}
   )
 
 add_custom_command(
-  OUTPUT ${AUTOGEN_DST}/logger.cpp
+  OUTPUT ${SRC_DST}/logger.cpp
   COMMAND ${TMPL_VM} ${TMPL_DIR}/logger.cpp.ct2 ${MODEL} logger.cpp 0 102400
-  WORKING_DIRECTORY ${AUTOGEN_DST}
+  WORKING_DIRECTORY ${SRC_DST}
   COMMENT "Generating logger.cpp from ${MODEL}" VERBATIM
   DEPENDS ${TMPL_VM} ${TMPL_DIR}/logger.cpp.ct2 ${MODEL}
   )
 
+add_custom_command(
+  OUTPUT ${SCRIPT_DST}/log_viewer.py
+  COMMAND ${TMPL_VM} ${TMPL_DIR}/log_viewer.py.ct2 ${MODEL} log_viewer.py 0 102400
+  WORKING_DIRECTORY ${SCRIPT_DST}
+  COMMENT "Generating log_viewer.py from ${MODEL}" VERBATIM
+  DEPENDS ${TMPL_VM} ${TMPL_DIR}/log_viewer.py.ct2 ${MODEL}
+  )
+
+add_custom_target(
+  log_viewer
+  DEPENDS ${SCRIPT_DST}/log_viewer.py
+  )
 include_directories(
   ${gtest_INC_DIR}
   ${PROJECT_SOURCE_DIR}/include
@@ -59,7 +72,7 @@ include_directories(
 )
 
 file(GLOB SOURCES "*.cpp")
-list(APPEND SOURCES ${AUTOGEN_DST}/logger.cpp ${AUTOGEN_DST}/logger.hpp)
+list(APPEND SOURCES ${SRC_DST}/logger.cpp ${SRC_DST}/logger.hpp)
 list(APPEND LIBRARIES ${gtest_LIB_NAME} ${PROJECT_NAME})
 
 add_definitions(-D${BOARD_FAMILY})
@@ -75,5 +88,6 @@ set_property(
 
 target_link_libraries(${PROJECT_NAME}_tests ${LIBRARIES})
 add_test(NAME ${PROJECT_NAME}_tests COMMAND ${PROJECT_NAME}_tests)
+add_dependencies(${PROJECT_NAME}_tests log_viewer)
 
 # } boltalog

@@ -40,13 +40,14 @@ Logger::Logger(btr::SharedPtr<btr::log::LoggerImpl> logger_impl, int log_level)
 //============================================= OPERATIONS =========================================
 
 // static
-void Logger::init(int log_level)
+btr::SharedPtr<Logger> Logger::init(int log_level)
 {
   if (nullptr == logger_.get()) {
     btr::SharedPtr<btr::log::LoggerImpl> impl(new btr::log::LoggerImpl());
     btr::SharedPtr<Logger> logger(new Logger(impl, log_level));
     Logger::instance(logger);
   }
+  return Logger::instance();
 }
 
 // static

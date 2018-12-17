@@ -1,4 +1,5 @@
-/* Copyright (C) 2018 Bolt Robotics <info@boltrobotics.com> */
+// Copyright (C) 2018 Bolt Robotics <info@boltrobotics.com>
+// License: GNU GPL v3
 
 #ifndef _btr_log_TypeMapper_hpp_
 #define _btr_log_TypeMapper_hpp_

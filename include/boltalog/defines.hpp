@@ -1,11 +1,12 @@
-/* Copyright (C) 2018 Bolt Robotics <info@boltrobotics.com> */
+// Copyright (C) 2019 Bolt Robotics <info@boltrobotics.com>
+// License: GNU GPL v3
 
 #ifndef _btr_log_Defines_hpp_
 #define _btr_log_Defines_hpp_
 
 // SYSTEM INCLUDES
-#include <inttypes.h>
-#include <errno.h>
+#include <cinttypes>
+#include <cerrno>
 
 namespace btr
 {
@@ -21,7 +22,8 @@ enum LOG_LEVEL {
   INFO      = 2,
   WARN      = 3,
   ERROR     = 4,
-  CRITICAL  = 5
+  CRITICAL  = 5,
+  LOGS_OFF  = 6
 };
 
 } // namespace log

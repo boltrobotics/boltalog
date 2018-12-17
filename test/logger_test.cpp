@@ -1,3 +1,6 @@
+// Copyright (C) 2018 Bolt Robotics <info@boltrobotics.com>
+// License: GNU GPL v3
+
 // SYSTEM INCLUDES
 #include <gtest/gtest.h>
 #include <iostream>

@@ -39,9 +39,6 @@ LoggerImpl::LoggerImpl() :
 
 LoggerImpl::~LoggerImpl()
 {
-  if (logger_) {
-    spdlog::drop(logger_->name());
-  }
 }
 
 //============================================= OPERATIONS =========================================

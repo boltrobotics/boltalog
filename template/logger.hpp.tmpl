@@ -23,15 +23,9 @@
 // SYSTEM INCLUDES
 #include <cinttypes>
 
-namespace btr
-{
-namespace log
-{
-
-class LoggerImpl;
-
-} // namespace btr
-} // namespace log
+// SYSTEM INCLUDES
+#include "utility/shared_ptr.hpp"
+#include "boltalog/logger_impl.hpp"
 
 <TMPL_foreach namespace as n>
 namespace <TMPL_var n>
@@ -54,7 +48,7 @@ namespace <TMPL_var n>
   <-TMPL_foreach params as p->
   <TMPL_if !p.__first__>, </TMPL_if><TMPL_var p.name>
   <-/TMPL_foreach>) \
-  if (Logger::instance() && Logger::instance()->filter(<TMPL_var e.id>)) { \
+  if (Logger::isInstance() && Logger::instance()->filter(<TMPL_var e.id>)) { \
     Logger::instance()-><TMPL_var e.name>Impl( \
       <TMPL_foreach params as p><TMPL_if !p.__first__>, </TMPL_if><TMPL_var p.name>
       <-/TMPL_foreach>); \
@@ -77,7 +71,7 @@ public:
    * @param impl - logger implementation
    * @param log_level - the minimum log level to allow pass through
    */
-  Logger(btr::log::LoggerImpl* impl, int log_level);
+  Logger(btr::SharedPtr<btr::log::LoggerImpl> impl, int log_level);
 
   /**
    * Dtor.
@@ -87,26 +81,38 @@ public:
 // OPERATIONS
 
   /**
+   * Initialize default instance if none already set.
+   *
+   * @param log_level - the log level to set on the instance
+   */
+  static void init(int log_level);
+
+  /**
+   * @return true if logger instance is set
+   */
+  static bool isInstance();
+
+  /**
    * @return global logger instance
    */
-  static Logger* instance();
+  static btr::SharedPtr<Logger> instance();
 
   /**
    * @param logger - the global logger instance to set
    * @return any previous logger instance
    */
-  static Logger* instance(Logger* logger);
+  static btr::SharedPtr<Logger> instance(btr::SharedPtr<Logger> logger);
 
   /**
    * @return logger implementation
    */
-  btr::log::LoggerImpl* impl();
+  btr::SharedPtr<btr::log::LoggerImpl> impl();
 
   /**
    * @param impl - the logger implementation instance
    * @return any previous logger implementation instance
    */
-  btr::log::LoggerImpl* impl(btr::log::LoggerImpl* impl);
+  btr::SharedPtr<btr::log::LoggerImpl> impl(btr::SharedPtr<btr::log::LoggerImpl> impl);
 
   /**
    * @param errnum - the error number
@@ -158,8 +164,8 @@ private:
 
 // ATTRIBUTES
 
-  static Logger* logger_;
-  btr::log::LoggerImpl* logger_impl_;
+  static btr::SharedPtr<Logger> logger_;
+  btr::SharedPtr<btr::log::LoggerImpl> logger_impl_;
   int levels_[<TMPL_var (COUNT() + 1)>];
 };
 <TMPL_foreach namespace as n>

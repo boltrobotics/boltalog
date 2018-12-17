@@ -13,7 +13,6 @@
 
 // PROJECT INCLUDES
 #include "logger.hpp" // class implemented
-#include "boltalog/logger_impl.hpp"
 
 <TMPL_foreach namespace as n->
 namespace <TMPL_var n>
@@ -21,13 +20,14 @@ namespace <TMPL_var n>
 
 </TMPL_foreach->
 
-Logger* Logger::logger_ = nullptr;
+btr::SharedPtr<Logger> Logger::logger_;
 
 /////////////////////////////////////////////// PUBLIC /////////////////////////////////////////////
 
 //============================================= LIFECYCLE ==========================================
 
-Logger::Logger(btr::log::LoggerImpl* logger_impl, int log_level) :
+Logger::Logger(btr::SharedPtr<btr::log::LoggerImpl> logger_impl, int log_level)
+  :
   logger_impl_(logger_impl)
 {
   levels_[0] = log_level;
@@ -40,27 +40,43 @@ Logger::Logger(btr::log::LoggerImpl* logger_impl, int log_level) :
 //============================================= OPERATIONS =========================================
 
 // static
-Logger* Logger::instance()
+void Logger::init(int log_level)
+{
+  if (nullptr == logger_.get()) {
+    btr::SharedPtr<btr::log::LoggerImpl> impl(new btr::log::LoggerImpl());
+    btr::SharedPtr<Logger> logger(new Logger(impl, log_level));
+    Logger::instance(logger);
+  }
+}
+
+// static
+bool Logger::isInstance()
+{
+  return (nullptr != logger_.get());
+}
+
+// static
+btr::SharedPtr<Logger> Logger::instance()
 {
   return logger_;
 }
 
 // static
-Logger* Logger::instance(Logger* logger)
+btr::SharedPtr<Logger> Logger::instance(btr::SharedPtr<Logger> logger)
 {
-  Logger* prev_logger = logger_;
+  btr::SharedPtr<Logger> prev_logger = logger_;
   logger_ = logger;
   return prev_logger;
 }
 
-btr::log::LoggerImpl* Logger::impl()
+btr::SharedPtr<btr::log::LoggerImpl> Logger::impl()
 {
   return logger_impl_;
 }
 
-btr::log::LoggerImpl* Logger::impl(btr::log::LoggerImpl* impl)
+btr::SharedPtr<btr::log::LoggerImpl> Logger::impl(btr::SharedPtr<btr::log::LoggerImpl> impl)
 {
-  btr::log::LoggerImpl* prev_logger_impl = logger_impl_;
+  btr::SharedPtr<btr::log::LoggerImpl> prev_logger_impl = logger_impl_;
   logger_impl_ = impl;
   return prev_logger_impl;
 }

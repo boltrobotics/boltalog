@@ -46,7 +46,7 @@ public:
   LoggerImpl();
 
   /**
-   * Deregister a logger.
+   * Deregister the logger instance.
    */
   ~LoggerImpl();
 

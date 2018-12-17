@@ -10,6 +10,7 @@
 // PROJECT INCLUDES
 #include "logger.hpp"
 #include "boltalog/logger_impl.hpp"
+#include "utility/shared_ptr.hpp"
 
 using namespace log::test;
 
@@ -30,12 +31,12 @@ public:
     fname_(fname),
     spd_logger_(spdlog::basic_logger_st("mylogger", fname_, true)),
     logger_impl_(new LoggerImpl(spd_logger_)),
-    logger_(new Logger(logger_impl_.get(), LOG_LEVEL::TRACE))
+    logger_(new Logger(logger_impl_, LOG_LEVEL::TRACE))
   {
     spd_logger_->set_level(spdlog::level::trace);
     // 2017-08-28T11:45:40.523085-04:00
     spd_logger_->set_pattern("%Y-%m-%dT%T.%f%z %L [%t]: %v");
-    Logger::instance(logger_.get());
+    Logger::instance(logger_);
   }
 
   ~LoggerTest()
@@ -47,8 +48,8 @@ public:
 
   std::string fname_;
   std::shared_ptr<spdlog::logger> spd_logger_;
-  std::unique_ptr<LoggerImpl> logger_impl_;
-  std::unique_ptr<Logger> logger_;
+  btr::SharedPtr<LoggerImpl> logger_impl_;
+  btr::SharedPtr<Logger> logger_;
 };
 
 //---------------------------------------------------------------------------------------------------
@@ -75,12 +76,12 @@ std::vector<std::string> readLastLines(
 
 TEST_F(LoggerTest, instance)
 {
-  ASSERT_EQ(logger_.get(), Logger::instance());
+  ASSERT_EQ(logger_.get(), Logger::instance().get());
 }
 
 TEST_F(LoggerTest, Level)
 {
-  Logger* logger = Logger::instance();
+  btr::SharedPtr<Logger> logger = Logger::instance();
 
   for (int i = 0; i < 5; i++) {
     ASSERT_EQ(true, logger->filter(i));

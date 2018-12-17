@@ -4,6 +4,18 @@ include(gtest)
 list(APPEND LIBRARIES ${gtest_LIB_NAME})
 
 ####################################################################################################
+# utility {
+
+add_project(
+  PREFIX utility
+  HOME "$ENV{UTILITY_HOME}"
+  URL "ssh://sergey@panda:2222/volume1/homes/sergey/dev/projects/utility.git")
+
+include_directories(${utility_INC_DIR})
+
+# }
+
+####################################################################################################
 # spdlog {
 
 add_project(

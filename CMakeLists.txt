@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(boltalog)
 
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
+set(CMAKE_MODULE_PATH $ENV{PROJECTS_HOME}/cmake-helpers/cmake/Modules)
 include(init)
 include(firmware)
 

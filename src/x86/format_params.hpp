@@ -1,8 +1,8 @@
 // Copyright (C) 2018 Bolt Robotics <info@boltrobotics.com>
 // License: GNU GPL v3
 
-#ifndef _btr_log_FormatSpec_hpp_
-#define _btr_log_FormatSpec_hpp_
+#ifndef _btr_log_FormatParams_hpp_
+#define _btr_log_FormatParams_hpp_
 
 // SYSTEM INCLUDES
 #include "CTPP2VMSyscall.hpp"
@@ -21,7 +21,7 @@ using namespace CTPP;
 /**
  * The class encapsulates a set of servers and registers to poll once or periodically.
  */
-class FormatSpec : public SyscallHandler
+class FormatParams : public SyscallHandler
 {
 public:
 
@@ -30,12 +30,12 @@ public:
   /**
    * Ctor.
    */
-  FormatSpec() = default;
+  FormatParams() = default;
 
   /**
    * Dtor.
    */
-  ~FormatSpec() = default;;
+  ~FormatParams() = default;;
 
 private:
 
@@ -65,36 +65,36 @@ private:
 
 //============================================= OPERATIONS =========================================
 
-inline INT_32 FormatSpec::Handler(CDT* argv, const UINT_32 argc, CDT& cdt, Logger& logger)
+inline INT_32 FormatParams::Handler(CDT* argv, const UINT_32 argc, CDT& cdt, Logger& logger)
 {
-  (void)logger;
   int rc = 0;
 
-  if (argc == 1) {
-    const STLW::string s = argv[0].GetString();
+  if (argc == 2) {
+    const STLW::string n = argv[0].GetString();
+    const STLW::string s = argv[1].GetString();
 
     if (s == "int8_t") {
-      cdt = "PRId8";
+      cdt = n;
     } else if (s == "uint8_t") {
-      cdt = "PRIu8";
+      cdt = n;
     } else if (s == "int16_t") {
-      cdt = "PRId16";
+      cdt = n;
     } else if (s == "uint16_t") {
-      cdt = "PRIu16";
+      cdt = n;
     } else if (s == "int32_t") {
-      cdt = "PRId32";
+      cdt = n;
     } else if (s == "uint32_t") {
-      cdt = "PRIu32";
+      cdt = n;
     } else if (s == "int64_t") {
-      cdt = "PRId64";
+      cdt = n;
     } else if (s == "uint64_t") {
-      cdt = "PRIu64";
+      cdt = n;
     } else if (s == "double") {
-      cdt = "\".6f\"";
+      cdt = n;
     } else if (s == "string") {
-      cdt = "\".*s\"";
+      cdt = n + "_size, " + n;
     } else if (s == "hex") {
-      cdt = "\".*s\"";
+      cdt = n + "_size*3-1, " + n + "_buff";
     } else {
       std::string t(
           "int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t, "
@@ -103,19 +103,19 @@ inline INT_32 FormatSpec::Handler(CDT* argv, const UINT_32 argc, CDT& cdt, Logge
       rc = -1;
     }
   } else {
-    logger.Emerg("Usage: FORMATSPEC(type)"); 
+    logger.Emerg("Usage: FORMATPARAMS(type, name)"); 
     rc = -1;
   }
   return rc;
 }
 
-inline CCHAR_P FormatSpec::GetName() const
+inline CCHAR_P FormatParams::GetName() const
 {
-  return "formatspec";
+  return "formatparams";
 }
 
 } // namespace log
 
 } // namespace btr
 
-#endif // _btr_log_FormatSpec_hpp_
+#endif // _btr_log_FormatParams_hpp_

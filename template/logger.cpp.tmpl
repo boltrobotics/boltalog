@@ -1,10 +1,6 @@
-<TMPL_verbose>
-<TMPL_comment>
-// Copyright (C) 2018 Bolt Robotics <info@boltrobotics.com>
-// License: GNU GPL v3
-</TMPL_comment>
-<TMPL_include "license.tmpl">
-</TMPL_verbose>
+// Copyright (C) 2019 Bolt Robotics <info@boltrobotics.com>
+// License: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // WARNING: The code is auto-generated. Any changes will be overwritten.
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,6 +17,28 @@ namespace <TMPL_var n>
 </TMPL_foreach->
 
 btr::SharedPtr<Logger> Logger::logger_;
+
+uint32_t toHex(const char* data, uint32_t size, char* dst_str, uint32_t dst_size)
+{
+  if (size == 0 || dst_size < (size * 3)) {
+    return -1;
+  }
+
+  static const char lut[] = "0123456789ABCDEF";
+  uint32_t j = 0;
+
+  for (uint32_t i = 0; i < size; i++, j += 3) {
+    const uint8_t c = data[i];
+    dst_str[j] = lut[c >> 4];
+    dst_str[j + 1] = lut[c & 15];
+    dst_str[j + 2] = ':';
+  }
+
+  if (j >= 3) {
+    dst_str[(j - 3) + 2] = '\0';
+  }
+  return j;
+}
 
 /////////////////////////////////////////////// PUBLIC /////////////////////////////////////////////
 
@@ -115,9 +133,9 @@ int Logger::<TMPL_var e.name>Impl(
 
   <TMPL_foreach params as p->
   <TMPL_if !(p.__first__)->,
-  <TMPL_var TYPEMAPPER(p.type)> <TMPL_var p.name->
+  <TMPL_var PARAMMAPPER(p.type, p.name)->
   <TMPL_else>
-  <TMPL_var TYPEMAPPER(p.type)> <TMPL_var p.name->
+  <TMPL_var PARAMMAPPER(p.type, p.name)->
   </TMPL_if->
   </TMPL_foreach->)
 
@@ -125,6 +143,11 @@ int Logger::<TMPL_var e.name>Impl(
   <-/TMPL_if>
 {
   char buff[MAX_LOG_SIZE];
+  <TMPL_if DEFINED(params)->
+  <TMPL_foreach params as p->
+  <-TMPL_var TOHEX(p.type, p.name)>
+  <-/TMPL_foreach->
+  </TMPL_if>
   int cx = snprintf(buff, MAX_LOG_SIZE, "<TMPL_var e.id>"
     <TMPL_if DEFINED(params)->
 
@@ -133,7 +156,7 @@ int Logger::<TMPL_var e.name>Impl(
     <-/TMPL_foreach->
     ,
     <TMPL_foreach params as p->
-    <TMPL_if !p.__first__>,</TMPL_if><TMPL_var p.name>
+    <TMPL_if !p.__first__>,</TMPL_if><TMPL_var FORMATPARAMS(p.type, p.name)>
     <-/TMPL_foreach>
 
     <-/TMPL_if>);

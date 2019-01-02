@@ -12,10 +12,9 @@
 #include "boltalog/logger_impl.hpp"
 #include "utility/shared_ptr.hpp"
 
-using namespace log::test;
-
 namespace btr
 {
+
 namespace log
 {
 
@@ -31,12 +30,12 @@ public:
     fname_(fname),
     spd_logger_(spdlog::basic_logger_st("mylogger", fname_, true)),
     logger_impl_(new LoggerImpl(spd_logger_)),
-    logger_(new Logger(logger_impl_, LOG_LEVEL::TRACE))
+    logger_(new test::log::Logger(logger_impl_, LOG_LEVEL::TRACE))
   {
     spd_logger_->set_level(spdlog::level::trace);
     // 2017-08-28T11:45:40.523085-04:00
     spd_logger_->set_pattern("%Y-%m-%dT%T.%f%z %L [%t]: %v");
-    Logger::instance(logger_);
+    test::log::Logger::instance(logger_);
   }
 
   ~LoggerTest()
@@ -48,7 +47,7 @@ public:
   std::string fname_;
   std::shared_ptr<spdlog::logger> spd_logger_;
   btr::SharedPtr<LoggerImpl> logger_impl_;
-  btr::SharedPtr<Logger> logger_;
+  btr::SharedPtr<test::log::Logger> logger_;
 };
 
 //---------------------------------------------------------------------------------------------------
@@ -75,12 +74,12 @@ std::vector<std::string> readLastLines(
 
 TEST_F(LoggerTest, instance)
 {
-  ASSERT_EQ(logger_.get(), Logger::instance().get());
+  ASSERT_EQ(logger_.get(), test::log::Logger::instance().get());
 }
 
 TEST_F(LoggerTest, Level)
 {
-  btr::SharedPtr<Logger> logger = Logger::instance();
+  btr::SharedPtr<test::log::Logger> logger = test::log::Logger::instance();
 
   for (int i = 0; i < 5; i++) {
     ASSERT_EQ(true, logger->filter(i));
@@ -111,15 +110,15 @@ TEST_F(LoggerTest, Output)
 
   event1(32, 8);
   event2(65535, 3.03);
-  event3(64, 32323, "string", 4);
-  event4(8, 64, 16, 32, 32, 16, 64, 8, 8.8, "text");
+  event3(64, 32323, "string", strlen("string"), 4, "string", strlen("string"));
+  event4(8, 64, 16, 32, 32, 16, 64, 8, 8.8, "text", 4, "text", 2, "text", 3);
   spd_logger_->flush();
 
   std::vector<std::string> expected;
   expected.push_back("1,32,8");
   expected.push_back("2,65535,3.030000");
-  expected.push_back("3,64,32323,string,4");
-  expected.push_back("4,8,64,16,32,32,16,64,8,8.800000,text");
+  expected.push_back("3,64,32323,string,4,73:74:72:69:6E:67");
+  expected.push_back("4,8,64,16,32,32,16,64,8,8.800000,text,74:65,74:65:78");
 
   uint8_t start_idx = 0;
   uint8_t count = 4;

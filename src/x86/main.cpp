@@ -1,5 +1,5 @@
-// Copyright (C) 2018 Bolt Robotics <info@boltrobotics.com>
-// License: GNU GPL v3
+// Copyright (C) 2019 Bolt Robotics <info@boltrobotics.com>
+// License: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 // SYSTEM INCLUDES
 #include <stdlib.h>
@@ -31,7 +31,11 @@
 // PROJECT INCLUDES
 #include "count.hpp"
 #include "format_spec.hpp"
+#include "format_params.hpp"
 #include "type_mapper.hpp"
+#include "macro_mapper.hpp"
+#include "param_mapper.hpp"
+#include "to_hex.hpp"
 
 using namespace CTPP;
 
@@ -68,10 +72,18 @@ int main(int argc, char** argv)
   SyscallFactory syscall_factory(100);
   btr::log::Count count;
   syscall_factory.RegisterHandler(&count);
-  btr::log::FormatSpec pf;
-  syscall_factory.RegisterHandler(&pf);
+  btr::log::FormatSpec fs;
+  syscall_factory.RegisterHandler(&fs);
+  btr::log::FormatParams fp;
+  syscall_factory.RegisterHandler(&fp);
   btr::log::TypeMapper tm;
   syscall_factory.RegisterHandler(&tm);
+  btr::log::ParamMapper pm;
+  syscall_factory.RegisterHandler(&pm);
+  btr::log::MacroMapper mm;
+  syscall_factory.RegisterHandler(&mm);
+  btr::log::ToHex th;
+  syscall_factory.RegisterHandler(&th);
 
   STDLibInitializer::InitLibrary(syscall_factory);
 

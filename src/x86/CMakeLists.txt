@@ -43,33 +43,33 @@ set(PREFIX "${TMPL_DIR}/logger")
 set(SCRIPT_PRE "${TMPL_DIR}/log_viewer")
 
 add_custom_command(
-  OUTPUT ${PREFIX}.hpp.ct2
-  COMMAND ${CTPP2C} ${PREFIX}.hpp.tmpl ${PREFIX}.hpp.ct2
+  OUTPUT ${PREFIX}.hppct2
+  COMMAND ${CTPP2C} ${PREFIX}.hpptmpl ${PREFIX}.hppct2
   WORKING_DIRECTORY ${TMPL_DIR}
-  COMMENT "Generating ${PREFIX}.hpp.ct2 from ${PREFIX}.hpp.tmpl" VERBATIM
-  DEPENDS ${PREFIX}.hpp.tmpl
+  COMMENT "Generating ${PREFIX}.hppct2 from ${PREFIX}.hpptmpl" VERBATIM
+  DEPENDS ${PREFIX}.hpptmpl
   )
 
 add_custom_command(
-  OUTPUT ${PREFIX}.cpp.ct2
-  COMMAND ${CTPP2C} ${PREFIX}.cpp.tmpl ${PREFIX}.cpp.ct2
+  OUTPUT ${PREFIX}.cppct2
+  COMMAND ${CTPP2C} ${PREFIX}.cpptmpl ${PREFIX}.cppct2
   WORKING_DIRECTORY ${TMPL_DIR}
-  COMMENT "Generating ${PREFIX}.cpp.ct2 from ${PREFIX}.cpp.tmpl" VERBATIM
-  DEPENDS ${PREFIX}.cpp.tmpl
+  COMMENT "Generating ${PREFIX}.cppct2 from ${PREFIX}.cpptmpl" VERBATIM
+  DEPENDS ${PREFIX}.cpptmpl
   )
 
 add_custom_command(
-  OUTPUT ${SCRIPT_PRE}.py.ct2
-  COMMAND ${CTPP2C} ${SCRIPT_PRE}.py.tmpl ${SCRIPT_PRE}.py.ct2
+  OUTPUT ${SCRIPT_PRE}.pyct2
+  COMMAND ${CTPP2C} ${SCRIPT_PRE}.pytmpl ${SCRIPT_PRE}.pyct2
   WORKING_DIRECTORY ${TMPL_DIR}
-  COMMENT "Generating ${SCRIPT_PRE}.py.ct2 from ${SCRIPT_PRE}.py.tmpl" VERBATIM
-  DEPENDS ${SCRIPT_PRE}.py.tmpl
+  COMMENT "Generating ${SCRIPT_PRE}.pyct2 from ${SCRIPT_PRE}.pytmpl" VERBATIM
+  DEPENDS ${SCRIPT_PRE}.pytmpl
   )
 
 add_custom_target(
   boltalog_templates
-  DEPENDS ${PREFIX}.cpp.ct2 ${PREFIX}.cpp.tmpl ${PREFIX}.hpp.ct2 ${PREFIX}.hpp.tmpl
-    ${SCRIPT_PRE}.py.ct2 ${SCRIPT_PRE}.py.tmpl
+  DEPENDS ${PREFIX}.cppct2 ${PREFIX}.cpptmpl ${PREFIX}.hppct2 ${PREFIX}.hpptmpl
+    ${SCRIPT_PRE}.pyct2 ${SCRIPT_PRE}.pytmpl
   )
 
 # } autogen

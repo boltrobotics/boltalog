@@ -38,26 +38,26 @@ set(SCRIPT_DST "${PROJECT_SOURCE_DIR}/script")
 
 add_custom_command(
   OUTPUT ${SRC_DST}/logger.hpp
-  COMMAND ${TMPL_VM} ${TMPL_DIR}/logger.hpp.ct2 ${MODEL} logger.hpp 0 102400
+  COMMAND ${TMPL_VM} ${TMPL_DIR}/logger.hppct2 ${MODEL} logger.hpp 0 102400
   WORKING_DIRECTORY ${SRC_DST}
   COMMENT "Generating logger.hpp from ${MODEL}" VERBATIM
-  DEPENDS ${TMPL_VM} ${TMPL_DIR}/logger.hpp.ct2 ${MODEL}
+  DEPENDS ${TMPL_VM} ${TMPL_DIR}/logger.hppct2 ${MODEL}
   )
 
 add_custom_command(
   OUTPUT ${SRC_DST}/logger.cpp
-  COMMAND ${TMPL_VM} ${TMPL_DIR}/logger.cpp.ct2 ${MODEL} logger.cpp 0 102400
+  COMMAND ${TMPL_VM} ${TMPL_DIR}/logger.cppct2 ${MODEL} logger.cpp 0 102400
   WORKING_DIRECTORY ${SRC_DST}
   COMMENT "Generating logger.cpp from ${MODEL}" VERBATIM
-  DEPENDS ${TMPL_VM} ${TMPL_DIR}/logger.cpp.ct2 ${MODEL}
+  DEPENDS ${TMPL_VM} ${TMPL_DIR}/logger.cppct2 ${MODEL}
   )
 
 add_custom_command(
   OUTPUT ${SCRIPT_DST}/log_viewer.py
-  COMMAND ${TMPL_VM} ${TMPL_DIR}/log_viewer.py.ct2 ${MODEL} log_viewer.py 0 102400
+  COMMAND ${TMPL_VM} ${TMPL_DIR}/log_viewer.pyct2 ${MODEL} log_viewer.py 0 102400
   WORKING_DIRECTORY ${SCRIPT_DST}
   COMMENT "Generating log_viewer.py from ${MODEL}" VERBATIM
-  DEPENDS ${TMPL_VM} ${TMPL_DIR}/log_viewer.py.ct2 ${MODEL}
+  DEPENDS ${TMPL_VM} ${TMPL_DIR}/log_viewer.pyct2 ${MODEL}
   )
 
 add_custom_target(

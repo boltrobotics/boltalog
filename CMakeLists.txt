@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 3.5)
 project(boltalog)
 
-set(CMAKE_MODULE_PATH $ENV{PROJECTS_HOME}/cmake-helpers/cmake/Modules)
+set(CMAKE_MODULE_PATH $ENV{CMAKEHELPERS_HOME}/cmake/Modules)
 include(init)
 include(firmware)
+
+####################################################################################################
+# x86, stm32 {
 
 function(add_target_config_args)
   add_target_config(
@@ -53,6 +56,8 @@ else ()
   endif ()
 
 endif ()
+
+# } x86, stm32
 
 ####################################################################################################
 # unit testing, x86 {

@@ -1,10 +1,6 @@
-<TMPL_verbose>
-<TMPL_comment>
-// Copyright (C) 2018 Bolt Robotics <info@boltrobotics.com>
-// License: GNU GPL v3
-</TMPL_comment>
-<TMPL_include "license.tmpl">
-</TMPL_verbose>
+// Copyright (C) 2019 Bolt Robotics <info@boltrobotics.com>
+// License: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // WARNING: The code is auto-generated. Any changes will be overwritten.
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,16 +36,16 @@ namespace <TMPL_var n>
 {
 </TMPL_foreach->
 <-TMPL_foreach events as e->
-<-TMPL_if DEFINED(e.desc)>
+<-TMPL_if DEFINED(e.doc)>
 
 /**
- * <TMPL_var e.desc>
+ * <TMPL_var e.doc>
  *
 <-TMPL_else>
 /**
 <-/TMPL_if>
 <-TMPL_foreach params as p>
- * @param <TMPL_var p.name> <TMPL_var p.desc>
+ * @param <TMPL_var p.name> <TMPL_var p.doc>
 <-/TMPL_foreach>
  */
 #define <TMPL_var e.name>(

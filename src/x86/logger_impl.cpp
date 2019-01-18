@@ -1,5 +1,5 @@
-// Copyright (C) 2018 Bolt Robotics <info@boltrobotics.com>
-// License: GNU GPL v3
+// Copyright (C) 2019 Bolt Robotics <info@boltrobotics.com>
+// License: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 // SYSTEM INCLUDES
 #if defined(x86)
@@ -54,7 +54,7 @@ const char* LoggerImpl::strerror(int errnum)
   case EBADLOGLEVEL:
     return "Bad log level";
   default:
-    return "Unknown";
+    return strerror(errnum);
   }
 }
 

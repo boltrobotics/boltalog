@@ -9,8 +9,8 @@ include(project_setup)
 set(CTPP2_HOME $ENV{CTPP2_HOME})
 include_directories(${CTPP2_HOME}/include)
 
-if (NOT TARGET ctpp)
-  add_subdirectory(${CTPP2_HOME} ${PROJECT_BINARY_DIR}/ctpp)
+if (NOT TARGET ctpp2)
+  add_subdirectory(${CTPP2_HOME} ${PROJECT_BINARY_DIR}/ctpp2)
 endif ()
 
 # } CTPP2

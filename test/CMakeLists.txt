@@ -76,9 +76,9 @@ add_compile_options(-Wall -Wextra -Werror)
 
 add_executable(${PROJECT_NAME}_tests ${SOURCES})
 set_property(TARGET ${PROJECT_NAME}_tests PROPERTY install_rpath "@loader_path/../lib")
-
 target_link_LIBRARIES(${PROJECT_NAME}_tests ${gtest_LIB_NAME} ${PROJECT_NAME})
-add_test(NAME ${PROJECT_NAME}_tests COMMAND ${PROJECT_NAME}_tests)
+
+add_test(NAME ${PROJECT_NAME}_tests COMMAND $<TARGET_FILE:${PROJECT_NAME}_tests>)
 add_dependencies(${PROJECT_NAME}_tests log_viewer)
 
 # } boltalog

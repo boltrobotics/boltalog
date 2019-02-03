@@ -1,2 +1,3 @@
-# utility
-Utility library to share across projects
+# Introduction
+
+The project contains templates for auto-generating logging API.

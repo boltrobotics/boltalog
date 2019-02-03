@@ -1,4 +1,5 @@
-/* Copyright (C) 2018 Bolt Robotics <info@boltrobotics.com> */
+// Copyright (C) 2019 Bolt Robotics <info@boltrobotics.com>
+// License: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
 #ifndef _btr_log_LoggerImpl_hpp_
 #define _btr_log_LoggerImpl_hpp_

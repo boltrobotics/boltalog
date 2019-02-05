@@ -76,7 +76,7 @@ find_package(Threads)
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}
-  ${PROJECT_SOURCE_DIR}/src
+  ${PROJECT_SOURCE_DIR}/src/common
   ${PROJECT_SOURCE_DIR}/include
 )
 

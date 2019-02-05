@@ -93,9 +93,9 @@ inline INT_32 ParamMapper::Handler(CDT* argv, const UINT_32 argc, CDT& cdt, Logg
     } else if (s == "double") {
       cdt = "double " + n;
     } else if (s == "string") {
-      cdt = "const char* " + n + ", uint32_t " + n + "_size";
+      cdt = "const char* " + n + ", int " + n + "_size";
     } else if (s == "hex") {
-      cdt = "const char* " + n + ", uint32_t " + n + "_size";
+      cdt = "const char* " + n + ", int " + n + "_size";
     } else {
       std::string t(
           "int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t, "

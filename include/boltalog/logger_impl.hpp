@@ -7,6 +7,8 @@
 // SYSTEM INCLUDES
 #if defined(x86)
 #include <memory>
+#elif defined(avr)
+#include <Stream.h>
 #endif
 
 // PROJECT INCLUDES
@@ -34,27 +36,29 @@ public:
 
 // LIFECYCLE
 
-#if defined(x86)
   /**
-   * @param logger - spdlog logger
-   */
-  LoggerImpl(std::shared_ptr<spdlog::logger> logger);
-#endif
-
-  /**
-   * Create a stderr console logger as default.
+   * Use stderr console logger on x86.
+   * Use Serial on AVR.
    */
   LoggerImpl();
 
   /**
-   * Deregister the logger instance.
+   * @param logger - platform-specific instance
    */
-  ~LoggerImpl();
+#if defined(x86)
+  LoggerImpl(std::shared_ptr<spdlog::logger> logger);
+#elif defined(avr)
+  LoggerImpl(Stream& logger);
+#elif defined(stm32)
+#endif
 
 // OPERATIONS
 
 #if defined(x86)
   std::shared_ptr<spdlog::logger> backend();
+#elif defined(avr)
+  Stream& backend();
+#elif defined(stm32)
 #endif
 
   /**
@@ -76,6 +80,9 @@ private:
 
 #if defined(x86)
   std::shared_ptr<spdlog::logger> logger_;
+#elif defined(avr)
+  Stream& logger_;
+#elif defined(stm32)
 #endif
 };
 

@@ -92,9 +92,9 @@ inline INT_32 FormatSpec::Handler(CDT* argv, const UINT_32 argc, CDT& cdt, Logge
     } else if (s == "double") {
       cdt = "\".6f\"";
     } else if (s == "string") {
-      cdt = "\".*s\"";
+      cdt = "\"s\"";
     } else if (s == "hex") {
-      cdt = "\".*s\"";
+      cdt = "\"s\"";
     } else {
       std::string t(
           "int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t, "

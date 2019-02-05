@@ -35,7 +35,7 @@
 #include "type_mapper.hpp"
 #include "macro_mapper.hpp"
 #include "param_mapper.hpp"
-#include "to_hex.hpp"
+#include "prep_string.hpp"
 
 using namespace CTPP;
 
@@ -82,8 +82,8 @@ int main(int argc, char** argv)
   syscall_factory.RegisterHandler(&pm);
   btr::log::MacroMapper mm;
   syscall_factory.RegisterHandler(&mm);
-  btr::log::ToHex th;
-  syscall_factory.RegisterHandler(&th);
+  btr::log::PrepString preps;
+  syscall_factory.RegisterHandler(&preps);
 
   STDLibInitializer::InitLibrary(syscall_factory);
 

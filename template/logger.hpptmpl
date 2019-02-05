@@ -25,7 +25,8 @@
 #define _<TMPL_call "guard" args(namespace)>Logger_hpp_
 
 // SYSTEM INCLUDES
-#include <cinttypes>
+#define _STDC_FORMAT_MACROS
+#include <inttypes.h>
 
 // SYSTEM INCLUDES
 #include "utility/shared_ptr.hpp"

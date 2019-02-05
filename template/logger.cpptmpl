@@ -10,6 +10,14 @@
 // PROJECT INCLUDES
 #include "logger.hpp" // class implemented
 
+// AVR libc doesn't define these macros
+#if !defined(PRIu64)
+#define PRIu64 "llu"
+#endif
+#if !defined(PRId64)
+#define PRId64 "ll"
+#endif
+
 <TMPL_foreach namespace as n->
 namespace <TMPL_var n>
 {
@@ -145,7 +153,7 @@ int Logger::<TMPL_var e.name>Impl(
   char buff[MAX_LOG_SIZE];
   <TMPL_if DEFINED(params)->
   <TMPL_foreach params as p->
-  <-TMPL_var TOHEX(p.type, p.name)>
+  <-TMPL_var PREPSTRING(p.type, p.name)>
   <-/TMPL_foreach->
   </TMPL_if>
   int cx = snprintf(buff, MAX_LOG_SIZE, "<TMPL_var e.id>"
@@ -180,7 +188,8 @@ int Logger::log(int cx, int level, const char* msg)
     if (cx < MAX_LOG_SIZE) {
       rc = 0;
     } else {
-      errno = EOVERFLOW;
+      // AVR libc doesn't define EOVERFLOW, just use ERANGE
+      errno = ERANGE;
     }
   }
   return rc;

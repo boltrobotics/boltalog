@@ -5,8 +5,8 @@
 #define _btr_log_Defines_hpp_
 
 // SYSTEM INCLUDES
-#include <cinttypes>
-#include <cerrno>
+#include <inttypes.h>
+#include <errno.h>
 
 namespace btr
 {
@@ -17,8 +17,11 @@ namespace log
 #ifndef MAX_LOG_SIZE 
 #define MAX_LOG_SIZE 128
 #endif
+#ifndef MAX_STRING_SIZE 
+#define MAX_STRING_SIZE 96
+#endif
 #ifndef MAX_HEX_SIZE 
-#define MAX_HEX_SIZE 128
+#define MAX_HEX_SIZE 96
 #endif
 
 enum LOG_LEVEL {

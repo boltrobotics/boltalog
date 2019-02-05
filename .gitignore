@@ -5,7 +5,7 @@ test/log_viewer.py
 template/*ct2
 
 # Cmake
-build/
+build-*
 
 # Mac
 .DS_Store

@@ -1,7 +1,4 @@
-set(BOARD_FAMILY x86)
 set(CMAKE_MACOSX_RPATH 1)
-
-include(project_setup)
 
 ####################################################################################################
 # CTPP2 {
@@ -60,7 +57,7 @@ add_custom_command(
   )
 
 add_custom_target(
-  boltalog_templates
+  boltalog-templates
   DEPENDS
     ctpp2c
     ${LOGGER}.hppct2 ${LOGGER}.hpptmpl ${LOGGER}.cppct2 ${LOGGER}.cpptmpl 
@@ -74,23 +71,15 @@ add_custom_target(
 
 find_package(Threads)
 
-include_directories(
-  ${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}
-  ${PROJECT_SOURCE_DIR}/src/common
-  ${PROJECT_SOURCE_DIR}/include
-)
+set(BUILD_LIB ON)
+set(BUILD_EXE ON)
+set(EXE_SUFFIX "-autogen")
 
-set(MAIN_SRC ${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}/main.cpp)
-file(GLOB SOURCES "${PROJECT_SOURCE_DIR}/src/${BOARD_FAMILY}/*.c*")
-list(REMOVE_ITEM SOURCES ${MAIN_SRC})
+set(EXE_LIBRARIES ${PROJECT_NAME} ctpp2)
+set(LIB_LIBRARIES ${CMAKE_THREAD_LIBS_INIT} ctpp2)
 
-add_definitions(-D${BOARD_FAMILY})
-add_compile_options(-Wall -Wextra -Werror)
+include(x86_project)
 
-add_library(${PROJECT_NAME} SHARED ${SOURCES})
-
-add_executable(${PROJECT_NAME}_autogen ${MAIN_SRC})
-add_dependencies(${PROJECT_NAME}_autogen boltalog_templates)
-target_link_libraries(${PROJECT_NAME}_autogen ${PROJECT_NAME} ctpp2)
+add_dependencies(${PROJECT_NAME}${EXE_SUFFIX} boltalog-templates)
 
 # } boltalog

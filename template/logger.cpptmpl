@@ -6,9 +6,29 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // SYSTEM INCLUDES
+#include <stdio.h>
 
 // PROJECT INCLUDES
 #include "logger.hpp" // class implemented
+#include "boltalog/defines.hpp"
+
+#if defined(x86)
+
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/stdout_sinks.h"
+static auto x86_logger_ = spdlog::stderr_logger_st("std_err");
+
+#elif defined(avr)
+
+#include <HardwareSerial.h>
+static Stream* avr_logger_ = &Serial;
+
+#elif defined(stm32)
+
+#include "FreeRTOS.h"
+#include "devices/stm32/usb.hpp"
+
+#endif
 
 // AVR libc doesn't define these macros
 #if !defined(PRIu64)
@@ -24,7 +44,7 @@ namespace <TMPL_var n>
 
 </TMPL_foreach->
 
-btr::SharedPtr<Logger> Logger::logger_;
+static Logger logger_;
 
 uint32_t toHex(const char* data, uint32_t size, char* dst_str, uint32_t dst_size)
 {
@@ -52,11 +72,17 @@ uint32_t toHex(const char* data, uint32_t size, char* dst_str, uint32_t dst_size
 
 //============================================= LIFECYCLE ==========================================
 
-Logger::Logger(btr::SharedPtr<btr::log::LoggerImpl> logger_impl, int log_level)
-  :
-  logger_impl_(logger_impl)
+Logger::Logger()
 {
-  levels_[0] = log_level;
+#if defined(x86)
+  // 2017-08-28T11:45:40.523085-04:00
+  x86_logger_->set_pattern("%Y-%m-%dT%T.%f%z %L [%t]: %v");
+  x86_logger_->set_level(spdlog::level::trace);
+#elif defined(stm32)
+  btr::Usb::init(true, configMAX_PRIORITIES - 1);
+#endif
+
+  levels_[0] = BTR_LOG_LEVEL;
 
   <TMPL_foreach events as e->
   levels_[<TMPL_var e.id>] = btr::log::<TMPL_var e.level>;
@@ -66,51 +92,34 @@ Logger::Logger(btr::SharedPtr<btr::log::LoggerImpl> logger_impl, int log_level)
 //============================================= OPERATIONS =========================================
 
 // static
-btr::SharedPtr<Logger> Logger::init(int log_level)
+Logger* Logger::instance()
 {
-  if (nullptr == logger_.get()) {
-    btr::SharedPtr<btr::log::LoggerImpl> impl(new btr::log::LoggerImpl());
-    btr::SharedPtr<Logger> logger(new Logger(impl, log_level));
-    Logger::instance(logger);
-  }
-  return Logger::instance();
+  return &logger_;
 }
 
-// static
-bool Logger::isInstance()
+#if defined(x86)
+// static 
+void Logger::setBackend(std::shared_ptr<spdlog::logger>& backend)
 {
-  return (nullptr != logger_.get());
+  x86_logger_ = backend;
 }
-
-// static
-btr::SharedPtr<Logger> Logger::instance()
+#elif defined(avr)
+// static 
+void Logger::setBackend(Stream& backend)
 {
-  return logger_;
+  avr_logger_ = &backend;
 }
+#endif
 
-// static
-btr::SharedPtr<Logger> Logger::instance(btr::SharedPtr<Logger> logger)
-{
-  btr::SharedPtr<Logger> prev_logger = logger_;
-  logger_ = logger;
-  return prev_logger;
-}
-
-btr::SharedPtr<btr::log::LoggerImpl> Logger::impl()
-{
-  return logger_impl_;
-}
-
-btr::SharedPtr<btr::log::LoggerImpl> Logger::impl(btr::SharedPtr<btr::log::LoggerImpl> impl)
-{
-  btr::SharedPtr<btr::log::LoggerImpl> prev_logger_impl = logger_impl_;
-  logger_impl_ = impl;
-  return prev_logger_impl;
-}
-
+// static 
 const char* Logger::strerror(int errnum)
 {
-  return btr::log::LoggerImpl::strerror(errnum);
+  switch (errnum) {
+  case EBADLOGLEVEL:
+    return "Bad log level";
+  default:
+    return "Unknown";
+  }
 }
 
 int Logger::level(int event_id, int log_level)
@@ -162,7 +171,7 @@ int Logger::<TMPL_var e.name>Impl(
     <TMPL_foreach params as p->
     ",%" <TMPL_var FORMATSPEC(p.type)> ""
     <-/TMPL_foreach->
-    ,
+    "\r\n",
     <TMPL_foreach params as p->
     <TMPL_if !p.__first__>,</TMPL_if><TMPL_var FORMATPARAMS(p.type, p.name)>
     <-/TMPL_foreach>
@@ -183,7 +192,37 @@ int Logger::log(int cx, int level, const char* msg)
   int rc = -1;
 
   if (cx >= 0) {
-    logger_impl_->log(level, msg);
+#if defined(x86)
+    switch (level) {
+      case btr::log::TRACE:
+        x86_logger_->trace(msg);
+        break;
+      case btr::log::DEBUG:
+        x86_logger_->debug(msg);
+        break;
+      case btr::log::INFO:
+        x86_logger_->info(msg);
+        break;
+      case btr::log::WARN:
+        x86_logger_->warn(msg);
+        break;
+      case btr::log::ERROR:
+        x86_logger_->error(msg);
+        break;
+      case btr::log::CRITICAL:
+        x86_logger_->critical(msg);
+        break;
+      default:
+        errno = EBADLOGLEVEL;
+        return rc;
+    };
+#elif defined(avr)
+    (void) level;
+    avr_logger_->print(msg);
+#elif defined(stm32)
+    (void) level;
+    btr::Usb::send(msg);
+#endif
 
     if (cx < MAX_LOG_SIZE) {
       rc = 0;

@@ -14,16 +14,6 @@ namespace btr
 namespace log
 {
 
-#ifndef MAX_LOG_SIZE 
-#define MAX_LOG_SIZE 128
-#endif
-#ifndef MAX_STRING_SIZE 
-#define MAX_STRING_SIZE 96
-#endif
-#ifndef MAX_HEX_SIZE 
-#define MAX_HEX_SIZE 96
-#endif
-
 enum LOG_LEVEL {
   TRACE     = 0,
   DEBUG     = 1,
@@ -33,6 +23,21 @@ enum LOG_LEVEL {
   CRITICAL  = 5,
   LOGS_OFF  = 6
 };
+
+#ifndef MAX_LOG_SIZE 
+#define MAX_LOG_SIZE 128
+#endif
+#ifndef MAX_STRING_SIZE 
+#define MAX_STRING_SIZE 96
+#endif
+#ifndef MAX_HEX_SIZE 
+#define MAX_HEX_SIZE 96
+#endif
+#ifndef BTR_LOG_LEVEL
+#define BTR_LOG_LEVEL btr::log::TRACE
+#endif
+#define LOG_ENOBASE   23000
+#define EBADLOGLEVEL  (LOG_ENOBASE + 1)
 
 } // namespace log
 

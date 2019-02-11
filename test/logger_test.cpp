@@ -9,8 +9,8 @@
 
 // PROJECT INCLUDES
 #include "logger.hpp"
-#include "boltalog/logger_impl.hpp"
 #include "utility/shared_ptr.hpp"
+#include "boltalog/defines.hpp"
 
 namespace btr
 {
@@ -18,7 +18,7 @@ namespace btr
 namespace log
 {
 
-//---------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 class LoggerTest : public testing::Test
 {
@@ -28,14 +28,11 @@ public:
 
   LoggerTest(const std::string& fname = "test.log") :
     fname_(fname),
-    spd_logger_(spdlog::basic_logger_st("mylogger", fname_, true)),
-    logger_impl_(new LoggerImpl(spd_logger_)),
-    logger_(new test::log::Logger(logger_impl_, LOG_LEVEL::TRACE))
+    spd_logger_(spdlog::basic_logger_st("mylogger", fname_, true))
   {
-    spd_logger_->set_level(spdlog::level::trace);
-    // 2017-08-28T11:45:40.523085-04:00
     spd_logger_->set_pattern("%Y-%m-%dT%T.%f%z %L [%t]: %v");
-    test::log::Logger::instance(logger_);
+    spd_logger_->set_level(spdlog::level::trace);
+    test::log::Logger::setBackend(spd_logger_);
   }
 
   ~LoggerTest()
@@ -46,11 +43,9 @@ public:
 
   std::string fname_;
   std::shared_ptr<spdlog::logger> spd_logger_;
-  btr::SharedPtr<LoggerImpl> logger_impl_;
-  btr::SharedPtr<test::log::Logger> logger_;
 };
 
-//---------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 std::vector<std::string> readLastLines(
     uint8_t& start_idx, uint8_t count, const std::string& fname = "test.log")
@@ -72,34 +67,29 @@ std::vector<std::string> readLastLines(
 
 //---------------------------------------------------------------------------------------------------
 
-TEST_F(LoggerTest, instance)
-{
-  ASSERT_EQ(logger_.get(), test::log::Logger::instance().get());
-}
-
 TEST_F(LoggerTest, Level)
 {
-  btr::SharedPtr<test::log::Logger> logger = test::log::Logger::instance();
+  test::log::Logger* logger = test::log::Logger::instance();
 
   for (int i = 0; i < 5; i++) {
     ASSERT_EQ(true, logger->filter(i));
   }
 
-  logger->level(0, WARN);
+  logger->level(0, btr::log::WARN);
   ASSERT_EQ(true, logger->filter(0));
   ASSERT_EQ(false, logger->filter(1));
   ASSERT_EQ(true, logger->filter(2));
   ASSERT_EQ(false, logger->filter(3));
   ASSERT_EQ(false, logger->filter(4));
 
-  logger->level(1, ERROR);
-  logger->level(3, WARN);
+  logger->level(1, btr::log::ERROR);
+  logger->level(3, btr::log::WARN);
 
   for (int i = 0; i < 4; i++) {
     ASSERT_EQ(true, logger->filter(i));
   }
 
-  ASSERT_EQ(-1, logger->level(5, INFO));
+  ASSERT_EQ(-1, logger->level(5, btr::log::INFO));
 }
 
 TEST_F(LoggerTest, Output)
@@ -107,6 +97,8 @@ TEST_F(LoggerTest, Output)
   // The test is disabled because it refers to example log events, and when it is
   // built as part of other project, the referred-to events are not defined. This
   // would cause compilation problems.
+  test::log::Logger* logger = test::log::Logger::instance();
+  logger->level(0, btr::log::TRACE);
 
   event1(32, 8);
   event2(65535, 3.03);
@@ -127,7 +119,8 @@ TEST_F(LoggerTest, Output)
   for (uint8_t i = 0; i < count; i++, start_idx++) {
     std::cout << lines[start_idx % count] << std::endl;
     std::size_t found = lines[start_idx % count].find(expected[i]);
-    ASSERT_NE(std::string::npos, found) << "Not found: " << expected[i];
+    ASSERT_NE(std::string::npos, found) << "Actual: " << lines[start_idx % count]
+      << ". Expected: " << expected[i];
   }
 }
 

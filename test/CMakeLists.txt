@@ -55,12 +55,11 @@ add_custom_target(
   DEPENDS ${SRC_DST}/log_viewer.py
   )
 
-list(APPEND SOURCES ${SRC_DST}/logger.cpp ${SRC_DST}/logger.hpp)
-set(EXE_LIBRARIES ${PROJECT_NAME})
-set(EXE_SUFFIX "-tests")
-
 include(test_project)
 
-add_dependencies(${PROJECT_NAME}${EXE_SUFFIX} log_viewer)
+find_test_srcs()
+list(APPEND SOURCES ${SRC_DST}/logger.cpp ${SRC_DST}/logger.hpp)
+build_exe(SRCS ${SOURCES} SUFFIX "-tests")
+add_dependencies(${PROJECT_NAME}-tests log_viewer)
 
 # } boltalog test

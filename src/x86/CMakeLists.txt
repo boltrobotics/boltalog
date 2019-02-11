@@ -13,18 +13,6 @@ endif ()
 # } CTPP2
 
 ####################################################################################################
-# spdlog {
-
-set(SPDLOG_HOME $ENV{SPDLOG_HOME})
-include_directories(${SPDLOG_HOME}/include)
-
-if (NOT TARGET spdlog)
-  add_subdirectory(${SPDLOG_HOME} ${PROJECT_BINARY_DIR}/spdlog)
-endif ()
-
-# } spdlog
-
-####################################################################################################
 # autogen {
 
 set(TMPL_DIR "${PROJECT_SOURCE_DIR}/template")
@@ -69,17 +57,9 @@ add_custom_target(
 ####################################################################################################
 # boltalog {
 
-find_package(Threads)
-
-set(BUILD_LIB ON)
-set(BUILD_EXE ON)
-set(EXE_SUFFIX "-autogen")
-
-set(EXE_LIBRARIES ${PROJECT_NAME} ctpp2)
-set(LIB_LIBRARIES ${CMAKE_THREAD_LIBS_INIT} ctpp2)
-
 include(x86_project)
 
-add_dependencies(${PROJECT_NAME}${EXE_SUFFIX} boltalog-templates)
+build_exe(SRCS "${MAIN_SRC}" LIBS ctpp2 SUFFIX "-autogen")
+add_dependencies(${PROJECT_NAME}-autogen boltalog-templates)
 
 # } boltalog

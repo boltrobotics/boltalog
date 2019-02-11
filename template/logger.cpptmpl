@@ -74,14 +74,6 @@ uint32_t toHex(const char* data, uint32_t size, char* dst_str, uint32_t dst_size
 
 Logger::Logger()
 {
-#if defined(x86)
-  // 2017-08-28T11:45:40.523085-04:00
-  x86_logger_->set_pattern("%Y-%m-%dT%T.%f%z %L [%t]: %v");
-  x86_logger_->set_level(spdlog::level::trace);
-#elif defined(stm32)
-  btr::Usb::init(true, configMAX_PRIORITIES - 1);
-#endif
-
   levels_[0] = BTR_LOG_LEVEL;
 
   <TMPL_foreach events as e->
@@ -90,6 +82,18 @@ Logger::Logger()
 }
 
 //============================================= OPERATIONS =========================================
+
+// static
+void Logger::init()
+{
+#if defined(x86)
+  // 2017-08-28T11:45:40.523085-04:00
+  x86_logger_->set_pattern("%Y-%m-%dT%T.%f%z %L [%t]: %v");
+  x86_logger_->set_level(spdlog::level::trace);
+#elif defined(stm32)
+  btr::Usb::init(true, configMAX_PRIORITIES - 1);
+#endif
+}
 
 // static
 Logger* Logger::instance()

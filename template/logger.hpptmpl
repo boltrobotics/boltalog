@@ -94,6 +94,11 @@ public:
 // OPERATIONS
 
   /**
+   * Initialize logger backend. The function must be called prior to any others in this class.
+   */
+  static void init();
+
+  /**
    * @return global logger instance
    */
   static Logger* instance();

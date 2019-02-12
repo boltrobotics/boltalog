@@ -39,11 +39,11 @@ static Stream* avr_logger_ = &Serial;
 #define PRId64 "ll"
 #endif
 
-<TMPL_foreach namespace as n->
-namespace <TMPL_var n>
+namespace test
 {
 
-</TMPL_foreach->
+namespace log
+{
 
 static Logger logger_;
 
@@ -77,9 +77,11 @@ Logger::Logger()
 {
   levels_[0] = BTR_LOG_LEVEL;
 
-  <TMPL_foreach events as e->
-  levels_[<TMPL_var e.id>] = btr::log::<TMPL_var e.level>;
-  </TMPL_foreach>
+  levels_[1] = btr::log::INFO;
+  levels_[2] = btr::log::WARN;
+  levels_[3] = btr::log::DEBUG;
+  levels_[4] = btr::log::TRACE;
+  
 }
 
 //============================================= OPERATIONS =========================================
@@ -147,46 +149,78 @@ bool Logger::filter(int event_id) const
   }
 }
 
-<TMPL_foreach events as e->
-
-<TMPL_var COUNT(1)->
-int Logger::<TMPL_var e.name>Impl(
-  <-TMPL_if DEFINED(params)->
-
-  <TMPL_foreach params as p->
-  <TMPL_if !(p.__first__)->,
-  <TMPL_var PARAMMAPPER(p.type, p.name)->
-  <TMPL_else>
-  <TMPL_var PARAMMAPPER(p.type, p.name)->
-  </TMPL_if->
-  </TMPL_foreach->)
-
-  <-TMPL_else->)
-  <-/TMPL_if>
+int Logger::event1Impl(
+  int32_t param1,
+  int8_t param2)
 {
   char buff[MAX_LOG_SIZE];
-  <TMPL_if DEFINED(params)->
-  <TMPL_foreach params as p->
-  <-TMPL_var PREPSTRING(p.type, p.name)>
-  <-/TMPL_foreach->
-  </TMPL_if>
-  int cx = snprintf(buff, MAX_LOG_SIZE, "<TMPL_var e.id>"
-    <TMPL_if DEFINED(params)->
+  
+  int cx = snprintf(buff, MAX_LOG_SIZE, "1"
+    ",%" PRId32 """,%" PRId8 """\r\n",
+    param1,param2);
 
-    <TMPL_foreach params as p->
-    ",%" <TMPL_var FORMATSPEC(p.type)> ""
-    <-/TMPL_foreach->
-    "\r\n",
-    <TMPL_foreach params as p->
-    <TMPL_if !p.__first__>,</TMPL_if><TMPL_var FORMATPARAMS(p.type, p.name)>
-    <-/TMPL_foreach>
-
-    <-/TMPL_if>);
-
-  return log(cx, levels_[<TMPL_var e.id>], buff);
+  return log(cx, levels_[1], buff);
 }
 
-</TMPL_foreach->
+int Logger::event2Impl(
+  uint16_t param1,
+  double param2)
+{
+  char buff[MAX_LOG_SIZE];
+  
+  int cx = snprintf(buff, MAX_LOG_SIZE, "2"
+    ",%" PRIu16 """,%" ".6f" """\r\n",
+    param1,param2);
+
+  return log(cx, levels_[2], buff);
+}
+
+int Logger::event3Impl(
+  uint64_t p1,
+  int16_t p2,
+  const char* p3, int p3_size,
+  uint8_t p4,
+  const char* p5, int p5_size)
+{
+  char buff[MAX_LOG_SIZE];
+  
+  (void) p3_size;
+  char p5_buff[MAX_HEX_SIZE];
+  toHex(p5, p5_size, p5_buff, MAX_HEX_SIZE);
+  int cx = snprintf(buff, MAX_LOG_SIZE, "3"
+    ",%" PRIu64 """,%" PRId16 """,%" "s" """,%" PRIu8 """,%" "s" """\r\n",
+    p1,p2,p3,p4,p5_buff);
+
+  return log(cx, levels_[3], buff);
+}
+
+int Logger::event4Impl(
+  uint8_t u8,
+  int64_t d64,
+  uint16_t u16,
+  int32_t d32,
+  uint32_t u32,
+  int16_t d16,
+  uint64_t u64,
+  int8_t d8,
+  double dbl,
+  const char* str, int str_size,
+  const char* hx, int hx_size,
+  const char* hx2, int hx2_size)
+{
+  char buff[MAX_LOG_SIZE];
+  
+  (void) str_size;
+  char hx_buff[MAX_HEX_SIZE];
+  toHex(hx, hx_size, hx_buff, MAX_HEX_SIZE);
+  char hx2_buff[MAX_HEX_SIZE];
+  toHex(hx2, hx2_size, hx2_buff, MAX_HEX_SIZE);
+  int cx = snprintf(buff, MAX_LOG_SIZE, "4"
+    ",%" PRIu8 """,%" PRId64 """,%" PRIu16 """,%" PRId32 """,%" PRIu32 """,%" PRId16 """,%" PRIu64 """,%" PRId8 """,%" ".6f" """,%" "s" """,%" "s" """,%" "s" """\r\n",
+    u8,d64,u16,d32,u32,d16,u64,d8,dbl,str,hx_buff,hx2_buff);
+
+  return log(cx, levels_[4], buff);
+}
 
 /////////////////////////////////////////////// PRIVATE ////////////////////////////////////////////
 
@@ -238,6 +272,8 @@ int Logger::log(int cx, int level, const char* msg)
   }
   return rc;
 }
-<TMPL_foreach namespace as n>
-} // namespace <TMPL_var n>
-</TMPL_foreach>
+
+} // namespace test
+
+} // namespace log
+

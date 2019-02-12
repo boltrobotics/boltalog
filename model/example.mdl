@@ -2,21 +2,21 @@
 'namespace': [ 'test', 'log' ],
 'events': [
   {
-    'id':'1', 'name':'event1', 'level':'INFO', 'desc':'Event1 description',
+    'id':'1', 'name':'event1', 'level':'INFO', 'doc':'Event1 description',
     'params': [
       { 'name':'param1', 'type':'int32_t' },
       { 'name':'param2', 'type':'int8_t' }
     ]
   },
   {
-    'id':'2', 'name':'event2', 'level':'WARN', 'desc':'Event2 description',
+    'id':'2', 'name':'event2', 'level':'WARN', 'doc':'Event2 description',
     'params': [
       { 'name':'param1', 'type':'uint16_t' },
       { 'name':'param2', 'type':'double' }
     ]
   },
   {
-    'id':'3', 'name':'event3', 'level':'DEBUG', 'desc':'Event3 description',
+    'id':'3', 'name':'event3', 'level':'DEBUG', 'doc':'Event3 description',
     'params': [
       { 'name':'p1', 'type':'uint64_t' },
       { 'name':'p2', 'type':'int16_t' },
@@ -26,9 +26,9 @@
     ]
   },
   {
-    'id':'4', 'name':'event4', 'level':'TRACE', 'desc':'Event4 description',
+    'id':'4', 'name':'event4', 'level':'TRACE', 'doc':'Event4 description',
     'params': [
-      { 'name':'u8', 'type':'uint8_t', 'desc':'u8 description' },
+      { 'name':'u8', 'type':'uint8_t', 'doc':'u8 description' },
       { 'name':'d64', 'type':'int64_t' },
       { 'name':'u16', 'type':'uint16_t' },
       { 'name':'d32', 'type':'int32_t' },
@@ -36,9 +36,9 @@
       { 'name':'d16', 'type':'int16_t' },
       { 'name':'u64', 'type':'uint64_t' },
       { 'name':'d8', 'type':'int8_t' },
-      { 'name':'dbl', 'type':'double', 'desc':'dbl description' },
-      { 'name':'str', 'type':'string', 'desc':'string description' },
-      { 'name':'hx', 'type':'hex', 'desc':'hex description' },
+      { 'name':'dbl', 'type':'double', 'doc':'dbl description' },
+      { 'name':'str', 'type':'string', 'doc':'string description' },
+      { 'name':'hx', 'type':'hex', 'doc':'hex description' },
       { 'name':'hx2', 'type':'hex' }
     ]
   }

@@ -94,9 +94,6 @@ TEST_F(LoggerTest, Level)
 
 TEST_F(LoggerTest, Output)
 {
-  // The test is disabled because it refers to example log events, and when it is
-  // built as part of other project, the referred-to events are not defined. This
-  // would cause compilation problems.
   test::log::Logger* logger = test::log::Logger::instance();
   logger->level(0, btr::log::TRACE);
 

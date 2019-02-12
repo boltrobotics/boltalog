@@ -13,18 +13,21 @@
 #include "boltalog/defines.hpp"
 
 #if defined(x86)
+#define BOLTALOG_EOL() ""
 
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_sinks.h"
-// spdlog appends newline by default. Redefine it in spdlog/include/spdlog/tweakme.h
+
 static auto x86_logger_ = spdlog::stderr_logger_st("std_err");
 
 #elif defined(avr)
+#define BOLTALOG_EOL() "\r\n"
 
 #include <HardwareSerial.h>
 static Stream* avr_logger_ = &Serial;
 
 #elif defined(stm32)
+#define BOLTALOG_EOL() "\r\n"
 
 #include "FreeRTOS.h"
 #include "devices/stm32/usb.hpp"
@@ -156,7 +159,7 @@ int Logger::event1Impl(
   char buff[MAX_LOG_SIZE];
   
   int cx = snprintf(buff, MAX_LOG_SIZE, "1"
-    ",%" PRId32 """,%" PRId8 """\r\n",
+    ",%" PRId32 """,%" PRId8 "" BOLTALOG_EOL(),
     param1,param2);
 
   return log(cx, levels_[1], buff);
@@ -169,7 +172,7 @@ int Logger::event2Impl(
   char buff[MAX_LOG_SIZE];
   
   int cx = snprintf(buff, MAX_LOG_SIZE, "2"
-    ",%" PRIu16 """,%" ".6f" """\r\n",
+    ",%" PRIu16 """,%" ".6f" "" BOLTALOG_EOL(),
     param1,param2);
 
   return log(cx, levels_[2], buff);
@@ -188,7 +191,7 @@ int Logger::event3Impl(
   char p5_buff[MAX_HEX_SIZE];
   toHex(p5, p5_size, p5_buff, MAX_HEX_SIZE);
   int cx = snprintf(buff, MAX_LOG_SIZE, "3"
-    ",%" PRIu64 """,%" PRId16 """,%" "s" """,%" PRIu8 """,%" "s" """\r\n",
+    ",%" PRIu64 """,%" PRId16 """,%" "s" """,%" PRIu8 """,%" "s" "" BOLTALOG_EOL(),
     p1,p2,p3,p4,p5_buff);
 
   return log(cx, levels_[3], buff);
@@ -216,7 +219,7 @@ int Logger::event4Impl(
   char hx2_buff[MAX_HEX_SIZE];
   toHex(hx2, hx2_size, hx2_buff, MAX_HEX_SIZE);
   int cx = snprintf(buff, MAX_LOG_SIZE, "4"
-    ",%" PRIu8 """,%" PRId64 """,%" PRIu16 """,%" PRId32 """,%" PRIu32 """,%" PRId16 """,%" PRIu64 """,%" PRId8 """,%" ".6f" """,%" "s" """,%" "s" """,%" "s" """\r\n",
+    ",%" PRIu8 """,%" PRId64 """,%" PRIu16 """,%" PRId32 """,%" PRIu32 """,%" PRId16 """,%" PRIu64 """,%" PRId8 """,%" ".6f" """,%" "s" """,%" "s" """,%" "s" "" BOLTALOG_EOL(),
     u8,d64,u16,d32,u32,d16,u64,d8,dbl,str,hx_buff,hx2_buff);
 
   return log(cx, levels_[4], buff);

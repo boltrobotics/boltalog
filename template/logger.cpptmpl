@@ -13,18 +13,21 @@
 #include "boltalog/defines.hpp"
 
 #if defined(x86)
+#define BOLTALOG_EOL() ""
 
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_sinks.h"
-// spdlog appends newline by default. Redefine it in spdlog/include/spdlog/tweakme.h
+
 static auto x86_logger_ = spdlog::stderr_logger_st("std_err");
 
 #elif defined(avr)
+#define BOLTALOG_EOL() "\r\n"
 
 #include <HardwareSerial.h>
 static Stream* avr_logger_ = &Serial;
 
 #elif defined(stm32)
+#define BOLTALOG_EOL() "\r\n"
 
 #include "FreeRTOS.h"
 #include "devices/stm32/usb.hpp"
@@ -175,8 +178,7 @@ int Logger::<TMPL_var e.name>Impl(
 
     <TMPL_foreach params as p->
     ",%" <TMPL_var FORMATSPEC(p.type)> ""
-    <-/TMPL_foreach->
-    "\r\n",
+    <-/TMPL_foreach> BOLTALOG_EOL(),
     <TMPL_foreach params as p->
     <TMPL_if !p.__first__>,</TMPL_if><TMPL_var FORMATPARAMS(p.type, p.name)>
     <-/TMPL_foreach>

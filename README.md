@@ -44,7 +44,7 @@ are specified in <a href="https://github.com/boltrobotics/boltalog/blob/master/t
 ### <a name="Model" href="https://github.com/boltrobotics/boltalog/blob/master/model/example.mdl" target="_blank">Model</a>
 
 Event model is specified using JSON format:
-```json
+```javascript
 {
 'namespace': [ 'test', 'log' ],
 'events': [

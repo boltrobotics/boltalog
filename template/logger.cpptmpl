@@ -24,7 +24,7 @@ static auto x86_logger_ = spdlog::stderr_logger_st("std_err");
 #define BOLTALOG_EOL() "\r\n"
 
 #include <HardwareSerial.h>
-static Stream* avr_logger_ = &Serial;
+static HardwareSerial* avr_logger_ = &Serial;
 
 #elif defined(stm32)
 #define BOLTALOG_EOL() "\r\n"
@@ -94,7 +94,10 @@ void Logger::init()
   // 2017-08-28T11:45:40.523085-04:00
   x86_logger_->set_pattern("%Y-%m-%dT%T.%f%z %L [%t]: %v");
   x86_logger_->set_level(spdlog::level::trace);
+#elif defined(avr)
+  avr_logger_->begin(115200, SERIAL_8N1);
 #elif defined(stm32)
+  // TODO
   btr::Usb::init(true, configMAX_PRIORITIES - 1);
 #endif
 }
@@ -113,10 +116,12 @@ void Logger::setBackend(std::shared_ptr<spdlog::logger>& backend)
 }
 #elif defined(avr)
 // static 
-void Logger::setBackend(Stream& backend)
+void Logger::setBackend(HardwareSerial& backend)
 {
   avr_logger_ = &backend;
 }
+#elif defined(stm32)
+
 #endif
 
 // static 

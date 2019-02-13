@@ -18,7 +18,7 @@ class logger;
 
 #elif defined(avr)
 
-class Stream;
+class HardwareSerial;
 
 #endif // defined(x86)
 
@@ -134,7 +134,7 @@ public:
 #if defined(x86)
   static void setBackend(std::shared_ptr<spdlog::logger>& backend);
 #elif defined(avr)
-  static void setBackend(Stream& backend);
+  static void setBackend(HardwareSerial& backend);
 #endif
 
   /**

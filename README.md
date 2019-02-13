@@ -105,7 +105,7 @@ namespace spdlog
 class logger;
 }
 #elif defined(avr)
-class Stream;
+class HardwareSerial;
 #endif // defined(x86)
 ...
 ```

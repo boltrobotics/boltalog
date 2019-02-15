@@ -14,25 +14,15 @@
 
 #if defined(x86)
 #define BOLTALOG_EOL() ""
-
 #include "spdlog/spdlog.h"
-#include "spdlog/sinks/stdout_sinks.h"
-
-static auto x86_logger_ = spdlog::stderr_logger_st("std_err");
-
 #elif defined(avr)
 #define BOLTALOG_EOL() "\r\n"
-
 #include <HardwareSerial.h>
-static HardwareSerial* avr_logger_ = &Serial;
-
 #elif defined(stm32)
 #define BOLTALOG_EOL() "\r\n"
-
-#include "FreeRTOS.h"
 #include "devices/stm32/usb.hpp"
-
-#endif
+#include "devices/stm32/usart.hpp"
+#endif // x86, avr, stm32
 
 // AVR libc doesn't define these macros
 #if !defined(PRIu64)
@@ -88,40 +78,38 @@ Logger::Logger()
 //============================================= OPERATIONS =========================================
 
 // static
-void Logger::init()
-{
 #if defined(x86)
-  // 2017-08-28T11:45:40.523085-04:00
-  x86_logger_->set_pattern("%Y-%m-%dT%T.%f%z %L [%t]: %v");
-  x86_logger_->set_level(spdlog::level::trace);
-#elif defined(avr)
-  avr_logger_->begin(115200, SERIAL_8N1);
-#elif defined(stm32)
-  // TODO
-  btr::Usb::init(true, configMAX_PRIORITIES - 1);
-#endif
-}
-
-// static
-Logger* Logger::instance()
+Logger* Logger::instance(std::shared_ptr<spdlog::logger>* backend)
 {
+  if (nullptr != backend) {
+    logger_.backend_ = *backend;
+  }
   return &logger_;
 }
-
-#if defined(x86)
-// static 
-void Logger::setBackend(std::shared_ptr<spdlog::logger>& backend)
-{
-  x86_logger_ = backend;
-}
 #elif defined(avr)
-// static 
-void Logger::setBackend(HardwareSerial& backend)
+Logger* Logger::instance(HardwareSerial* backend)
 {
-  avr_logger_ = &backend;
+  if (nullptr != backend) {
+    logger_.backend_ = backend;
+  }
+  return &logger_;
 }
-#elif defined(stm32)
-
+#elif defined(BTR_STM32_LOGGER_USB)
+Logger* Logger::instance(btr::Usb* backend)
+{
+  if (nullptr != backend) {
+    logger_.backend_ = backend;
+  }
+  return &logger_;
+}
+#elif defined(BTR_STM32_LOGGER_USART)
+Logger* Logger::instance(btr::Usart* backend)
+{
+  if (nullptr != backend) {
+    logger_.backend_ = backend;
+  }
+  return &logger_;
+}
 #endif
 
 // static 
@@ -203,45 +191,49 @@ int Logger::log(int cx, int level, const char* msg)
 {
   int rc = -1;
 
-  if (cx >= 0) {
+  if (nullptr != backend_) {
+    if (cx >= 0) {
 #if defined(x86)
-    switch (level) {
-      case btr::log::TRACE:
-        x86_logger_->trace(msg);
-        break;
-      case btr::log::DEBUG:
-        x86_logger_->debug(msg);
-        break;
-      case btr::log::INFO:
-        x86_logger_->info(msg);
-        break;
-      case btr::log::WARN:
-        x86_logger_->warn(msg);
-        break;
-      case btr::log::ERROR:
-        x86_logger_->error(msg);
-        break;
-      case btr::log::CRITICAL:
-        x86_logger_->critical(msg);
-        break;
-      default:
-        errno = EBADLOGLEVEL;
-        return rc;
-    };
+      switch (level) {
+        case btr::log::TRACE:
+          backend_->trace(msg);
+          break;
+        case btr::log::DEBUG:
+          backend_->debug(msg);
+          break;
+        case btr::log::INFO:
+          backend_->info(msg);
+          break;
+        case btr::log::WARN:
+          backend_->warn(msg);
+          break;
+        case btr::log::ERROR:
+          backend_->error(msg);
+          break;
+        case btr::log::CRITICAL:
+          backend_->critical(msg);
+          break;
+        default:
+          errno = EBADLOGLEVEL;
+          return rc;
+      };
 #elif defined(avr)
-    (void) level;
-    avr_logger_->print(msg);
+      (void) level;
+      backend_->print(msg);
 #elif defined(stm32)
-    (void) level;
-    btr::Usb::send(msg);
+      (void) level;
+      backend_->send(msg);
 #endif
 
-    if (cx < MAX_LOG_SIZE) {
-      rc = 0;
-    } else {
-      // AVR libc doesn't define EOVERFLOW, just use ERANGE
-      errno = ERANGE;
+      if (cx < MAX_LOG_SIZE) {
+        rc = 0;
+      } else {
+        // AVR libc doesn't define EOVERFLOW, just use ERANGE
+        errno = ERANGE;
+      }
     }
+  } else {
+    errno = EINVAL;
   }
   return rc;
 }

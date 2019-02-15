@@ -32,7 +32,7 @@ public:
   {
     spd_logger_->set_pattern("%Y-%m-%dT%T.%f%z %L [%t]: %v");
     spd_logger_->set_level(spdlog::level::trace);
-    test::log::Logger::setBackend(spd_logger_);
+    test::log::Logger::instance(&spd_logger_);
   }
 
   ~LoggerTest()

@@ -20,7 +20,15 @@ class logger;
 
 class HardwareSerial;
 
-#endif // defined(x86)
+#elif defined(stm32)
+
+namespace btr
+{
+class Usb;
+class Usart;
+}
+
+#endif // x86, avr, stm32
 
 // SYSTEM INCLUDES
 #define _STDC_FORMAT_MACROS
@@ -122,19 +130,17 @@ public:
 // OPERATIONS
 
   /**
-   * Initialize logger backend. The function must be called prior to any others in this class.
-   */
-  static void init();
-
-  /**
+   * @param backend - new backend logger. Should be supplied first time when instance() is called
    * @return global logger instance
    */
-  static Logger* instance();
-
 #if defined(x86)
-  static void setBackend(std::shared_ptr<spdlog::logger>& backend);
+  static Logger* instance(std::shared_ptr<spdlog::logger>* backend = nullptr);
 #elif defined(avr)
-  static void setBackend(HardwareSerial& backend);
+  static Logger* instance(HardwareSerial* backend = nullptr);
+#elif defined(BTR_STM32_LOGGER_USB)
+  static Logger* instance(btr::Usb* backend = nullptr);
+#elif defined(BTR_STM32_LOGGER_USART)
+  static Logger* instance(btr::Usart* backend = nullptr);
 #endif
 
   /**
@@ -205,6 +211,17 @@ private:
 // ATTRIBUTES
 
   int levels_[5];
+#if defined(x86)
+  std::shared_ptr<spdlog::logger> backend_;
+#elif defined(avr)
+  HardwareSerial* backend_;
+#elif defined(stm32)
+#if defined(BTR_STM32_LOGGER_USB)
+  btr::Usb* backend_;
+#elif defined(BTR_STM32_LOGGER_USART)
+  btr::Usart* backend_;
+#endif // stm32
+#endif // x86, avr, stm32
 };
 
 } // namespace test

@@ -24,6 +24,10 @@
 #ifndef _<TMPL_call "guard" args(namespace)>Logger_hpp_
 #define _<TMPL_call "guard" args(namespace)>Logger_hpp_
 
+#ifndef BTR_LOG_ENABLED
+#define BTR_LOG_ENABLED 1
+#endif
+
 #if defined(x86)
 #include <memory>
 
@@ -52,6 +56,7 @@ class Usart;
 <TMPL_foreach namespace as n>
 namespace <TMPL_var n>
 {
+
 </TMPL_foreach->
 <-TMPL_foreach events as e->
 <-TMPL_if DEFINED(e.doc)>
@@ -66,6 +71,7 @@ namespace <TMPL_var n>
  * @param <TMPL_var p.name> <TMPL_var p.doc>
 <-/TMPL_foreach>
  */
+#if BTR_LOG_ENABLED > 0
 #define <TMPL_var e.name>(
   <-TMPL_foreach params as p->
   <TMPL_if !p.__first__>, </TMPL_if><TMPL_var MACROMAPPER(p.type, p.name)>
@@ -76,6 +82,12 @@ namespace <TMPL_var n>
         <-/TMPL_if><TMPL_var MACROMAPPER(p.type, p.name)>
       <-/TMPL_foreach>); \
   }
+#else
+#define <TMPL_var e.name>(
+  <-TMPL_foreach params as p->
+  <TMPL_if !p.__first__>, </TMPL_if><TMPL_var MACROMAPPER(p.type, p.name)>
+  <-/TMPL_foreach>)
+#endif // BTR_LOG_ENABLED > 0
 </TMPL_foreach>
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -135,6 +147,8 @@ public:
    */
   bool filter(int event_id) const;
 
+#if BTR_LOG_ENABLED > 0
+
   //------------------------------------------------------------------------------------------------
 
   <TMPL_foreach events as e>
@@ -176,6 +190,8 @@ private:
   btr::Usart* backend_;
 #endif // stm32
 #endif // x86, avr, stm32
+
+#endif // BTR_LOG_ENABLED > 0
 };
 <TMPL_foreach namespace as n>
 } // namespace <TMPL_var n>

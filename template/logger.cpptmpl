@@ -5,23 +5,27 @@
 // WARNING: The code is auto-generated. Any changes will be overwritten.
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// SYSTEM INCLUDES
-#include <stdio.h>
-
 // PROJECT INCLUDES
 #include "logger.hpp" // class implemented
 #include "boltalog/defines.hpp"
 
+#if BTR_LOG_ENABLED > 0
+
 #if defined(x86)
 #define BOLTALOG_EOL() ""
 #include "spdlog/spdlog.h"
+#define PROGMEM
+
 #elif defined(avr)
 #define BOLTALOG_EOL() "\r\n"
 #include <HardwareSerial.h>
+#include <avr/pgmspace.h>
+
 #elif defined(stm32)
 #define BOLTALOG_EOL() "\r\n"
 #include "devices/stm32/usb.hpp"
 #include "devices/stm32/usart.hpp"
+#define PROGMEM
 #endif // x86, avr, stm32
 
 // AVR libc doesn't define these macros
@@ -32,11 +36,18 @@
 #define PRId64 "ll"
 #endif
 
+// SYSTEM INCLUDES
+#include <stdio.h>
+
+#endif // BTR_LOG_ENABLED > 0
+
 <TMPL_foreach namespace as n->
 namespace <TMPL_var n>
 {
 
 </TMPL_foreach->
+
+#if BTR_LOG_ENABLED > 0
 
 static Logger logger_;
 
@@ -46,7 +57,7 @@ uint32_t toHex(const char* data, uint32_t size, char* dst_str, uint32_t dst_size
     return -1;
   }
 
-  static const char lut[] = "0123456789ABCDEF";
+  static const char lut[] PROGMEM = "0123456789ABCDEF";
   uint32_t j = 0;
 
   for (uint32_t i = 0; i < size; i++, j += 3) {
@@ -62,17 +73,21 @@ uint32_t toHex(const char* data, uint32_t size, char* dst_str, uint32_t dst_size
   return j;
 }
 
+#endif // BTR_LOG_ENABLED > 0
+
 /////////////////////////////////////////////// PUBLIC /////////////////////////////////////////////
 
 //============================================= LIFECYCLE ==========================================
 
 Logger::Logger()
 {
+#if BTR_LOG_ENABLED > 0
   levels_[0] = BTR_LOG_LEVEL;
 
   <TMPL_foreach events as e->
   levels_[<TMPL_var e.id>] = btr::log::<TMPL_var e.level>;
   </TMPL_foreach>
+#endif // BTR_LOG_ENABLED > 0
 }
 
 //============================================= OPERATIONS =========================================
@@ -81,34 +96,54 @@ Logger::Logger()
 #if defined(x86)
 Logger* Logger::instance(std::shared_ptr<spdlog::logger>* backend)
 {
+#if BTR_LOG_ENABLED > 0
   if (nullptr != backend) {
     logger_.backend_ = *backend;
   }
   return &logger_;
+#else
+  (void) backend;
+  return nullptr;
+#endif // BTR_LOG_ENABLED > 0
 }
 #elif defined(avr)
 Logger* Logger::instance(HardwareSerial* backend)
 {
+#if BTR_LOG_ENABLED > 0
   if (nullptr != backend) {
     logger_.backend_ = backend;
   }
   return &logger_;
+#else
+  (void) backend;
+  return nullptr;
+#endif // BTR_LOG_ENABLED > 0
 }
 #elif defined(BTR_STM32_LOGGER_USB)
 Logger* Logger::instance(btr::Usb* backend)
 {
+#if BTR_LOG_ENABLED > 0
   if (nullptr != backend) {
     logger_.backend_ = backend;
   }
   return &logger_;
+#else
+  (void) backend;
+  return nullptr;
+#endif // BTR_LOG_ENABLED > 0
 }
 #elif defined(BTR_STM32_LOGGER_USART)
 Logger* Logger::instance(btr::Usart* backend)
 {
+#if BTR_LOG_ENABLED > 0
   if (nullptr != backend) {
     logger_.backend_ = backend;
   }
   return &logger_;
+#else
+  (void) backend;
+  return nullptr;
+#endif // BTR_LOG_ENABLED > 0
 }
 #endif
 
@@ -125,6 +160,7 @@ const char* Logger::strerror(int errnum)
 
 int Logger::level(int event_id, int log_level)
 {
+#if BTR_LOG_ENABLED > 0
   int prev_event_id = -1;
 
   if (event_id < (int)(sizeof(levels_) / sizeof(int))) {
@@ -132,17 +168,27 @@ int Logger::level(int event_id, int log_level)
     levels_[event_id] = log_level;
   }
   return prev_event_id;
+#else
+  (void) event_id; (void) log_level;
+  return -1;
+#endif // BTR_LOG_ENABLED > 0
 }
 
 bool Logger::filter(int event_id) const
 {
+#if BTR_LOG_ENABLED > 0
   if (event_id < (int)(sizeof(levels_) / sizeof(int)) && levels_[event_id] >= levels_[0]) {
     return true;
   } else {
     return false;
   }
+#else
+  (void) event_id;
+  return false;
+#endif // BTR_LOG_ENABLED > 0
 }
 
+#if BTR_LOG_ENABLED > 0
 <TMPL_foreach events as e->
 
 <TMPL_var COUNT(1)->
@@ -183,9 +229,13 @@ int Logger::<TMPL_var e.name>Impl(
 
 </TMPL_foreach->
 
+#endif // BTR_LOG_ENABLED > 0
+
 /////////////////////////////////////////////// PRIVATE ////////////////////////////////////////////
 
 //============================================= OPERATIONS =========================================
+
+#if BTR_LOG_ENABLED > 0
 
 int Logger::log(int cx, int level, const char* msg)
 {
@@ -237,6 +287,7 @@ int Logger::log(int cx, int level, const char* msg)
   }
   return rc;
 }
+#endif // BTR_LOG_ENABLED > 0
 <TMPL_foreach namespace as n>
 } // namespace <TMPL_var n>
 </TMPL_foreach>

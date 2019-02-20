@@ -4,6 +4,10 @@
 set(UTILITY_HOME $ENV{UTILITY_HOME})
 include_directories(${UTILITY_HOME}/include)
 
+if (NOT TARGET utility)
+  add_subdirectory(${UTILITY_HOME} ${PROJECT_BINARY_DIR}/utility)
+endif ()
+
 # }
 
 ####################################################################################################

@@ -8,6 +8,10 @@
 #ifndef _test_log_Logger_hpp_
 #define _test_log_Logger_hpp_
 
+#ifndef BTR_LOG_ENABLED
+#define BTR_LOG_ENABLED 1
+#endif
+
 #if defined(x86)
 #include <memory>
 
@@ -37,8 +41,10 @@ class Usart;
 namespace test
 {
 
+
 namespace log
 {
+
 
 
 /**
@@ -47,11 +53,15 @@ namespace log
  * @param param1 
  * @param param2 
  */
+#if BTR_LOG_ENABLED > 0
 #define event1(param1, param2) \
   if (test::log::Logger::instance()->filter(1)) { \
     test::log::Logger::instance()->event1Impl( \
       param1,param2); \
   }
+#else
+#define event1(param1, param2)
+#endif // BTR_LOG_ENABLED > 0
 
 
 /**
@@ -60,11 +70,15 @@ namespace log
  * @param param1 
  * @param param2 
  */
+#if BTR_LOG_ENABLED > 0
 #define event2(param1, param2) \
   if (test::log::Logger::instance()->filter(2)) { \
     test::log::Logger::instance()->event2Impl( \
       param1,param2); \
   }
+#else
+#define event2(param1, param2)
+#endif // BTR_LOG_ENABLED > 0
 
 
 /**
@@ -76,11 +90,15 @@ namespace log
  * @param p4 
  * @param p5 
  */
+#if BTR_LOG_ENABLED > 0
 #define event3(p1, p2, p3, p3_size, p4, p5, p5_size) \
   if (test::log::Logger::instance()->filter(3)) { \
     test::log::Logger::instance()->event3Impl( \
       p1,p2,p3, p3_size,p4,p5, p5_size); \
   }
+#else
+#define event3(p1, p2, p3, p3_size, p4, p5, p5_size)
+#endif // BTR_LOG_ENABLED > 0
 
 
 /**
@@ -99,11 +117,15 @@ namespace log
  * @param hx hex description
  * @param hx2 
  */
+#if BTR_LOG_ENABLED > 0
 #define event4(u8, d64, u16, d32, u32, d16, u64, d8, dbl, str, str_size, hx, hx_size, hx2, hx2_size) \
   if (test::log::Logger::instance()->filter(4)) { \
     test::log::Logger::instance()->event4Impl( \
       u8,d64,u16,d32,u32,d16,u64,d8,dbl,str, str_size,hx, hx_size,hx2, hx2_size); \
   }
+#else
+#define event4(u8, d64, u16, d32, u32, d16, u64, d8, dbl, str, str_size, hx, hx_size, hx2, hx2_size)
+#endif // BTR_LOG_ENABLED > 0
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -162,6 +184,8 @@ public:
    * @return true if event is allowed to pass through, false otherwise
    */
   bool filter(int event_id) const;
+
+#if BTR_LOG_ENABLED > 0
 
   //------------------------------------------------------------------------------------------------
 
@@ -222,6 +246,8 @@ private:
   btr::Usart* backend_;
 #endif // stm32
 #endif // x86, avr, stm32
+
+#endif // BTR_LOG_ENABLED > 0
 };
 
 } // namespace test

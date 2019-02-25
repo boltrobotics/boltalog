@@ -11,31 +11,35 @@ export STM32CMAKE_HOME=${XTRA_HOME}/stm32-cmake
 export LIBOPENCM3_HOME=${XTRA_HOME}/libopencm3
 export FREERTOS_HOME=${XTRA_HOME}/FreeRTOSv10.1.1
 
-PULL_XTRA_LIBS=0
-BUILD_X86=0
-BUILD_AVR=0
-BUILD_STM=0
+X86=0
+STM32=0
+AVR=0
+ARD=0
 BOARD_PORT=""
+PULL_XTRA_LIBS=0
 
 help()
 {
-  echo "Usage: `basename $0` [-x] [-s] [-a] [-b _board_] [-c _board_cpu_] [-p _serial_port_] [-u] [-h]"
-  echo -e "\t-x - build x86"
-  echo -e "\t-s - build stm32 (board stm32f103)"
-  echo -e "\t-a - build avr (must specify board)"
-  echo -e "\t-b - board (uno, mega, etc.)"
-  echo -e "\t-c - board CPU (atmega328, atmega2560, etc.)"
-  echo -e "\t-p - board serial port (e.g. /dev/ttyACM0)"
+  echo -n "Usage: `basename $0` [-x] [-s] [-r] [-a] "
+  echo "[-b _board_] [-c _board_cpu_] [-p _serial_port_] [-u] [-h]"
+  echo -e "\t-x - x86"
+  echo -e "\t-s - stm32"
+  echo -e "\t-r - avr (specify: -DAVR_MCU=atmega2560? -DAVR_H_FUSE=0x99? -DAVR_L_FUSE=0x42?)"
+  echo -e "\t-a - arduino (specify board)"
+  echo -e "\t-b - arduino board (uno, mega, etc.)"
+  echo -e "\t-c - arduino board CPU (atmega328, atmega2560, etc.)"
+  echo -e "\t-p - arduino board serial port (e.g. /dev/ttyACM0)"
   echo -e "\t-u - clone/pull dependencies from github"
   echo -e "\t-h - this help"
 }
 
-while getopts "xsab:c:p:uh" Option
+while getopts "xsrab:c:p:uh" Option
 do
   case $Option in
-    x) BUILD_X86=1;;
-    s) BUILD_STM=1;;
-    a) BUILD_AVR=1;;
+    x) X86=1;;
+    s) STM32=1;;
+    r) AVR=1;;
+    a) ARD=1;;
     b) BOARD="${OPTARG}";;
     c) BOARD_CPU="${OPTARG}";;
     p) BOARD_PORT="${OPTARG}";;
@@ -67,35 +71,46 @@ if [ "${PULL_XTRA_LIBS}" -eq 1 ]; then
   clone_or_pull "${LIBOPENCM3_HOME}" "https://github.com/libopencm3/libopencm3.git"
 fi
 
-if [ ${BUILD_X86} -eq 1 ]; then
+if [ ${X86} -eq 1 ]; then
   (mkdir -p "build-x86" && cd "build-x86" \
     && cmake \
-      -DBOARD_FAMILY=x86 "$@" .. \
+      -DBTR_X86=1 \
+      "$@" .. \
     && make)
 fi
 
-if [ ${BUILD_AVR} -eq 1 ]; then
+if [ ${STM32} -eq 1 ]; then
+  (mkdir -p "build-stm32" && cd "build-stm32" \
+    && cmake \
+      -DBTR_STM32=1 \
+      -DSTM32_CHIP=stm32f103c8t6 \
+      -DSTM32_FLASH_SIZE=64K \
+      -DSTM32_RAM_SIZE=20K \
+      "$@" .. \
+    && make)
+fi
+
+if [ ${AVR} -eq 1 ]; then
+  (mkdir -p "build-avr" && cd "build-avr" \
+    && cmake \
+      -DBTR_AVR=1 \
+      "$@" .. \
+    && make)
+fi
+
+if [ ${ARD} -eq 1 ]; then
   if [ -z ${BOARD} ]; then
-    echo "Must specify AVR board" 
+    echo "Must specify Arduino board" 
     help
     exit -1
   else
-    (mkdir -p "build-avr" && cd "build-avr" \
+    (mkdir -p "build-ard" && cd "build-ard" \
       && cmake \
-        -DBOARD_FAMILY=avr \
+        -DBTR_ARD=1 \
         -DBOARD_PORT=${BOARD_PORT} \
         -DBOARD=${BOARD} \
-        -DBOARD_CPU=${BOARD_CPU} "$@" .. \
+        -DBOARD_CPU=${BOARD_CPU} \
+        "$@" .. \
       && make)
   fi
-fi
-
-if [ ${BUILD_STM} -eq 1 ]; then
-  (mkdir -p "build-stm32" && cd "build-stm32" \
-    && cmake \
-      -DBOARD_FAMILY=stm32 \
-      -DSTM32_CHIP=stm32f103c8t6 \
-      -DSTM32_FLASH_SIZE=64K \
-      -DSTM32_RAM_SIZE=20K "$@" .. \
-    && make)
 fi

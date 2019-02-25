@@ -11,22 +11,27 @@
 
 #if BTR_LOG_ENABLED > 0
 
-#if defined(x86)
+#if BTR_X86 > 0
 #define BOLTALOG_EOL() ""
 #include "spdlog/spdlog.h"
 #define PROGMEM
 
-#elif defined(avr)
+#elif BTR_ARD > 0
 #define BOLTALOG_EOL() "\r\n"
 #include <HardwareSerial.h>
 #include <avr/pgmspace.h>
 
-#elif defined(stm32)
+#elif BTR_AVR > 0
+#define BOLTALOG_EOL() "\r\n"
+#include <avr/pgmspace.h>
+#include "devices/avr/usart.hpp"
+
+#elif BTR_STM32 > 0
 #define BOLTALOG_EOL() "\r\n"
 #include "devices/stm32/usb.hpp"
 #include "devices/stm32/usart.hpp"
 #define PROGMEM
-#endif // x86, avr, stm32
+#endif // x86, ard, avr, stm32
 
 // AVR libc doesn't define these macros
 #if !defined(PRIu64)
@@ -95,7 +100,7 @@ Logger::Logger()
 //============================================= OPERATIONS =========================================
 
 // static
-#if defined(x86)
+#if BTR_X86 > 0
 Logger* Logger::instance(std::shared_ptr<spdlog::logger>* backend)
 {
 #if BTR_LOG_ENABLED > 0
@@ -108,7 +113,9 @@ Logger* Logger::instance(std::shared_ptr<spdlog::logger>* backend)
   return nullptr;
 #endif // BTR_LOG_ENABLED > 0
 }
-#elif defined(avr)
+
+#elif BTR_ARD > 0
+
 Logger* Logger::instance(HardwareSerial* backend)
 {
 #if BTR_LOG_ENABLED > 0
@@ -121,7 +128,23 @@ Logger* Logger::instance(HardwareSerial* backend)
   return nullptr;
 #endif // BTR_LOG_ENABLED > 0
 }
-#elif defined(BTR_STM32_LOGGER_USB)
+
+#elif BTR_AVR > 0
+
+Logger* Logger::instance(btr::Usart* backend)
+{
+#if BTR_LOG_ENABLED > 0
+  if (nullptr != backend) {
+    logger_.backend_ = backend;
+  }
+  return &logger_;
+#else
+  (void) backend;
+  return nullptr;
+#endif // BTR_LOG_ENABLED > 0
+}
+
+#elif BTR_STM32_LOGGER_USB > 0
 Logger* Logger::instance(btr::Usb* backend)
 {
 #if BTR_LOG_ENABLED > 0
@@ -134,7 +157,7 @@ Logger* Logger::instance(btr::Usb* backend)
   return nullptr;
 #endif // BTR_LOG_ENABLED > 0
 }
-#elif defined(BTR_STM32_LOGGER_USART)
+#elif BTR_STM32_LOGGER_USART > 0
 Logger* Logger::instance(btr::Usart* backend)
 {
 #if BTR_LOG_ENABLED > 0
@@ -278,7 +301,7 @@ int Logger::log(int cx, int level, const char* msg)
 
   if (nullptr != backend_) {
     if (cx >= 0) {
-#if defined(x86)
+#if BTR_X86 > 0
       switch (level) {
         case btr::log::TRACE:
           backend_->trace(msg);
@@ -302,10 +325,10 @@ int Logger::log(int cx, int level, const char* msg)
           errno = EBADLOGLEVEL;
           return rc;
       };
-#elif defined(avr)
+#elif BTR_ARD > 0
       (void) level;
       backend_->print(msg);
-#elif defined(stm32)
+#elif BTR_AVR > 0 || BTR_STM32 > 0
       (void) level;
       backend_->send(msg);
 #endif

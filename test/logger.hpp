@@ -8,11 +8,8 @@
 #ifndef _test_log_Logger_hpp_
 #define _test_log_Logger_hpp_
 
-#ifndef BTR_LOG_ENABLED
-#define BTR_LOG_ENABLED 1
-#endif
+#if BTR_X86 > 0
 
-#if defined(x86)
 #include <memory>
 
 namespace spdlog
@@ -20,11 +17,18 @@ namespace spdlog
 class logger;
 }
 
-#elif defined(avr)
+#elif BTR_ARD > 0
 
 class HardwareSerial;
 
-#elif defined(stm32)
+#elif BTR_AVR > 0
+
+namespace btr
+{
+class Usart;
+}
+
+#elif BTR_STM32 > 0
 
 namespace btr
 {
@@ -32,11 +36,14 @@ class Usb;
 class Usart;
 }
 
-#endif // x86, avr, stm32
+#endif // x86, avr, ard, stm32
 
 // SYSTEM INCLUDES
 #define _STDC_FORMAT_MACROS
 #include <inttypes.h>
+#ifndef BTR_LOG_ENABLED
+#define BTR_LOG_ENABLED 1
+#endif
 
 namespace test
 {
@@ -60,7 +67,9 @@ namespace log
       param1,param2); \
   }
 #else
-#define event1(param1, param2)
+#define event1(param1, param2) \
+      (void) param1; (void) param2; 
+
 #endif // BTR_LOG_ENABLED > 0
 
 
@@ -77,7 +86,9 @@ namespace log
       param1,param2); \
   }
 #else
-#define event2(param1, param2)
+#define event2(param1, param2) \
+      (void) param1; (void) param2; 
+
 #endif // BTR_LOG_ENABLED > 0
 
 
@@ -97,7 +108,9 @@ namespace log
       p1,p2,p3, p3_size,p4,p5, p5_size); \
   }
 #else
-#define event3(p1, p2, p3, p3_size, p4, p5, p5_size)
+#define event3(p1, p2, p3, p3_size, p4, p5, p5_size) \
+      (void) p1; (void) p2; (void) p3; (void) p3_size; (void) p4; (void) p5; (void) p5_size; 
+
 #endif // BTR_LOG_ENABLED > 0
 
 
@@ -124,7 +137,9 @@ namespace log
       u8,d64,u16,d32,u32,d16,u64,d8,dbl,str, str_size,hx, hx_size,hx2, hx2_size); \
   }
 #else
-#define event4(u8, d64, u16, d32, u32, d16, u64, d8, dbl, str, str_size, hx, hx_size, hx2, hx2_size)
+#define event4(u8, d64, u16, d32, u32, d16, u64, d8, dbl, str, str_size, hx, hx_size, hx2, hx2_size) \
+      (void) u8; (void) d64; (void) u16; (void) d32; (void) u32; (void) d16; (void) u64; (void) d8; (void) dbl; (void) str; (void) str_size; (void) hx; (void) hx_size; (void) hx2; (void) hx2_size; 
+
 #endif // BTR_LOG_ENABLED > 0
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -155,10 +170,12 @@ public:
    * @param backend - new backend logger. Should be supplied first time when instance() is called
    * @return global logger instance
    */
-#if defined(x86)
+#if BTR_X86 > 0
   static Logger* instance(std::shared_ptr<spdlog::logger>* backend = nullptr);
-#elif defined(avr)
+#elif BTR_ARD > 0
   static Logger* instance(HardwareSerial* backend = nullptr);
+#elif BTR_AVR > 0
+  static Logger* instance(btr::Usart* backend = nullptr);
 #elif defined(BTR_STM32_LOGGER_USB)
   static Logger* instance(btr::Usb* backend = nullptr);
 #elif defined(BTR_STM32_LOGGER_USART)
@@ -235,11 +252,13 @@ private:
 // ATTRIBUTES
 
   int levels_[5];
-#if defined(x86)
+#if BTR_X86 > 0
   std::shared_ptr<spdlog::logger> backend_;
-#elif defined(avr)
+#elif BTR_ARD > 0
   HardwareSerial* backend_;
-#elif defined(stm32)
+#elif BTR_AVR > 0
+  btr::Usart* backend_;
+#elif BTR_STM32 > 0
 #if defined(BTR_STM32_LOGGER_USB)
   btr::Usb* backend_;
 #elif defined(BTR_STM32_LOGGER_USART)

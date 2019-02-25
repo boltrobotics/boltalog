@@ -24,11 +24,8 @@
 #ifndef _<TMPL_call "guard" args(namespace)>Logger_hpp_
 #define _<TMPL_call "guard" args(namespace)>Logger_hpp_
 
-#ifndef BTR_LOG_ENABLED
-#define BTR_LOG_ENABLED 1
-#endif
+#if BTR_X86 > 0
 
-#if defined(x86)
 #include <memory>
 
 namespace spdlog
@@ -36,11 +33,18 @@ namespace spdlog
 class logger;
 }
 
-#elif defined(avr)
+#elif BTR_ARD > 0
 
 class HardwareSerial;
 
-#elif defined(stm32)
+#elif BTR_AVR > 0
+
+namespace btr
+{
+class Usart;
+}
+
+#elif BTR_STM32 > 0
 
 namespace btr
 {
@@ -48,11 +52,14 @@ class Usb;
 class Usart;
 }
 
-#endif // x86, avr, stm32
+#endif // x86, avr, ard, stm32
 
 // SYSTEM INCLUDES
 #define _STDC_FORMAT_MACROS
 #include <inttypes.h>
+#ifndef BTR_LOG_ENABLED
+#define BTR_LOG_ENABLED 1
+#endif
 <TMPL_foreach namespace as n>
 namespace <TMPL_var n>
 {
@@ -74,19 +81,21 @@ namespace <TMPL_var n>
 #if BTR_LOG_ENABLED > 0
 #define <TMPL_var e.name>(
   <-TMPL_foreach params as p->
-  <TMPL_if !p.__first__>, </TMPL_if><TMPL_var MACROMAPPER(p.type, p.name)>
+  <TMPL_if !p.__first__>, </TMPL_if><TMPL_var MACROMAPPER(p.type, p.name, 1)>
   <-/TMPL_foreach>) \
   if (<TMPL_call "scope" args(namespace)>Logger::instance()->filter(<TMPL_var e.id>)) { \
     <TMPL_call "scope" args(namespace)>Logger::instance()-><TMPL_var e.name>Impl( \
       <TMPL_foreach params as p><TMPL_if !p.__first__>,
-        <-/TMPL_if><TMPL_var MACROMAPPER(p.type, p.name)>
+        <-/TMPL_if><TMPL_var MACROMAPPER(p.type, p.name, 1)>
       <-/TMPL_foreach>); \
   }
 #else
 #define <TMPL_var e.name>(
   <-TMPL_foreach params as p->
-  <TMPL_if !p.__first__>, </TMPL_if><TMPL_var MACROMAPPER(p.type, p.name)>
-  <-/TMPL_foreach>)
+  <TMPL_if !p.__first__>, </TMPL_if><TMPL_var MACROMAPPER(p.type, p.name, 1)>
+  <-/TMPL_foreach>) \
+      <TMPL_foreach params as p><TMPL_var MACROMAPPER(p.type, p.name, 0)>; </TMPL_foreach>
+
 #endif // BTR_LOG_ENABLED > 0
 </TMPL_foreach>
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -117,10 +126,12 @@ public:
    * @param backend - new backend logger. Should be supplied first time when instance() is called
    * @return global logger instance
    */
-#if defined(x86)
+#if BTR_X86 > 0
   static Logger* instance(std::shared_ptr<spdlog::logger>* backend = nullptr);
-#elif defined(avr)
+#elif BTR_ARD > 0
   static Logger* instance(HardwareSerial* backend = nullptr);
+#elif BTR_AVR > 0
+  static Logger* instance(btr::Usart* backend = nullptr);
 #elif defined(BTR_STM32_LOGGER_USB)
   static Logger* instance(btr::Usb* backend = nullptr);
 #elif defined(BTR_STM32_LOGGER_USART)
@@ -179,11 +190,13 @@ private:
 // ATTRIBUTES
 
   int levels_[<TMPL_var (COUNT() + 1)>];
-#if defined(x86)
+#if BTR_X86 > 0
   std::shared_ptr<spdlog::logger> backend_;
-#elif defined(avr)
+#elif BTR_ARD > 0
   HardwareSerial* backend_;
-#elif defined(stm32)
+#elif BTR_AVR > 0
+  btr::Usart* backend_;
+#elif BTR_STM32 > 0
 #if defined(BTR_STM32_LOGGER_USB)
   btr::Usb* backend_;
 #elif defined(BTR_STM32_LOGGER_USART)

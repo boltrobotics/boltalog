@@ -55,27 +55,28 @@ namespace <TMPL_var n>
 #if BTR_LOG_ENABLED > 0
 
 static Logger logger_;
+static const char lut[] = "0123456789ABCDEF";
 
-uint32_t toHex(const char* data, uint32_t size, char* dst_str, uint32_t dst_size)
+uint32_t toHex(const char* src_str, uint32_t src_size, char* dst_str, uint32_t dst_size)
 {
-  if (size == 0 || dst_size < (size * 3)) {
+  // Includes null character.
+  uint32_t total_size = src_size * 3;
+
+  if (src_size == 0 || dst_size < total_size) {
     return -1;
   }
 
-  static const char lut[] PROGMEM = "0123456789ABCDEF";
-  uint32_t j = 0;
-
-  for (uint32_t i = 0; i < size; i++, j += 3) {
-    const uint8_t c = data[i];
+  for (uint32_t i = 0, j = 0; i < src_size; i++, j += 3) {
+    const uint8_t c = src_str[i];
     dst_str[j] = lut[c >> 4];
-    dst_str[j + 1] = lut[c & 15];
-    dst_str[j + 2] = ':';
-  }
+    dst_str[j + 1] = lut[c & 0xF];
 
-  if (j >= 3) {
-    dst_str[(j - 3) + 2] = '\0';
+    if ((i + 1) < src_size) {
+      dst_str[j + 2] = ':';
+    }
   }
-  return j;
+  dst_str[total_size - 1] = '\0';
+  return total_size;
 }
 
 #endif // BTR_LOG_ENABLED > 0

@@ -202,6 +202,11 @@ public:
    */
   bool filter(int event_id) const;
 
+  /**
+   * @return one letter log level
+   */
+  int shortLogLevel(int level);
+
 #if BTR_LOG_ENABLED > 0
 
   //------------------------------------------------------------------------------------------------

@@ -18,13 +18,14 @@
 
 #elif BTR_ARD > 0
 #define BOLTALOG_EOL() "\r\n"
-#include <HardwareSerial.h>
+#include <Arduino.h>
 #include <avr/pgmspace.h>
 
 #elif BTR_AVR > 0
 #define BOLTALOG_EOL() "\r\n"
 #include <avr/pgmspace.h>
 #include "devices/avr/usart.hpp"
+#include "devices/avr/time.hpp"
 
 #elif BTR_STM32 > 0
 #define BOLTALOG_EOL() "\r\n"
@@ -212,6 +213,26 @@ bool Logger::filter(int event_id) const
 #endif // BTR_LOG_ENABLED > 0
 }
 
+int Logger::shortLogLevel(int level)
+{
+  switch (level) {
+    case btr::log::TRACE:
+      return 'T';
+    case btr::log::DEBUG:
+      return 'D';
+    case btr::log::INFO:
+      return 'I';
+    case btr::log::WARN:
+      return 'W';
+    case btr::log::ERROR:
+      return 'E';
+    case btr::log::CRITICAL:
+      return 'C';
+    default:
+      return 'O';
+  }
+}
+
 #if BTR_LOG_ENABLED > 0
 <TMPL_foreach events as e->
 
@@ -236,17 +257,35 @@ int Logger::<TMPL_var e.name>Impl(
   <-TMPL_var PREPSTRING(p.type, p.name)>
   <-/TMPL_foreach->
   </TMPL_if>
-  int cx = snprintf(buff, MAX_LOG_SIZE, "<TMPL_var e.id>"
+  int cx = snprintf(buff, MAX_LOG_SIZE,
+#if BTR_AVR > 0 | BTR_ARD > 0 | BTR_STM32 > 0
+    "%9lu %c [0]: "
+#endif
+    "<TMPL_var e.id>"
     <TMPL_if DEFINED(params)->
 
     <TMPL_foreach params as p->
     ",%" <TMPL_var FORMATSPEC(p.type)> ""
     <-/TMPL_foreach> BOLTALOG_EOL(),
+#if BTR_AVR > 0
+    btr::Time::micros(), shortLogLevel(levels_[<TMPL_var e.id>]),
+#elif BTR_ARD > 0
+    micros(), shortLogLevel(levels_[<TMPL_var e.id>]),
+#elif BTR_STM32 > 0 // TODO
+    (uint32_t) 0, shortLogLevel(levels_[<TMPL_var e.id>]),
+#endif
     <TMPL_foreach params as p->
     <TMPL_if !p.__first__>,</TMPL_if><TMPL_var FORMATPARAMS(p.type, p.name)>
     <-/TMPL_foreach>
-
-    <-/TMPL_if>);
+    <TMPL_else->
+#if BTR_AVR > 0
+    , btr::Time::micros(), shortLogLevel(levels_[<TMPL_var e.id>])
+#elif BTR_ARD > 0
+    , micros(), shortLogLevel(levels_[<TMPL_var e.id>])
+#elif BTR_STM32 > 0 // TODO
+    , (uint32_t) 0, shortLogLevel(levels_[<TMPL_var e.id>])
+#endif
+    </TMPL_if>);
 
   return log(cx, levels_[<TMPL_var e.id>], buff);
 }

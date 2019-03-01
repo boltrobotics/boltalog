@@ -20,10 +20,12 @@
 #define BOLTALOG_EOL() "\r\n"
 #include <Arduino.h>
 #include <avr/pgmspace.h>
+#include <string.h>
 
 #elif BTR_AVR > 0
 #define BOLTALOG_EOL() "\r\n"
 #include <avr/pgmspace.h>
+#include <string.h>
 #include "devices/avr/usart.hpp"
 #include "devices/avr/time.hpp"
 
@@ -244,16 +246,16 @@ int Logger::event1Impl(
   
   int cx = snprintf(buff, MAX_LOG_SIZE,
 #if BTR_AVR > 0 | BTR_ARD > 0 | BTR_STM32 > 0
-    "%9lu %c [0]: "
+    "%6lu.%03lu %c [0]: "
 #endif
     "1"
     ",%" PRId32 """,%" PRId8 "" BOLTALOG_EOL(),
 #if BTR_AVR > 0
-    btr::Time::micros(), shortLogLevel(levels_[1]),
+    btr::Time::sec(), (btr::Time::millis() % 1000), shortLogLevel(levels_[1]),
 #elif BTR_ARD > 0
-    micros(), shortLogLevel(levels_[1]),
+    (millis() / 1000), (millis() % 1000), shortLogLevel(levels_[1]),
 #elif BTR_STM32 > 0 // TODO
-    (uint32_t) 0, shortLogLevel(levels_[1]),
+    (uint32_t) 0, (uint32_t) 0, shortLogLevel(levels_[1]),
 #endif
     param1,param2
     );
@@ -269,16 +271,16 @@ int Logger::event2Impl(
   
   int cx = snprintf(buff, MAX_LOG_SIZE,
 #if BTR_AVR > 0 | BTR_ARD > 0 | BTR_STM32 > 0
-    "%9lu %c [0]: "
+    "%6lu.%03lu %c [0]: "
 #endif
     "2"
     ",%" PRIu16 """,%" ".6f" "" BOLTALOG_EOL(),
 #if BTR_AVR > 0
-    btr::Time::micros(), shortLogLevel(levels_[2]),
+    btr::Time::sec(), (btr::Time::millis() % 1000), shortLogLevel(levels_[2]),
 #elif BTR_ARD > 0
-    micros(), shortLogLevel(levels_[2]),
+    (millis() / 1000), (millis() % 1000), shortLogLevel(levels_[2]),
 #elif BTR_STM32 > 0 // TODO
-    (uint32_t) 0, shortLogLevel(levels_[2]),
+    (uint32_t) 0, (uint32_t) 0, shortLogLevel(levels_[2]),
 #endif
     param1,param2
     );
@@ -300,16 +302,16 @@ int Logger::event3Impl(
   toHex(p5, p5_size, p5_buff, MAX_HEX_SIZE);
   int cx = snprintf(buff, MAX_LOG_SIZE,
 #if BTR_AVR > 0 | BTR_ARD > 0 | BTR_STM32 > 0
-    "%9lu %c [0]: "
+    "%6lu.%03lu %c [0]: "
 #endif
     "3"
     ",%" PRIu64 """,%" PRId16 """,%" "s" """,%" PRIu8 """,%" "s" "" BOLTALOG_EOL(),
 #if BTR_AVR > 0
-    btr::Time::micros(), shortLogLevel(levels_[3]),
+    btr::Time::sec(), (btr::Time::millis() % 1000), shortLogLevel(levels_[3]),
 #elif BTR_ARD > 0
-    micros(), shortLogLevel(levels_[3]),
+    (millis() / 1000), (millis() % 1000), shortLogLevel(levels_[3]),
 #elif BTR_STM32 > 0 // TODO
-    (uint32_t) 0, shortLogLevel(levels_[3]),
+    (uint32_t) 0, (uint32_t) 0, shortLogLevel(levels_[3]),
 #endif
     p1,p2,p3,p4,p5_buff
     );
@@ -340,16 +342,16 @@ int Logger::event4Impl(
   toHex(hx2, hx2_size, hx2_buff, MAX_HEX_SIZE);
   int cx = snprintf(buff, MAX_LOG_SIZE,
 #if BTR_AVR > 0 | BTR_ARD > 0 | BTR_STM32 > 0
-    "%9lu %c [0]: "
+    "%6lu.%03lu %c [0]: "
 #endif
     "4"
     ",%" PRIu8 """,%" PRId64 """,%" PRIu16 """,%" PRId32 """,%" PRIu32 """,%" PRId16 """,%" PRIu64 """,%" PRId8 """,%" ".6f" """,%" "s" """,%" "s" """,%" "s" "" BOLTALOG_EOL(),
 #if BTR_AVR > 0
-    btr::Time::micros(), shortLogLevel(levels_[4]),
+    btr::Time::sec(), (btr::Time::millis() % 1000), shortLogLevel(levels_[4]),
 #elif BTR_ARD > 0
-    micros(), shortLogLevel(levels_[4]),
+    (millis() / 1000), (millis() % 1000), shortLogLevel(levels_[4]),
 #elif BTR_STM32 > 0 // TODO
-    (uint32_t) 0, shortLogLevel(levels_[4]),
+    (uint32_t) 0, (uint32_t) 0, shortLogLevel(levels_[4]),
 #endif
     u8,d64,u16,d32,u32,d16,u64,d8,dbl,str,hx_buff,hx2_buff
     );
@@ -400,7 +402,7 @@ int Logger::log(int cx, int level, const char* msg)
       backend_->print(msg);
 #elif BTR_AVR > 0 || BTR_STM32 > 0
       (void) level;
-      backend_->send(msg);
+      backend_->send(msg, strlen(msg));
 #endif
 
       if (cx < MAX_LOG_SIZE) {

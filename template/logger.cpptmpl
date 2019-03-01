@@ -20,10 +20,12 @@
 #define BOLTALOG_EOL() "\r\n"
 #include <Arduino.h>
 #include <avr/pgmspace.h>
+#include <string.h>
 
 #elif BTR_AVR > 0
 #define BOLTALOG_EOL() "\r\n"
 #include <avr/pgmspace.h>
+#include <string.h>
 #include "devices/avr/usart.hpp"
 #include "devices/avr/time.hpp"
 
@@ -259,7 +261,7 @@ int Logger::<TMPL_var e.name>Impl(
   </TMPL_if>
   int cx = snprintf(buff, MAX_LOG_SIZE,
 #if BTR_AVR > 0 | BTR_ARD > 0 | BTR_STM32 > 0
-    "%9lu %c [0]: "
+    "%6lu.%03lu %c [0]: "
 #endif
     "<TMPL_var e.id>"
     <TMPL_if DEFINED(params)->
@@ -268,22 +270,22 @@ int Logger::<TMPL_var e.name>Impl(
     ",%" <TMPL_var FORMATSPEC(p.type)> ""
     <-/TMPL_foreach> BOLTALOG_EOL(),
 #if BTR_AVR > 0
-    btr::Time::micros(), shortLogLevel(levels_[<TMPL_var e.id>]),
+    btr::Time::sec(), (btr::Time::millis() % 1000), shortLogLevel(levels_[<TMPL_var e.id>]),
 #elif BTR_ARD > 0
-    micros(), shortLogLevel(levels_[<TMPL_var e.id>]),
+    (millis() / 1000), (millis() % 1000), shortLogLevel(levels_[<TMPL_var e.id>]),
 #elif BTR_STM32 > 0 // TODO
-    (uint32_t) 0, shortLogLevel(levels_[<TMPL_var e.id>]),
+    (uint32_t) 0, (uint32_t) 0, shortLogLevel(levels_[<TMPL_var e.id>]),
 #endif
     <TMPL_foreach params as p->
     <TMPL_if !p.__first__>,</TMPL_if><TMPL_var FORMATPARAMS(p.type, p.name)>
     <-/TMPL_foreach>
     <TMPL_else->
 #if BTR_AVR > 0
-    , btr::Time::micros(), shortLogLevel(levels_[<TMPL_var e.id>])
+    , btr::Time::sec(), (btr::Time::millis() % 1000), shortLogLevel(levels_[<TMPL_var e.id>])
 #elif BTR_ARD > 0
-    , micros(), shortLogLevel(levels_[<TMPL_var e.id>])
+    , (millis() / 1000), (millis() % 1000), shortLogLevel(levels_[<TMPL_var e.id>])
 #elif BTR_STM32 > 0 // TODO
-    , (uint32_t) 0, shortLogLevel(levels_[<TMPL_var e.id>])
+    , (uint32_t) 0, (uint32_t) 0, shortLogLevel(levels_[<TMPL_var e.id>])
 #endif
     </TMPL_if>);
 
@@ -335,7 +337,7 @@ int Logger::log(int cx, int level, const char* msg)
       backend_->print(msg);
 #elif BTR_AVR > 0 || BTR_STM32 > 0
       (void) level;
-      backend_->send(msg);
+      backend_->send(msg, strlen(msg));
 #endif
 
       if (cx < MAX_LOG_SIZE) {

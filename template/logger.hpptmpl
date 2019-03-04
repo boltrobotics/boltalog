@@ -67,9 +67,9 @@ namespace <TMPL_var n>
 {
 
 </TMPL_foreach->
-<-TMPL_foreach events as e->
+<-TMPL_foreach events as e>
+#if BTR_LOG_ENABLED > 0
 <-TMPL_if DEFINED(e.doc)>
-
 /**
  * <TMPL_var e.doc>.
  *
@@ -77,10 +77,9 @@ namespace <TMPL_var n>
 /**
 <-/TMPL_if>
 <-TMPL_foreach params as p>
- * @param <TMPL_var p.name> <TMPL_var p.doc>
+ <TMPL_var FORMATDOC(p.name, p.type, p.doc)>
 <-/TMPL_foreach>
  */
-#if BTR_LOG_ENABLED > 0
 #define <TMPL_var e.name>(
   <-TMPL_foreach params as p->
   <TMPL_if !p.__first__>, </TMPL_if><TMPL_var MACROMAPPER(p.type, p.name, 1)>

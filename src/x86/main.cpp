@@ -36,6 +36,7 @@
 #include "macro_mapper.hpp"
 #include "param_mapper.hpp"
 #include "prep_string.hpp"
+#include "format_doc.hpp"
 
 using namespace CTPP;
 
@@ -84,6 +85,8 @@ int main(int argc, char** argv)
   syscall_factory.RegisterHandler(&mm);
   btr::log::PrepString preps;
   syscall_factory.RegisterHandler(&preps);
+  btr::log::FormatDoc fd;
+  syscall_factory.RegisterHandler(&fd);
 
   STDLibInitializer::InitLibrary(syscall_factory);
 

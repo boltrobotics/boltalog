@@ -31,6 +31,7 @@
 
 #elif BTR_STM32 > 0
 #define BOLTALOG_EOL() "\r\n"
+#include <string.h>
 #include "devices/stm32/usb.hpp"
 #include "devices/stm32/usart.hpp"
 #define PROGMEM

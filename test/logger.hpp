@@ -55,14 +55,13 @@ namespace log
 {
 
 
-
+#if BTR_LOG_ENABLED > 0
 /**
  * Event1 description.
  *
  * @param param1 
  * @param param2 
  */
-#if BTR_LOG_ENABLED > 0
 #define event1(param1, param2) \
   if (test::log::Logger::instance()->filter(1)) { \
     test::log::Logger::instance()->event1Impl( \
@@ -74,14 +73,13 @@ namespace log
 
 #endif // BTR_LOG_ENABLED > 0
 
-
+#if BTR_LOG_ENABLED > 0
 /**
  * Event2 description.
  *
  * @param param1 
  * @param param2 
  */
-#if BTR_LOG_ENABLED > 0
 #define event2(param1, param2) \
   if (test::log::Logger::instance()->filter(2)) { \
     test::log::Logger::instance()->event2Impl( \
@@ -93,17 +91,16 @@ namespace log
 
 #endif // BTR_LOG_ENABLED > 0
 
-
+#if BTR_LOG_ENABLED > 0
 /**
- * Event3 description.
- *
  * @param p1 
  * @param p2 
  * @param p3 
+ * @param p3_size - string size
  * @param p4 
  * @param p5 
+ * @param p5_size - string size
  */
-#if BTR_LOG_ENABLED > 0
 #define event3(p1, p2, p3, p3_size, p4, p5, p5_size) \
   if (test::log::Logger::instance()->filter(3)) { \
     test::log::Logger::instance()->event3Impl( \
@@ -115,7 +112,7 @@ namespace log
 
 #endif // BTR_LOG_ENABLED > 0
 
-
+#if BTR_LOG_ENABLED > 0
 /**
  * Event4 description.
  *
@@ -129,10 +126,12 @@ namespace log
  * @param d8 
  * @param dbl dbl description
  * @param str string description
+ * @param str_size - string size
  * @param hx hex description
+ * @param hx_size - string size
  * @param hx2 
+ * @param hx2_size - string size
  */
-#if BTR_LOG_ENABLED > 0
 #define event4(u8, d64, u16, d32, u32, d16, u64, d8, dbl, str, str_size, hx, hx_size, hx2, hx2_size) \
   if (test::log::Logger::instance()->filter(4)) { \
     test::log::Logger::instance()->event4Impl( \

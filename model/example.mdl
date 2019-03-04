@@ -16,7 +16,7 @@
     ]
   },
   {
-    'id':'3', 'name':'event3', 'level':'DEBUG', 'doc':'Event3 description',
+    'id':'3', 'name':'event3', 'level':'DEBUG', 
     'params': [
       { 'name':'p1', 'type':'uint64_t' },
       { 'name':'p2', 'type':'int16_t' },
@@ -29,17 +29,17 @@
     'id':'4', 'name':'event4', 'level':'TRACE', 'doc':'Event4 description',
     'params': [
       { 'name':'u8', 'type':'uint8_t', 'doc':'u8 description' },
-      { 'name':'d64', 'type':'int64_t' },
-      { 'name':'u16', 'type':'uint16_t' },
-      { 'name':'d32', 'type':'int32_t' },
-      { 'name':'u32', 'type':'uint32_t' },
-      { 'name':'d16', 'type':'int16_t' },
-      { 'name':'u64', 'type':'uint64_t' },
-      { 'name':'d8', 'type':'int8_t' },
+      { 'name':'d64', 'type':'int64_t', 'doc':'' },
+      { 'name':'u16', 'type':'uint16_t', 'doc':'' },
+      { 'name':'d32', 'type':'int32_t', 'doc':'' },
+      { 'name':'u32', 'type':'uint32_t', 'doc':'' },
+      { 'name':'d16', 'type':'int16_t', 'doc':'' },
+      { 'name':'u64', 'type':'uint64_t', 'doc':'' },
+      { 'name':'d8', 'type':'int8_t', 'doc':'' },
       { 'name':'dbl', 'type':'double', 'doc':'dbl description' },
       { 'name':'str', 'type':'string', 'doc':'string description' },
       { 'name':'hx', 'type':'hex', 'doc':'hex description' },
-      { 'name':'hx2', 'type':'hex' }
+      { 'name':'hx2', 'type':'hex', 'doc':'' }
     ]
   }
 ]

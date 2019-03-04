@@ -66,7 +66,7 @@ list(APPEND SOURCES ${SRC_DST}/logger.cpp ${SRC_DST}/logger.hpp)
 build_exe(SRCS ${SOURCES} SUFFIX "-tests")
 add_dependencies(${PROJECT_NAME}-tests log_viewer)
 
-set(DOXYGEN_WARN NO)
-build_doc(DEP ${PROJECT_NAME}-tests SUFFIX "-docs")
+#set(DOXYGEN_WARN NO)
+#build_doc(DEP ${PROJECT_NAME}-tests SUFFIX "-docs")
 
 # } boltalog test

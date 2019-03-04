@@ -1,6 +1,8 @@
 // Copyright (C) 2019 Bolt Robotics <info@boltrobotics.com>
 // License: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
+/** @file */
+
 #ifndef _btr_log_Count_hpp_
 #define _btr_log_Count_hpp_
 
@@ -18,7 +20,7 @@ namespace log
 using namespace CTPP;
 
 /**
- * The class encapsulates a set of servers and registers to poll once or periodically.
+ * The class counts an occurance of a token and may provide the total count.
  */
 class Count : public SyscallHandler
 {

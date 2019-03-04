@@ -38,7 +38,7 @@ public:
   ~LoggerTest()
   {
     spdlog::drop_all();
-    //remove(fname_.c_str());
+    remove(fname_.c_str());
   }
 
   std::string fname_;

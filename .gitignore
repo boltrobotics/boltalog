@@ -6,6 +6,7 @@ template/*ct2
 
 # Cmake
 build-*
+doc/html*
 
 # Mac
 .DS_Store

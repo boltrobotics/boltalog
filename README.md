@@ -1,4 +1,4 @@
-# Introduction
+# Overview
 
 Project's requirements:
 
@@ -28,18 +28,18 @@ Benefits:
 The following are top-level dependencies. Depending on target platform additional tools may be
 required.<br>
 (See [Example](#Example),
-<a href="https://github.com/boltrobotics/boltalog/blob/master/src/stm32/CMakeLists.txt" target="_blank">stm32/CMakeLists.txt<a>,
-<a href="https://github.com/boltrobotics/boltalog/blob/master/src/avr/CMakeLists.txt" target="_blank">avr/CMakeLists.txt<a>)
+<a href="https://github.com/boltrobotics/boltalog/blob/master/src/stm32/CMakeLists.txt" target="_blank">stm32/CMakeLists.txt</a>,
+<a href="https://github.com/boltrobotics/boltalog/blob/master/src/avr/CMakeLists.txt" target="_blank">avr/CMakeLists.txt</a>)
 
-* <a href="https://github.com/boltrobotics/cmake-helpers" target="_blank">cmake-helpers<a>
-* <a href="https://github.com/boltrobotics/ctpp" target="_blank">ctpp<a>
-* <a href="https://github.com/boltrobotics/utility" target="_blank">utility<a>
-* <a href="https://github.com/gabime/spdlog" target="_blank">spdlog<a>
+* <a href="https://github.com/boltrobotics/cmake-helpers" target="_blank">cmake-helpers</a>
+* <a href="https://github.com/boltrobotics/ctpp" target="_blank">ctpp</a>
+* <a href="https://github.com/boltrobotics/utility" target="_blank">utility</a>
+* <a href="https://github.com/gabime/spdlog" target="_blank">spdlog</a>
 
 # <a name="Example" href="https://github.com/boltrobotics/boltalog/tree/master/test" target="_blank">Example</a>
 
 Example log model and code generation is included as part of unit testing. Cmake build instructions
-are specified in <a href="https://github.com/boltrobotics/boltalog/blob/master/test/CMakeLists.txt" target="_blank">test/CMakeLists.txt<a>.
+are specified in <a href="https://github.com/boltrobotics/boltalog/blob/master/test/CMakeLists.txt" target="_blank">test/CMakeLists.txt</a>.
 
 ### <a name="Model" href="https://github.com/boltrobotics/boltalog/blob/master/model/example.mdl" target="_blank">Model</a>
 

@@ -1,6 +1,8 @@
 // Copyright (C) 2019 Bolt Robotics <info@boltrobotics.com>
 // License: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
+/** @file */
+
 #ifndef _btr_log_TypeMapper_hpp_
 #define _btr_log_TypeMapper_hpp_
 
@@ -19,7 +21,7 @@ namespace log
 using namespace CTPP;
 
 /**
- * The class encapsulates a set of servers and registers to poll once or periodically.
+ * The class maps types between model and source code.
  */
 class TypeMapper : public SyscallHandler
 {

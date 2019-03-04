@@ -1,6 +1,8 @@
 // Copyright (C) 2019 Bolt Robotics <info@boltrobotics.com>
 // License: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
+/** @file */
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // WARNING: The code is auto-generated. Any changes will be overwritten.
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,7 +57,7 @@ namespace log
 
 
 /**
- * Event1 description
+ * Event1 description.
  *
  * @param param1 
  * @param param2 
@@ -74,7 +76,7 @@ namespace log
 
 
 /**
- * Event2 description
+ * Event2 description.
  *
  * @param param1 
  * @param param2 
@@ -93,7 +95,7 @@ namespace log
 
 
 /**
- * Event3 description
+ * Event3 description.
  *
  * @param p1 
  * @param p2 
@@ -115,7 +117,7 @@ namespace log
 
 
 /**
- * Event4 description
+ * Event4 description.
  *
  * @param u8 u8 description
  * @param d64 
@@ -166,11 +168,11 @@ public:
 
 // OPERATIONS
 
+#if BTR_X86 > 0
   /**
    * @param backend - new backend logger. Should be supplied first time when instance() is called
    * @return global logger instance
    */
-#if BTR_X86 > 0
   static Logger* instance(std::shared_ptr<spdlog::logger>* backend = nullptr);
 #elif BTR_ARD > 0
   static Logger* instance(HardwareSerial* backend = nullptr);
@@ -183,7 +185,10 @@ public:
 #endif
 
   /**
-   * @return text description of the error
+   * Provide an error string. This functionality is available only on x86 platform.
+   *
+   * @param errnum - errno number
+   * @return text description of the error or empty on embedded platform
    */
   static const char* strerror(int errnum);
 

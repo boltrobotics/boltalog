@@ -1,6 +1,8 @@
 // Copyright (C) 2019 Bolt Robotics <info@boltrobotics.com>
 // License: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 
+/** @file */
+
 #ifndef _btr_log_ParamMapper_hpp_
 #define _btr_log_ParamMapper_hpp_
 
@@ -19,7 +21,7 @@ namespace log
 using namespace CTPP;
 
 /**
- * The class encapsulates a set of servers and registers to poll once or periodically.
+ * The class returns a parameter type and name when declaring/defining a function.
  */
 class ParamMapper : public SyscallHandler
 {

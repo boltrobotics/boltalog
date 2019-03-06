@@ -41,6 +41,10 @@ enum LOG_LEVEL {
 #define LOG_ENOBASE   23000
 #define EBADLOGLEVEL  (LOG_ENOBASE + 1)
 
+#if !defined(BTR_LOG_PORT_USB) && !defined(BTR_LOG_PORT_USART)
+#define BTR_LOG_PORT_USB 1
+#endif
+
 } // namespace log
 
 } // namespace btr

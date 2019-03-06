@@ -177,11 +177,15 @@ public:
   static Logger* instance(HardwareSerial* backend = nullptr);
 #elif BTR_AVR > 0
   static Logger* instance(btr::Usart* backend = nullptr);
-#elif defined(BTR_STM32_LOGGER_USB)
+#elif BTR_STM32 > 0
+
+#if BTR_LOG_PORT_USB > 0
   static Logger* instance(btr::Usb* backend = nullptr);
-#elif defined(BTR_STM32_LOGGER_USART)
+#elif BTR_LOG_PORT_USART > 0
   static Logger* instance(btr::Usart* backend = nullptr);
-#endif
+#endif // STM32 backend
+
+#endif // Platform
 
   /**
    * Provide an error string. This functionality is available only on x86 platform.

@@ -59,6 +59,7 @@ add_custom_target(
 
 include(x86_project)
 
+setup_x86()
 build_exe(SRCS "${MAIN_SRC}" LIBS ctpp2 SUFFIX "-autogen")
 add_dependencies(${PROJECT_NAME}-autogen boltalog-templates)
 

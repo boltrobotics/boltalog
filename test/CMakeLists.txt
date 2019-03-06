@@ -60,10 +60,10 @@ add_custom_target(
   )
 
 include(test_project)
-setup()
+setup_tests()
 find_test_srcs()
 list(APPEND SOURCES ${SRC_DST}/logger.cpp ${SRC_DST}/logger.hpp)
-build_exe(SRCS ${SOURCES} SUFFIX "-tests")
+build_tests(SRCS ${SOURCES} SUFFIX "-tests")
 add_dependencies(${PROJECT_NAME}-tests log_viewer)
 
 set(DOXYGEN_WARN NO)

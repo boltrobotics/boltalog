@@ -206,12 +206,12 @@ private:
 #elif BTR_AVR > 0
   btr::Usart* backend_;
 #elif BTR_STM32 > 0
-#if defined(BTR_STM32_LOGGER_USB)
+#if BTR_LOG_PORT_USB > 0
   btr::Usb* backend_;
-#elif defined(BTR_STM32_LOGGER_USART)
+#elif BTR_LOG_PORT_USART > 0
   btr::Usart* backend_;
-#endif // stm32
-#endif // x86, avr, stm32
+#endif // BTR_LOG_PORT_*
+#endif // BTR_X86, BTR_ARD, BTR_AVR, BTR_STM32
 
 #endif // BTR_LOG_ENABLED > 0
 };

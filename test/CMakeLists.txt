@@ -60,7 +60,7 @@ add_custom_target(
   )
 
 include(test_project)
-
+setup()
 find_test_srcs()
 list(APPEND SOURCES ${SRC_DST}/logger.cpp ${SRC_DST}/logger.hpp)
 build_exe(SRCS ${SOURCES} SUFFIX "-tests")

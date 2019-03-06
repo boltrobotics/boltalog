@@ -26,14 +26,14 @@
 #define BOLTALOG_EOL() "\r\n"
 #include <avr/pgmspace.h>
 #include <string.h>
-#include "devices/avr/usart.hpp"
+#include "devices/usart.hpp"
 #include "devices/avr/time.hpp"
 
 #elif BTR_STM32 > 0
 #define BOLTALOG_EOL() "\r\n"
 #include <string.h>
+#include "devices/usart.hpp"
 #include "devices/stm32/usb.hpp"
-#include "devices/stm32/usart.hpp"
 #define PROGMEM
 #endif // x86, ard, avr, stm32
 
@@ -149,7 +149,7 @@ Logger* Logger::instance(btr::Usart* backend)
 #endif // BTR_LOG_ENABLED > 0
 }
 
-#elif BTR_STM32_LOGGER_USB > 0
+#elif BTR_LOG_PORT_USB > 0
 Logger* Logger::instance(btr::Usb* backend)
 {
 #if BTR_LOG_ENABLED > 0
@@ -162,7 +162,7 @@ Logger* Logger::instance(btr::Usb* backend)
   return nullptr;
 #endif // BTR_LOG_ENABLED > 0
 }
-#elif BTR_STM32_LOGGER_USART > 0
+#elif BTR_LOG_PORT_USART > 0
 Logger* Logger::instance(btr::Usart* backend)
 {
 #if BTR_LOG_ENABLED > 0

@@ -26,6 +26,9 @@
 #ifndef _<TMPL_call "guard" args(namespace)>Logger_hpp_
 #define _<TMPL_call "guard" args(namespace)>Logger_hpp_
 
+// PROJECT INCLUDES
+#include "boltalog/defines.hpp"
+
 #if BTR_X86 > 0
 
 #include <memory>
@@ -55,13 +58,6 @@ class Usart;
 }
 
 #endif // x86, avr, ard, stm32
-
-// SYSTEM INCLUDES
-#define _STDC_FORMAT_MACROS
-#include <inttypes.h>
-#ifndef BTR_LOG_ENABLED
-#define BTR_LOG_ENABLED 1
-#endif
 <TMPL_foreach namespace as n>
 namespace <TMPL_var n>
 {
@@ -124,32 +120,79 @@ public:
 // OPERATIONS
 
 #if BTR_X86 > 0
+
   /**
    * @param backend - new backend logger. Should be supplied first time when instance() is called
    * @return global logger instance
    */
   static Logger* instance(std::shared_ptr<spdlog::logger>* backend = nullptr);
+
 #elif BTR_ARD > 0
+
   static Logger* instance(HardwareSerial* backend = nullptr);
+
 #elif BTR_AVR > 0
+
   static Logger* instance(btr::Usart* backend = nullptr);
+
 #elif BTR_STM32 > 0
 
 #if BTR_LOG_PORT_USB > 0
   static Logger* instance(btr::Usb* backend = nullptr);
 #elif BTR_LOG_PORT_USART > 0
   static Logger* instance(btr::Usart* backend = nullptr);
+#else
+  /**
+   * No-op logger, added as simple fix for when no USB or USART loggers are specified.
+   * @return no-op logger
+   */
+  static Logger* instance();
 #endif // STM32 backend
 
-#endif // Platform
+#endif // BTR_X86 > 0 | BTR_ARD > 0 | BTR_AVR > 0 | BTR_STM32 > 0
+
+  //------------------------------------------------------------------------------------------------
+  // Error state
 
   /**
-   * Provide an error string. This functionality is available only on x86 platform.
+   * Set error.
    *
-   * @param errnum - errno number
-   * @return text description of the error or empty on embedded platform
+   * @param err_addr - address of an error bit (0 - 255)
+   * @param offset - address space offset. A system can have more than one subsystems whose error
+   *  IDs most likely start at 0. To distinguish errors, use subsytem/address-space offset. The
+   *  offsets must be coordinated between the subsystems.
    */
-  static const char* strerror(int errnum);
+  static void setError(uint8_t err_addr, uint8_t offset);
+
+  /**
+   * Clear error.
+   *
+   * @param err_addr - address of an error bit (0 - 255)
+   * @param offset - address space offset
+   */
+  static void clearError(uint8_t err_addr, uint8_t offset);
+
+  /**
+   * Check if an error is set.
+   *
+   * @param err_addr - address of an error bit (0 - 255)
+   * @param offset - address space offset
+   * @return true if the error is set, false otherwise
+   */
+  static bool isError(uint8_t err_addr, uint8_t offset);
+
+  /**
+   * Check if any error is set system-wide.
+   * @return true if some error is set, false if no errors are set
+   */
+  static bool isError();
+
+  /**
+   * Clear all errors.
+   */
+  static void clearErrors();
+
+  //------------------------------------------------------------------------------------------------
 
   /**
    * Set the log level of a given event ID.

@@ -7,8 +7,8 @@
 #define _btr_log_Defines_hpp_
 
 // SYSTEM INCLUDES
+#define _STDC_FORMAT_MACROS
 #include <inttypes.h>
-#include <errno.h>
 
 namespace btr
 {
@@ -26,6 +26,9 @@ enum LOG_LEVEL {
   LOGS_OFF  = 6
 };
 
+#ifndef BTR_LOG_ENABLED
+#define BTR_LOG_ENABLED   1
+#endif
 #ifndef MAX_LOG_SIZE 
 #define MAX_LOG_SIZE 128
 #endif
@@ -38,8 +41,21 @@ enum LOG_LEVEL {
 #ifndef BTR_LOG_LEVEL
 #define BTR_LOG_LEVEL btr::log::TRACE
 #endif
-#define LOG_ENOBASE   23000
-#define EBADLOGLEVEL  (LOG_ENOBASE + 1)
+
+//--------------------------------------------------------------------------------------------------
+// Errors
+
+#define BTR_LOG_EBADLOGLEVEL  0
+#define BTR_LOG_ECOUNT        (BTR_LOG_EBADLOGLEVEL + 1)
+
+#ifndef BTR_LOG_ERR_OFFSET 
+#define BTR_LOG_ERR_OFFSET    0
+#endif
+#ifndef BTR_LOG_ERR_ENABLED
+#define BTR_LOG_ERR_ENABLED   BTR_LOG_ECOUNT
+#endif
+
+//--------------------------------------------------------------------------------------------------
 
 } // namespace log
 

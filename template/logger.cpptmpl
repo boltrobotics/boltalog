@@ -8,6 +8,7 @@
 // PROJECT INCLUDES
 #include "logger.hpp" // class implemented
 #include "boltalog/defines.hpp"
+#include "utility/misc.hpp"
 
 #if BTR_LOG_ENABLED > 0
 
@@ -56,6 +57,8 @@ namespace <TMPL_var n>
 
 </TMPL_foreach->
 
+//==================================================================================================
+
 #if BTR_LOG_ENABLED > 0
 
 static Logger logger_;
@@ -84,6 +87,14 @@ uint32_t toHex(const char* src_str, uint32_t src_size, char* dst_str, uint32_t d
 }
 
 #endif // BTR_LOG_ENABLED > 0
+
+//==================================================================================================
+
+#define BTR_ERR_BITS(m) ((m % 8) != 0 ? (m / 8 + 1) : (m / 8))
+
+#if BTR_LOG_ERR_ENABLED > 0
+static uint8_t errors_[BTR_ERR_BITS(BTR_LOG_ERR_ENABLED)];
+#endif
 
 /////////////////////////////////////////////// PUBLIC /////////////////////////////////////////////
 
@@ -147,7 +158,9 @@ Logger* Logger::instance(btr::Usart* backend)
 #endif // BTR_LOG_ENABLED > 0
 }
 
-#elif BTR_LOG_PORT_USB > 0
+#elif BTR_STM32 > 0
+
+#if BTR_LOG_PORT_USB > 0
 Logger* Logger::instance(btr::Usb* backend)
 {
 #if BTR_LOG_ENABLED > 0
@@ -160,6 +173,7 @@ Logger* Logger::instance(btr::Usb* backend)
   return nullptr;
 #endif // BTR_LOG_ENABLED > 0
 }
+
 #elif BTR_LOG_PORT_USART > 0
 Logger* Logger::instance(btr::Usart* backend)
 {
@@ -173,18 +187,69 @@ Logger* Logger::instance(btr::Usart* backend)
   return nullptr;
 #endif // BTR_LOG_ENABLED > 0
 }
+#else
+Logger* Logger::instance()
+{
+  // If BTR_LOG_ENABLED > 0 and BTR_LOG_PORT_USB == 0 and BTR_LOG_PORT_UART == 0
+  return &logger_;
+}
 #endif
 
-// static 
-const char* Logger::strerror(int errnum)
+#endif // BTR_X86, BTR_ARD, BTR_AVR, BTR_STM32
+
+//--------------------------------------------------------------------------------------------------
+// Error state
+
+// static
+void Logger::setError(uint8_t err_addr, uint8_t offset)
 {
-  switch (errnum) {
-  case EBADLOGLEVEL:
-    return "Bad log level";
-  default:
-    return "Unknown";
-  }
+#if BTR_LOG_ERR_ENABLED > 0
+  btr::Misc::setBit(errors_, err_addr, offset);
+#endif
 }
+
+// static
+void Logger::clearError(uint8_t err_addr, uint8_t offset)
+{
+#if BTR_LOG_ERR_ENABLED > 0
+  btr::Misc::clearBit(errors_, err_addr, offset);
+#endif
+}
+
+// static
+bool Logger::isError(uint8_t err_addr, uint8_t offset)
+{
+#if BTR_LOG_ERR_ENABLED > 0
+  return btr::Misc::checkBit(errors_, err_addr, offset);
+#else
+  return false;
+#endif
+}
+
+// static
+bool Logger::isError()
+{
+#if BTR_LOG_ERR_ENABLED > 0
+  for (uint8_t i = 0; i < BTR_LOG_ERR_ENABLED; i++) {
+    if (errors_[i] & 0xFF) {
+      return true;
+    }
+  }
+#endif
+  return false;
+}
+
+// static
+void Logger::clearErrors()
+{
+#if BTR_LOG_ERR_ENABLED > 0
+  for (uint8_t i = 0; i < BTR_LOG_ERR_ENABLED; i++) {
+    errors_[i] = 0;
+  }
+#endif
+}
+
+//--------------------------------------------------------------------------------------------------
 
 int Logger::level(int event_id, int log_level)
 {
@@ -330,16 +395,27 @@ int Logger::log(int cx, int level, const char* msg)
           backend_->critical(msg);
           break;
         default:
-          errno = EBADLOGLEVEL;
+          errno = BTR_LOG_EBADLOGLEVEL;
+          setError(BTR_LOG_EBADLOGLEVEL, BTR_LOG_ERR_OFFSET);
           return rc;
       };
 #elif BTR_ARD > 0
       (void) level;
       backend_->print(msg);
-#elif BTR_AVR > 0 || BTR_STM32 > 0
+#elif BTR_AVR > 0
       (void) level;
       backend_->send(msg, strlen(msg));
+#elif BTR_STM32 > 0
+
+#if BTR_LOG_PORT_USB > 0 OR BTR_LOG_PORT_UART > 0
+      (void) level;
+      backend_->send(msg, strlen(msg));
+#else
+      errno = EINVAL;
+      return -1;
 #endif
+
+#endif // BTR_X86 > 0 | BTR_ARD > 0 | BTR_AVR > 0 | BTR_STM32 > 0
 
       if (cx < MAX_LOG_SIZE) {
         rc = 0;

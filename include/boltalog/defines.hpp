@@ -45,8 +45,12 @@ enum LOG_LEVEL {
 //--------------------------------------------------------------------------------------------------
 // Errors
 
-#define BTR_LOG_EBADLOGLEVEL  0
-#define BTR_LOG_ECOUNT        (BTR_LOG_EBADLOGLEVEL + 1)
+#define BTR_LOG_EINVAL        0
+#define BTR_LOG_EBADLOGLEVEL  1
+#define BTR_LOG_ERANGE        2
+#define BTR_LOG_EIO           3
+#define BTR_LOG_ESEND         4
+#define BTR_LOG_ECOUNT        (BTR_LOG_ESEND + 1)
 
 #ifndef BTR_LOG_ERR_OFFSET 
 #define BTR_LOG_ERR_OFFSET    0
@@ -54,6 +58,9 @@ enum LOG_LEVEL {
 #ifndef BTR_LOG_ERR_ENABLED
 #define BTR_LOG_ERR_ENABLED   BTR_LOG_ECOUNT
 #endif
+
+/** Calculate how many byte are required to hold "m" bits. */
+#define BTR_ERR_BITS(m) ((m % 8) != 0 ? (m / 8 + 1) : (m / 8))
 
 //--------------------------------------------------------------------------------------------------
 

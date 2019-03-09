@@ -5,6 +5,8 @@
 // WARNING: The code is auto-generated. Any changes will be overwritten.
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// SYSTEM INCLUDES
+
 // PROJECT INCLUDES
 #include "logger.hpp" // class implemented
 #include "boltalog/defines.hpp"
@@ -89,8 +91,6 @@ uint32_t toHex(const char* src_str, uint32_t src_size, char* dst_str, uint32_t d
 #endif // BTR_LOG_ENABLED > 0
 
 //==================================================================================================
-
-#define BTR_ERR_BITS(m) ((m % 8) != 0 ? (m / 8 + 1) : (m / 8))
 
 #if BTR_LOG_ERR_ENABLED > 0
 static uint8_t errors_[BTR_ERR_BITS(BTR_LOG_ERR_ENABLED)];
@@ -189,11 +189,15 @@ Logger* Logger::instance(btr::Usart* backend)
   return nullptr;
 #endif // BTR_LOG_ENABLED > 0
 }
-#else
+
+#else // BTR_LOG_PORT_USB0 == 0 && BTR_LOG_PORT_USART == 0
 Logger* Logger::instance()
 {
-  // If BTR_LOG_ENABLED > 0 and BTR_LOG_PORT_USB == 0 and BTR_LOG_PORT_UART == 0
+#if BTR_LOG_ENABLED > 0
   return &logger_;
+#else
+  return nullptr;
+#endif // BTR_LOG_ENABLED > 0
 }
 #endif
 
@@ -232,7 +236,7 @@ bool Logger::isError(uint8_t err_addr, uint8_t offset)
 bool Logger::isError()
 {
 #if BTR_LOG_ERR_ENABLED > 0
-  for (uint8_t i = 0; i < BTR_LOG_ERR_ENABLED; i++) {
+  for (uint8_t i = 0; i < BTR_ERR_BITS(BTR_LOG_ERR_ENABLED); i++) {
     if (errors_[i] & 0xFF) {
       return true;
     }
@@ -245,7 +249,7 @@ bool Logger::isError()
 void Logger::clearErrors()
 {
 #if BTR_LOG_ERR_ENABLED > 0
-  for (uint8_t i = 0; i < BTR_LOG_ERR_ENABLED; i++) {
+  for (uint8_t i = 0; i < BTR_ERR_BITS(BTR_LOG_ERR_ENABLED); i++) {
     errors_[i] = 0;
   }
 #endif
@@ -433,9 +437,9 @@ int Logger::event4Impl(
 
 #if BTR_LOG_ENABLED > 0
 
-int Logger::log(int cx, int level, const char* msg)
+int Logger::log(int cx, int level __attribute((unused)), const char* msg)
 {
-  int rc = -1;
+  uint32_t rc = 0;
 
   if (nullptr != backend_) {
     if (cx >= 0) {
@@ -460,39 +464,36 @@ int Logger::log(int cx, int level, const char* msg)
           backend_->critical(msg);
           break;
         default:
-          errno = BTR_LOG_EBADLOGLEVEL;
           setError(BTR_LOG_EBADLOGLEVEL, BTR_LOG_ERR_OFFSET);
-          return rc;
+          return -1;
       };
 #elif BTR_ARD > 0
-      (void) level;
       backend_->print(msg);
 #elif BTR_AVR > 0
-      (void) level;
-      backend_->send(msg, strlen(msg));
+      rc = backend_->send(msg, strlen(msg));
 #elif BTR_STM32 > 0
-
-#if BTR_LOG_PORT_USB > 0 OR BTR_LOG_PORT_UART > 0
-      (void) level;
-      backend_->send(msg, strlen(msg));
+#if BTR_LOG_PORT_USB > 0 || BTR_LOG_PORT_UART > 0
+      rc = backend_->send(msg, strlen(msg));
 #else
-      errno = EINVAL;
-      return -1;
-#endif
-
+      rc = BTR_LOG_EINVAL;
+#endif // BTR_LOG_PORT_USB > 0 || BTR_LOG_PORT_UART > 0
 #endif // BTR_X86 > 0 | BTR_ARD > 0 | BTR_AVR > 0 | BTR_STM32 > 0
 
-      if (cx < MAX_LOG_SIZE) {
-        rc = 0;
+      if (0 == (rc & 0xFFFF0000)) {
+        if (cx > MAX_LOG_SIZE) {
+          setError(BTR_LOG_ERANGE, BTR_LOG_ERR_OFFSET);
+          return -1;
+        }
       } else {
-        // AVR libc doesn't define EOVERFLOW, just use ERANGE
-        errno = ERANGE;
+        setError(BTR_LOG_EIO, BTR_LOG_ERR_OFFSET);
+        return -1;
       }
     }
   } else {
-    errno = EINVAL;
+    setError(BTR_LOG_EINVAL, BTR_LOG_ERR_OFFSET);
+    return -1;
   }
-  return rc;
+  return 0;
 }
 #endif // BTR_LOG_ENABLED > 0
 

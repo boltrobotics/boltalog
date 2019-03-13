@@ -29,12 +29,13 @@
 #define BOLTALOG_EOL() "\r\n"
 #include <avr/pgmspace.h>
 #include <string.h>
+#include "devices/time.hpp"
 #include "devices/usart.hpp"
-#include "devices/avr/time.hpp"
 
 #elif BTR_STM32 > 0
 #define BOLTALOG_EOL() "\r\n"
 #include <string.h>
+#include "devices/time.hpp"
 #include "devices/usart.hpp"
 #include "devices/stm32/usb.hpp"
 #define PROGMEM
@@ -339,12 +340,10 @@ int Logger::<TMPL_var e.name>Impl(
     <TMPL_foreach params as p->
     ",%" <TMPL_var FORMATSPEC(p.type)> ""
     <-/TMPL_foreach> BOLTALOG_EOL(),
-#if BTR_AVR > 0
+#if BTR_AVR > 0 || BTR_STM32 > 0
     btr::Time::sec(), (btr::Time::millis() % 1000), shortLogLevel(levels_[<TMPL_var e.id>]),
 #elif BTR_ARD > 0
     (millis() / 1000), (millis() % 1000), shortLogLevel(levels_[<TMPL_var e.id>]),
-#elif BTR_STM32 > 0 // TODO
-    (uint32_t) 0, (uint32_t) 0, shortLogLevel(levels_[<TMPL_var e.id>]),
 #endif
     <TMPL_foreach params as p->
     <TMPL_if !p.__first__>,</TMPL_if><TMPL_var FORMATPARAMS(p.type, p.name)>

@@ -49,6 +49,10 @@ enum BTR_LOG_LEVEL {
 #define BTR_LOG_EIO             0x00080000
 #define BTR_LOG_ESEND           0x00100000
 
+#ifndef BTR_STATUS_ENABLED
+#define BTR_STATUS_ENABLED      1
+#endif
+
 namespace log
 {
 /** Provide this module's status accumulator or nullptr if BTR_STATUS_ENABLED is 0. */

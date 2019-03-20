@@ -75,27 +75,27 @@ TEST_F(LoggerTest, Level)
     ASSERT_EQ(true, logger->filter(i));
   }
 
-  logger->level(0, btr::log::WARN);
+  logger->level(0, btr::WARN);
   ASSERT_EQ(true, logger->filter(0));
   ASSERT_EQ(false, logger->filter(1));
   ASSERT_EQ(true, logger->filter(2));
   ASSERT_EQ(false, logger->filter(3));
   ASSERT_EQ(false, logger->filter(4));
 
-  logger->level(1, btr::log::ERROR);
-  logger->level(3, btr::log::WARN);
+  logger->level(1, btr::ERROR);
+  logger->level(3, btr::WARN);
 
   for (int i = 0; i < 4; i++) {
     ASSERT_EQ(true, logger->filter(i));
   }
 
-  ASSERT_EQ(-1, logger->level(5, btr::log::INFO));
+  ASSERT_EQ(-1, logger->level(5, btr::INFO));
 }
 
 TEST_F(LoggerTest, Output)
 {
   test::log::Logger* logger = test::log::Logger::instance();
-  logger->level(0, btr::log::TRACE);
+  logger->level(0, btr::TRACE);
 
   event1(32, 8);
   event2(65535, 3.03);

@@ -195,49 +195,6 @@ public:
 
 #endif // BTR_X86 > 0 | BTR_ARD > 0 | BTR_AVR > 0 | BTR_STM32 > 0
 
-  //------------------------------------------------------------------------------------------------
-  // Error state
-
-  /**
-   * Set error.
-   *
-   * @param err_addr - address of an error bit (0 - 255)
-   * @param offset - address space offset. A system can have more than one subsystems whose error
-   *  IDs most likely start at 0. To distinguish errors, use subsytem/address-space offset. The
-   *  offsets must be coordinated between the subsystems.
-   */
-  static void setError(uint8_t err_addr, uint8_t offset);
-
-  /**
-   * Clear error.
-   *
-   * @param err_addr - address of an error bit (0 - 255)
-   * @param offset - address space offset
-   */
-  static void clearError(uint8_t err_addr, uint8_t offset);
-
-  /**
-   * Check if an error is set.
-   *
-   * @param err_addr - address of an error bit (0 - 255)
-   * @param offset - address space offset
-   * @return true if the error is set, false otherwise
-   */
-  static bool isError(uint8_t err_addr, uint8_t offset);
-
-  /**
-   * Check if any error is set system-wide.
-   * @return true if some error is set, false if no errors are set
-   */
-  static bool isError();
-
-  /**
-   * Clear all errors.
-   */
-  static void clearErrors();
-
-  //------------------------------------------------------------------------------------------------
-
   /**
    * Set the log level of a given event ID.
    *

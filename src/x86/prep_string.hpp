@@ -77,8 +77,8 @@ inline INT_32 PrepString::Handler(CDT* argv, const UINT_32 argc, CDT& cdt, Logge
 
     if (var_type == "hex") {
       // Convert binary to hex
-      cdt = "\n  char " + var_name + "_buff[MAX_HEX_SIZE];\n  "
-      "toHex(" + var_name + ", " + var_name + "_size, " + var_name + "_buff, MAX_HEX_SIZE);";
+      cdt = "\n  char " + var_name + "_buff[BTR_LOG_MAX_HEX];\n  "
+      "toHex(" + var_name + ", " + var_name + "_size, " + var_name + "_buff, BTR_LOG_MAX_HEX);";
     } else if (var_type == "string") {
       cdt = "\n  (void) " + var_name + "_size;";
     }

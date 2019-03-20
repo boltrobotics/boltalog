@@ -10,7 +10,28 @@
 // PROJECT INCLUDES
 #include "logger.hpp" // class implemented
 #include "boltalog/defines.hpp"
+#include "utility/defines.hpp"
 #include "utility/misc.hpp"
+
+namespace btr
+{
+namespace log
+{
+#if BTR_STATUS_ENABLED > 0
+static uint32_t status_;
+
+uint32_t* status()
+{
+  return &status_;
+}
+#else
+uint32_t* status()
+{
+  return nullptr;
+}
+#endif // BTR_STATUS_ENABLED > 0
+} // namespace log
+} // namespace btr
 
 #if BTR_LOG_ENABLED > 0
 
@@ -93,10 +114,6 @@ uint32_t toHex(const char* src_str, uint32_t src_size, char* dst_str, uint32_t d
 
 //==================================================================================================
 
-#if BTR_LOG_ERR_ENABLED > 0
-static uint8_t errors_[BTR_ERR_BITS(BTR_LOG_ERR_ENABLED)];
-#endif
-
 /////////////////////////////////////////////// PUBLIC /////////////////////////////////////////////
 
 //============================================= LIFECYCLE ==========================================
@@ -104,12 +121,12 @@ static uint8_t errors_[BTR_ERR_BITS(BTR_LOG_ERR_ENABLED)];
 Logger::Logger()
 {
 #if BTR_LOG_ENABLED > 0
-  levels_[0] = BTR_LOG_LEVEL;
+  levels_[0] = BTR_LOG_LEVEL_DFLT;
 
-  levels_[1] = btr::log::INFO;
-  levels_[2] = btr::log::WARN;
-  levels_[3] = btr::log::DEBUG;
-  levels_[4] = btr::log::TRACE;
+  levels_[1] = btr::INFO;
+  levels_[2] = btr::WARN;
+  levels_[3] = btr::DEBUG;
+  levels_[4] = btr::TRACE;
   
 #endif // BTR_LOG_ENABLED > 0
 }
@@ -204,60 +221,6 @@ Logger* Logger::instance()
 
 #endif // BTR_X86, BTR_ARD, BTR_AVR, BTR_STM32
 
-//--------------------------------------------------------------------------------------------------
-// Error state
-
-// static
-void Logger::setError(uint8_t err_addr, uint8_t offset)
-{
-#if BTR_LOG_ERR_ENABLED > 0
-  btr::Misc::setBit(errors_, err_addr, offset);
-#endif
-}
-
-// static
-void Logger::clearError(uint8_t err_addr, uint8_t offset)
-{
-#if BTR_LOG_ERR_ENABLED > 0
-  btr::Misc::clearBit(errors_, err_addr, offset);
-#endif
-}
-
-// static
-bool Logger::isError(uint8_t err_addr, uint8_t offset)
-{
-#if BTR_LOG_ERR_ENABLED > 0
-  return btr::Misc::checkBit(errors_, err_addr, offset);
-#else
-  return false;
-#endif
-}
-
-// static
-bool Logger::isError()
-{
-#if BTR_LOG_ERR_ENABLED > 0
-  for (uint8_t i = 0; i < BTR_ERR_BITS(BTR_LOG_ERR_ENABLED); i++) {
-    if (errors_[i] & 0xFF) {
-      return true;
-    }
-  }
-#endif
-  return false;
-}
-
-// static
-void Logger::clearErrors()
-{
-#if BTR_LOG_ERR_ENABLED > 0
-  for (uint8_t i = 0; i < BTR_ERR_BITS(BTR_LOG_ERR_ENABLED); i++) {
-    errors_[i] = 0;
-  }
-#endif
-}
-
-//--------------------------------------------------------------------------------------------------
-
 int Logger::level(int event_id, int log_level)
 {
 #if BTR_LOG_ENABLED > 0
@@ -291,17 +254,17 @@ bool Logger::filter(int event_id) const
 int Logger::shortLogLevel(int level)
 {
   switch (level) {
-    case btr::log::TRACE:
+    case btr::TRACE:
       return 'T';
-    case btr::log::DEBUG:
+    case btr::DEBUG:
       return 'D';
-    case btr::log::INFO:
+    case btr::INFO:
       return 'I';
-    case btr::log::WARN:
+    case btr::WARN:
       return 'W';
-    case btr::log::ERROR:
+    case btr::ERROR:
       return 'E';
-    case btr::log::CRITICAL:
+    case btr::CRITICAL:
       return 'C';
     default:
       return 'O';
@@ -313,9 +276,9 @@ int Logger::event1Impl(
   int32_t param1,
   int8_t param2)
 {
-  char buff[MAX_LOG_SIZE];
+  char buff[BTR_LOG_MAX];
   
-  int cx = snprintf(buff, MAX_LOG_SIZE,
+  int cx = snprintf(buff, BTR_LOG_MAX,
 #if BTR_AVR > 0 | BTR_ARD > 0 | BTR_STM32 > 0
     "%6lu.%03lu %c [0]: "
 #endif
@@ -336,9 +299,9 @@ int Logger::event2Impl(
   uint16_t param1,
   double param2)
 {
-  char buff[MAX_LOG_SIZE];
+  char buff[BTR_LOG_MAX];
   
-  int cx = snprintf(buff, MAX_LOG_SIZE,
+  int cx = snprintf(buff, BTR_LOG_MAX,
 #if BTR_AVR > 0 | BTR_ARD > 0 | BTR_STM32 > 0
     "%6lu.%03lu %c [0]: "
 #endif
@@ -362,12 +325,12 @@ int Logger::event3Impl(
   uint8_t p4,
   const char* p5, int p5_size)
 {
-  char buff[MAX_LOG_SIZE];
+  char buff[BTR_LOG_MAX];
   
   (void) p3_size;
-  char p5_buff[MAX_HEX_SIZE];
-  toHex(p5, p5_size, p5_buff, MAX_HEX_SIZE);
-  int cx = snprintf(buff, MAX_LOG_SIZE,
+  char p5_buff[BTR_LOG_MAX_HEX];
+  toHex(p5, p5_size, p5_buff, BTR_LOG_MAX_HEX);
+  int cx = snprintf(buff, BTR_LOG_MAX,
 #if BTR_AVR > 0 | BTR_ARD > 0 | BTR_STM32 > 0
     "%6lu.%03lu %c [0]: "
 #endif
@@ -398,14 +361,14 @@ int Logger::event4Impl(
   const char* hx, int hx_size,
   const char* hx2, int hx2_size)
 {
-  char buff[MAX_LOG_SIZE];
+  char buff[BTR_LOG_MAX];
   
   (void) str_size;
-  char hx_buff[MAX_HEX_SIZE];
-  toHex(hx, hx_size, hx_buff, MAX_HEX_SIZE);
-  char hx2_buff[MAX_HEX_SIZE];
-  toHex(hx2, hx2_size, hx2_buff, MAX_HEX_SIZE);
-  int cx = snprintf(buff, MAX_LOG_SIZE,
+  char hx_buff[BTR_LOG_MAX_HEX];
+  toHex(hx, hx_size, hx_buff, BTR_LOG_MAX_HEX);
+  char hx2_buff[BTR_LOG_MAX_HEX];
+  toHex(hx2, hx2_size, hx2_buff, BTR_LOG_MAX_HEX);
+  int cx = snprintf(buff, BTR_LOG_MAX,
 #if BTR_AVR > 0 | BTR_ARD > 0 | BTR_STM32 > 0
     "%6lu.%03lu %c [0]: "
 #endif
@@ -438,26 +401,26 @@ int Logger::log(int cx, int level __attribute((unused)), const char* msg)
     if (cx >= 0) {
 #if BTR_X86 > 0
       switch (level) {
-        case btr::log::TRACE:
+        case btr::TRACE:
           backend_->trace(msg);
           break;
-        case btr::log::DEBUG:
+        case btr::DEBUG:
           backend_->debug(msg);
           break;
-        case btr::log::INFO:
+        case btr::INFO:
           backend_->info(msg);
           break;
-        case btr::log::WARN:
+        case btr::WARN:
           backend_->warn(msg);
           break;
-        case btr::log::ERROR:
+        case btr::ERROR:
           backend_->error(msg);
           break;
-        case btr::log::CRITICAL:
+        case btr::CRITICAL:
           backend_->critical(msg);
           break;
         default:
-          setError(BTR_LOG_EBADLOGLEVEL, BTR_LOG_ERR_OFFSET);
+          btr::set_status(btr::log::status(), BTR_LOG_EBADLOGLEVEL);
           return -1;
       };
 #elif BTR_ARD > 0
@@ -473,17 +436,17 @@ int Logger::log(int cx, int level __attribute((unused)), const char* msg)
 #endif // BTR_X86 > 0 | BTR_ARD > 0 | BTR_AVR > 0 | BTR_STM32 > 0
 
       if (0 == (rc & 0xFFFF0000)) {
-        if (cx > MAX_LOG_SIZE) {
-          setError(BTR_LOG_ERANGE, BTR_LOG_ERR_OFFSET);
+        if (cx > BTR_LOG_MAX) {
+          btr::set_status(btr::log::status(), BTR_LOG_ERANGE);
           return -1;
         }
       } else {
-        setError(BTR_LOG_EIO, BTR_LOG_ERR_OFFSET);
+        btr::set_status(btr::log::status(), BTR_LOG_EIO);
         return -1;
       }
     }
   } else {
-    setError(BTR_LOG_EINVAL, BTR_LOG_ERR_OFFSET);
+    btr::set_status(btr::log::status(), BTR_LOG_EINVAL);
     return -1;
   }
   return 0;

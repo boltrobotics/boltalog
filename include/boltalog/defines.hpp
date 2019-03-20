@@ -3,8 +3,8 @@
 
 /** @file */
 
-#ifndef _btr_log_Defines_hpp_
-#define _btr_log_Defines_hpp_
+#ifndef _boltalog_btr_Defines_hpp_
+#define _boltalog_btr_Defines_hpp_
 
 // SYSTEM INCLUDES
 #define _STDC_FORMAT_MACROS
@@ -13,10 +13,7 @@
 namespace btr
 {
 
-namespace log
-{
-
-enum LOG_LEVEL {
+enum BTR_LOG_LEVEL {
   TRACE     = 0,
   DEBUG     = 1,
   INFO      = 2,
@@ -27,45 +24,39 @@ enum LOG_LEVEL {
 };
 
 #ifndef BTR_LOG_ENABLED
-#define BTR_LOG_ENABLED   1
+#define BTR_LOG_ENABLED         1
 #endif
-#ifndef MAX_LOG_SIZE 
-#define MAX_LOG_SIZE 128
+#ifndef BTR_LOG_MAX
+#define BTR_LOG_MAX             128
 #endif
-#ifndef MAX_STRING_SIZE 
-#define MAX_STRING_SIZE 96
+#ifndef BTR_LOG_MAX_STRING
+#define BTR_LOG_MAX_STRING      96
 #endif
-#ifndef MAX_HEX_SIZE 
-#define MAX_HEX_SIZE 96
+#ifndef BTR_LOG_MAX_HEX
+#define BTR_LOG_MAX_HEX         96
 #endif
-#ifndef BTR_LOG_LEVEL
-#define BTR_LOG_LEVEL btr::log::TRACE
-#endif
-
-//--------------------------------------------------------------------------------------------------
-// Errors
-
-#define BTR_LOG_EINVAL        0
-#define BTR_LOG_EBADLOGLEVEL  1
-#define BTR_LOG_ERANGE        2
-#define BTR_LOG_EIO           3
-#define BTR_LOG_ESEND         4
-#define BTR_LOG_ECOUNT        (BTR_LOG_ESEND + 1)
-
-#ifndef BTR_LOG_ERR_OFFSET 
-#define BTR_LOG_ERR_OFFSET    0
-#endif
-#ifndef BTR_LOG_ERR_ENABLED
-#define BTR_LOG_ERR_ENABLED   BTR_LOG_ECOUNT
+#ifndef BTR_LOG_LEVEL_DFLT
+#define BTR_LOG_LEVEL_DFLT      btr::TRACE
 #endif
 
-/** Calculate how many byte are required to hold "m" bits. */
-#define BTR_ERR_BITS(m) ((m % 8) != 0 ? (m / 8 + 1) : (m / 8))
+//==================================================================================================
+// Status {
 
-//--------------------------------------------------------------------------------------------------
+#define BTR_LOG_ENOERR          0x00000000
+#define BTR_LOG_EINVAL          0x00010000
+#define BTR_LOG_EBADLOGLEVEL    0x00020000
+#define BTR_LOG_ERANGE          0x00040000
+#define BTR_LOG_EIO             0x00080000
+#define BTR_LOG_ESEND           0x00100000
 
-} // namespace log
+namespace log
+{
+/** Provide this module's status accumulator or nullptr if BTR_STATUS_ENABLED is 0. */
+uint32_t* status();
+}
+
+// } Status
 
 } // namespace btr
 
-#endif // _btr_log_Defines_hpp_
+#endif // _boltalog_btr_Defines_hpp_

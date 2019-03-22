@@ -22,7 +22,7 @@ add_custom_command(
   OUTPUT ${LOGGER}.hppct2
   COMMAND ctpp2c ${LOGGER}.hpptmpl ${LOGGER}.hppct2
   WORKING_DIRECTORY ${TMPL_DIR}
-  COMMENT "Generating ${LOGGER}.hppct2 from ${LOGGER}.hpptmpl" VERBATIM
+  COMMENT "Generating logger.hppct2 from logger.hpptmpl" VERBATIM
   DEPENDS ${LOGGER}.hpptmpl
   )
 
@@ -30,17 +30,17 @@ add_custom_command(
   OUTPUT ${LOGGER}.cppct2
   COMMAND ctpp2c ${LOGGER}.cpptmpl ${LOGGER}.cppct2
   WORKING_DIRECTORY ${TMPL_DIR}
-  COMMENT "Generating ${LOGGER}.cppct2 from ${LOGGER}.cpptmpl" VERBATIM
+  COMMENT "Generating logger.cppct2 from logger.cpptmpl" VERBATIM
   DEPENDS ${LOGGER}.cpptmpl
   )
 
-set(LOG_VIEWER "${TMPL_DIR}/log_viewer")
+set(LOG_VIEWER "${TMPL_DIR}/log-viewer")
 
 add_custom_command(
   OUTPUT ${LOG_VIEWER}.pyct2
   COMMAND ctpp2c ${LOG_VIEWER}.pytmpl ${LOG_VIEWER}.pyct2
   WORKING_DIRECTORY ${TMPL_DIR}
-  COMMENT "Generating ${LOG_VIEWER}.pyct2 from ${LOG_VIEWER}.pytmpl" VERBATIM
+  COMMENT "Generating log-viewer.pyct2 from log-viewer.pytmpl" VERBATIM
   DEPENDS ${LOG_VIEWER}.pytmpl
   )
 

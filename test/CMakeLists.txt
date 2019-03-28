@@ -1,26 +1,5 @@
-####################################################################################################
-# utility {
-
-set(UTILITY_HOME $ENV{UTILITY_HOME})
-include_directories(${UTILITY_HOME}/include)
-
-if (NOT TARGET utility)
-  add_subdirectory(${UTILITY_HOME} ${PROJECT_BINARY_DIR}/utility)
-endif ()
-
-# }
-
-####################################################################################################
-# spdlog {
-
-set(SPDLOG_HOME $ENV{SPDLOG_HOME})
-include_directories(${SPDLOG_HOME}/include)
-
-if (NOT TARGET spdlog)
-  add_subdirectory(${SPDLOG_HOME} ${PROJECT_BINARY_DIR}/spdlog)
-endif ()
-
-# } spdlog
+setup_dep(spdlog $ENV{SPDLOG_HOME} SUB_DIR "")
+setup_dep(utility $ENV{UTILITY_HOME} SUB_DIR "") 
 
 ####################################################################################################
 # boltalog test {

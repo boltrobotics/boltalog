@@ -24,8 +24,20 @@ enum BTR_LOG_LEVEL {
 };
 
 #ifndef BTR_LOG_ENABLED
+#if BTR_X86 > 0
 #define BTR_LOG_ENABLED         1
+#else
+#define BTR_LOG_ENABLED         0
 #endif
+#endif
+
+/**
+ * Set default port for logging output by setting BTR_LOG_PORT_USB or BTR_LOG_PORT_USART to a value
+ * between 0 and maximum platform-supported port. If both are defined, USB will be used. */
+#if !defined(BTR_LOG_PORT_USB) && !defined(BTR_LOG_PORT_USART)
+#define BTR_LOG_PORT_USB        1
+#endif
+
 #ifndef BTR_LOG_MAX
 #define BTR_LOG_MAX             128
 #endif

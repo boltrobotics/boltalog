@@ -35,6 +35,8 @@ uint32_t* status()
 
 #if BTR_LOG_ENABLED > 0
 
+#include "devices/defines.hpp"
+
 #if BTR_X86 > 0
 #define BOLTALOG_EOL() ""
 #include "spdlog/spdlog.h"
@@ -48,17 +50,17 @@ uint32_t* status()
 
 #elif BTR_AVR > 0
 #define BOLTALOG_EOL() "\r\n"
-#include <avr/pgmspace.h>
-#include <string.h>
 #include "devices/time.hpp"
 #include "devices/usart.hpp"
+#include <avr/pgmspace.h>
+#include <string.h>
 
 #elif BTR_STM32 > 0
 #define BOLTALOG_EOL() "\r\n"
-#include <string.h>
 #include "devices/time.hpp"
 #include "devices/usart.hpp"
 #include "devices/stm32/usb.hpp"
+#include <string.h>
 #define PROGMEM
 #endif // x86, ard, avr, stm32
 
@@ -294,7 +296,7 @@ int Logger::<TMPL_var e.name>Impl(
   <-/TMPL_foreach->
   </TMPL_if>
   int cx = snprintf(buff, BTR_LOG_MAX,
-#if BTR_AVR > 0 | BTR_ARD > 0 | BTR_STM32 > 0
+#if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
     "%6lu.%03lu %c [0]: "
 #endif
     "<TMPL_var e.id>"
@@ -303,21 +305,15 @@ int Logger::<TMPL_var e.name>Impl(
     <TMPL_foreach params as p->
     ",%" <TMPL_var FORMATSPEC(p.type)> ""
     <-/TMPL_foreach> BOLTALOG_EOL(),
-#if BTR_AVR > 0 || BTR_STM32 > 0
-    btr::Time::sec(), (btr::Time::millis() % 1000), shortLogLevel(levels_[<TMPL_var e.id>]),
-#elif BTR_ARD > 0
-    (millis() / 1000), (millis() % 1000), shortLogLevel(levels_[<TMPL_var e.id>]),
+#if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
+    SEC(), (MILLIS() % 1000), shortLogLevel(levels_[<TMPL_var e.id>]),
 #endif
     <TMPL_foreach params as p->
     <TMPL_if !p.__first__>,</TMPL_if><TMPL_var FORMATPARAMS(p.type, p.name)>
     <-/TMPL_foreach>
-    <TMPL_else->
-#if BTR_AVR > 0
-    , btr::Time::sec(), (btr::Time::millis() % 1000), shortLogLevel(levels_[<TMPL_var e.id>])
-#elif BTR_ARD > 0
-    , (millis() / 1000), (millis() % 1000), shortLogLevel(levels_[<TMPL_var e.id>])
-#elif BTR_STM32 > 0 // TODO
-    , (uint32_t) 0, (uint32_t) 0, shortLogLevel(levels_[<TMPL_var e.id>])
+    <TMPL_else>
+#if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
+    , SEC(), (MILLIS() % 1000), shortLogLevel(levels_[<TMPL_var e.id>])
 #endif
     </TMPL_if>);
 

@@ -35,6 +35,8 @@ uint32_t* status()
 
 #if BTR_LOG_ENABLED > 0
 
+#include "devices/defines.hpp"
+
 #if BTR_X86 > 0
 #define BOLTALOG_EOL() ""
 #include "spdlog/spdlog.h"
@@ -48,17 +50,17 @@ uint32_t* status()
 
 #elif BTR_AVR > 0
 #define BOLTALOG_EOL() "\r\n"
-#include <avr/pgmspace.h>
-#include <string.h>
 #include "devices/time.hpp"
 #include "devices/usart.hpp"
+#include <avr/pgmspace.h>
+#include <string.h>
 
 #elif BTR_STM32 > 0
 #define BOLTALOG_EOL() "\r\n"
-#include <string.h>
 #include "devices/time.hpp"
 #include "devices/usart.hpp"
 #include "devices/stm32/usb.hpp"
+#include <string.h>
 #define PROGMEM
 #endif // x86, ard, avr, stm32
 
@@ -279,15 +281,13 @@ int Logger::event1Impl(
   char buff[BTR_LOG_MAX];
   
   int cx = snprintf(buff, BTR_LOG_MAX,
-#if BTR_AVR > 0 | BTR_ARD > 0 | BTR_STM32 > 0
+#if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
     "%6lu.%03lu %c [0]: "
 #endif
     "1"
     ",%" PRId32 """,%" PRId8 "" BOLTALOG_EOL(),
-#if BTR_AVR > 0 || BTR_STM32 > 0
-    btr::Time::sec(), (btr::Time::millis() % 1000), shortLogLevel(levels_[1]),
-#elif BTR_ARD > 0
-    (millis() / 1000), (millis() % 1000), shortLogLevel(levels_[1]),
+#if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
+    SEC(), (MILLIS() % 1000), shortLogLevel(levels_[1]),
 #endif
     param1,param2
     );
@@ -302,15 +302,13 @@ int Logger::event2Impl(
   char buff[BTR_LOG_MAX];
   
   int cx = snprintf(buff, BTR_LOG_MAX,
-#if BTR_AVR > 0 | BTR_ARD > 0 | BTR_STM32 > 0
+#if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
     "%6lu.%03lu %c [0]: "
 #endif
     "2"
     ",%" PRIu16 """,%" ".6f" "" BOLTALOG_EOL(),
-#if BTR_AVR > 0 || BTR_STM32 > 0
-    btr::Time::sec(), (btr::Time::millis() % 1000), shortLogLevel(levels_[2]),
-#elif BTR_ARD > 0
-    (millis() / 1000), (millis() % 1000), shortLogLevel(levels_[2]),
+#if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
+    SEC(), (MILLIS() % 1000), shortLogLevel(levels_[2]),
 #endif
     param1,param2
     );
@@ -331,15 +329,13 @@ int Logger::event3Impl(
   char p5_buff[BTR_LOG_MAX_HEX];
   toHex(p5, p5_size, p5_buff, BTR_LOG_MAX_HEX);
   int cx = snprintf(buff, BTR_LOG_MAX,
-#if BTR_AVR > 0 | BTR_ARD > 0 | BTR_STM32 > 0
+#if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
     "%6lu.%03lu %c [0]: "
 #endif
     "3"
     ",%" PRIu64 """,%" PRId16 """,%" "s" """,%" PRIu8 """,%" "s" "" BOLTALOG_EOL(),
-#if BTR_AVR > 0 || BTR_STM32 > 0
-    btr::Time::sec(), (btr::Time::millis() % 1000), shortLogLevel(levels_[3]),
-#elif BTR_ARD > 0
-    (millis() / 1000), (millis() % 1000), shortLogLevel(levels_[3]),
+#if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
+    SEC(), (MILLIS() % 1000), shortLogLevel(levels_[3]),
 #endif
     p1,p2,p3,p4,p5_buff
     );
@@ -369,15 +365,13 @@ int Logger::event4Impl(
   char hx2_buff[BTR_LOG_MAX_HEX];
   toHex(hx2, hx2_size, hx2_buff, BTR_LOG_MAX_HEX);
   int cx = snprintf(buff, BTR_LOG_MAX,
-#if BTR_AVR > 0 | BTR_ARD > 0 | BTR_STM32 > 0
+#if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
     "%6lu.%03lu %c [0]: "
 #endif
     "4"
     ",%" PRIu8 """,%" PRId64 """,%" PRIu16 """,%" PRId32 """,%" PRIu32 """,%" PRId16 """,%" PRIu64 """,%" PRId8 """,%" ".6f" """,%" "s" """,%" "s" """,%" "s" "" BOLTALOG_EOL(),
-#if BTR_AVR > 0 || BTR_STM32 > 0
-    btr::Time::sec(), (btr::Time::millis() % 1000), shortLogLevel(levels_[4]),
-#elif BTR_ARD > 0
-    (millis() / 1000), (millis() % 1000), shortLogLevel(levels_[4]),
+#if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
+    SEC(), (MILLIS() % 1000), shortLogLevel(levels_[4]),
 #endif
     u8,d64,u16,d32,u32,d16,u64,d8,dbl,str,hx_buff,hx2_buff
     );

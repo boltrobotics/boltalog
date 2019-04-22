@@ -1,5 +1,6 @@
 setup_dep(spdlog $ENV{SPDLOG_HOME} SUB_DIR "")
 setup_dep(utility $ENV{UTILITY_HOME} SUB_DIR "") 
+setup_dep(devices $ENV{DEVICES_HOME} SUB_DIR "")
 
 ####################################################################################################
 # boltalog test {

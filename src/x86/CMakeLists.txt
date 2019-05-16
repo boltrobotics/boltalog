@@ -35,17 +35,21 @@ add_custom_command(
   DEPENDS ${LOG_VIEWER_BASE}.pytmpl
   )
 
-add_custom_target(
-  boltalog-templates
-  DEPENDS ctpp2c ${LOGGER_BASE}.hppct2 ${LOGGER_BASE}.cppct2 ${LOG_VIEWER_BASE}.pyct2
-  )
+if (NOT TARGET boltalog-templates)
+  add_custom_target(
+    boltalog-templates
+    DEPENDS ctpp2c ${LOGGER_BASE}.hppct2 ${LOGGER_BASE}.cppct2 ${LOG_VIEWER_BASE}.pyct2
+    )
+endif ()
 
 # } Templates
 
 ####################################################################################################
 # boltalog-autogen {
 
-build_exe(SRCS "${MAIN_SRC}" LIBS ${BTR_LIBS} SUFFIX "-autogen")
-add_dependencies(${PROJECT_NAME}-autogen boltalog-templates)
+if (NOT TARGET ${PROJECT_NAME}-autogen)
+  build_exe(SRCS "${MAIN_SRC}" LIBS ${BTR_LIBS} SUFFIX "-autogen")
+  add_dependencies(${PROJECT_NAME}-autogen boltalog-templates)
+endif ()
 
 # } boltalog-autogen 

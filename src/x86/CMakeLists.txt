@@ -13,7 +13,7 @@ add_custom_command(
   OUTPUT ${LOGGER_BASE}.hppct2
   COMMAND ctpp2c ${LOGGER_BASE}.hpptmpl ${LOGGER_BASE}.hppct2
   WORKING_DIRECTORY ${BOLTALOG_TMPL_DIR}
-  COMMENT "Generating logger.hppct2 from logger.hpptmpl" VERBATIM
+  COMMENT "Generating ${LOGGER_BASE}.hppct2 from ${LOGGER_BASE}.hpptmpl" VERBATIM
   DEPENDS ${LOGGER_BASE}.hpptmpl
   )
 
@@ -21,7 +21,7 @@ add_custom_command(
   OUTPUT ${LOGGER_BASE}.cppct2
   COMMAND ctpp2c ${LOGGER_BASE}.cpptmpl ${LOGGER_BASE}.cppct2
   WORKING_DIRECTORY ${BOLTALOG_TMPL_DIR}
-  COMMENT "Generating logger.cppct2 from logger.cpptmpl" VERBATIM
+  COMMENT "Generating ${LOGGER_BASE}.cppct2 from ${LOGGER_BASE}.cpptmpl" VERBATIM
   DEPENDS ${LOGGER_BASE}.cpptmpl
   )
 
@@ -31,7 +31,7 @@ add_custom_command(
   OUTPUT ${LOG_VIEWER_BASE}.pyct2
   COMMAND ctpp2c ${LOG_VIEWER_BASE}.pytmpl ${LOG_VIEWER_BASE}.pyct2
   WORKING_DIRECTORY ${BOLTALOG_TMPL_DIR}
-  COMMENT "Generating log-viewer.pyct2 from log-viewer.pytmpl" VERBATIM
+  COMMENT "Generating ${LOG_VIEWER_BASE}.pyct2 from ${LOG_VIEWER_BASE}.pytmpl" VERBATIM
   DEPENDS ${LOG_VIEWER_BASE}.pytmpl
   )
 

@@ -21,7 +21,6 @@ Benefits:
   * [Model](#Model)
   * [Generated Code](#Generated_Code)
   * [Program Code](#Program_Code)
-* [Contribute](#Contribute)
 
 # <a name="Dependencies">Dependencies</a>
 
@@ -175,8 +174,3 @@ TEST_F(LoggerTest, Output)
 ...
 }
 ```
-
-# <a name="Contribute" href="https://boltrobotics.com/contribute/" target="_blank">Contribute</a>
-
-Consider supporting our projects by contributing to their development.
-<a href="https://boltrobotics.com/contribute/" target="_blank">Learn more at boltrobotics.com</a>

@@ -92,7 +92,7 @@ By default, code generator produces three files:
 
 * [logger.hpp](#logger.hpp)
 * [logger.cpp](#logger.cpp)
-* [log_viewer.py](#log_viewer.py)
+* [log-viewer.py](#log-viewer.py)
 
 <a name="logger.hpp"></a>
 <h4><a href="https://github.com/boltrobotics/boltalog/blob/master/test/logger.hpp" target="_blank">logger.hpp</a></h4>
@@ -152,8 +152,8 @@ int Logger::event4Impl(...)
 }
 ```
 
-<a name="log_viewer.py"></a>
-<h4><a href="https://github.com/boltrobotics/boltalog/blob/master/test/log_viewer.py" target="_blank">log_viewer.py</a></h4>
+<a name="log-viewer.py"></a>
+<h4><a href="https://github.com/boltrobotics/boltalog/blob/master/test/log-viewer.py" target="_blank">log-viewer.py</a></h4>
 
 Generated C++ code outputs logs using CSV format, for example:
 ```

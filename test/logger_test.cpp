@@ -1,11 +1,15 @@
-// Copyright (C) 2018 Bolt Robotics <info@boltrobotics.com>
-// License: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+// Copyright (C) 2019 Sergey Kapustin <kapucin@gmail.com>
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 // SYSTEM INCLUDES
 #include <gtest/gtest.h>
 #include <iostream>
 #include <fstream>
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/basic_file_sink.h>
 
 // PROJECT INCLUDES
 #include "logger.hpp"

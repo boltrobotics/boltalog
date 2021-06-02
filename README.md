@@ -22,7 +22,8 @@ Benefits:
   * [Generated Code](#Generated_Code)
   * [Program Code](#Program_Code)
 
-# <a name="Dependencies">Dependencies</a>
+<a name="Dependencies"></a>
+# Dependencies
 
 The following are top-level dependencies. Depending on target platform additional tools may be
 required.<br>
@@ -35,12 +36,14 @@ required.<br>
 * <a href="https://github.com/boltrobotics/utility" target="_blank">utility</a>
 * <a href="https://github.com/gabime/spdlog" target="_blank">spdlog</a>
 
-# <a name="Example" href="https://github.com/boltrobotics/boltalog/tree/master/test" target="_blank">Example</a>
+<a name="Example"></a>
+<h1><a href="https://github.com/boltrobotics/boltalog/tree/master/test" target="_blank">Example</a></h1>
 
 Example log model and code generation is included as part of unit testing. Cmake build instructions
 are specified in <a href="https://github.com/boltrobotics/boltalog/blob/master/test/CMakeLists.txt" target="_blank">test/CMakeLists.txt</a>.
 
-### <a name="Model" href="https://github.com/boltrobotics/boltalog/blob/master/model/example.mdl" target="_blank">Model</a>
+<a name="Model"></a>
+<h3><a href="https://github.com/boltrobotics/boltalog/blob/master/model/example.mdl" target="_blank">Model</a></h3>
 
 Event model is specified using JSON format:
 ```javascript
@@ -82,7 +85,8 @@ Array ```events``` contains event definitions. Each event is described using the
   * type - parameter type (signed/unsgined integers, double, string, hex binary representation)
   * doc - parameter description
 
-### <a name="Generated_Code" href="https://github.com/boltrobotics/boltalog/blob/master/test/logger.hpp" target="_blank">Generated Code</a>
+<a name="Generated_Code"></a>
+<h3><a href="https://github.com/boltrobotics/boltalog/blob/master/test/logger.hpp" target="_blank">Generated Code</a></h3>
 
 By default, code generator produces three files:
 
@@ -90,7 +94,8 @@ By default, code generator produces three files:
 * [logger.cpp](#logger.cpp)
 * [log_viewer.py](#log_viewer.py)
 
-#### <a name="logger.hpp" href="https://github.com/boltrobotics/boltalog/blob/master/test/logger.hpp" target="_blank">logger.hpp</a>
+<a name="logger.hpp"></a>
+<h4><a href="https://github.com/boltrobotics/boltalog/blob/master/test/logger.hpp" target="_blank">logger.hpp</a></h4>
 
 The header file starts with a preample (header guard, platform-specific includes, namespace):
 ```cpp
@@ -135,7 +140,8 @@ class Logger {
 };
 ```
 
-#### <a name="logger.cpp" href="https://github.com/boltrobotics/boltalog/blob/master/test/logger.cpp" target="_blank">logger.cpp</a>
+<a name="logger.cpp"></a>
+<h4><a href="https://github.com/boltrobotics/boltalog/blob/master/test/logger.cpp" target="_blank">logger.cpp</a></h4>
 
 The file implementats functions declared in the header:
 ```cpp
@@ -146,7 +152,8 @@ int Logger::event4Impl(...)
 }
 ```
 
-#### <a name="log_viewer.py" href="https://github.com/boltrobotics/boltalog/blob/master/test/log_viewer.py" target="_blank">log_viewer.py</a>
+<a name="log_viewer.py"></a>
+<h4><a href="https://github.com/boltrobotics/boltalog/blob/master/test/log_viewer.py" target="_blank">log_viewer.py</a></h4>
 
 Generated C++ code outputs logs using CSV format, for example:
 ```
@@ -158,7 +165,8 @@ The python script prepends parameter name (defined in the model) to each field:
 event4, u8:8, d64:64, u16:16, d32:32, u32:32, d16:16, u64:64, d8:8, dbl:8.800000, str:text, hx:74:65, hx2:74:65:78
 ```
 
-### <a name="Program_Code" href="https://github.com/boltrobotics/boltalog/blob/master/test/logger_test.cpp" target="_blank">Program Code</a>
+<a name="Program_Code"></a>
+<h3><a href="https://github.com/boltrobotics/boltalog/blob/master/test/logger_test.cpp" target="_blank">Program Code</a></h3>
 
 An example of program code that uses the generated API is provided in
 <a href="https://github.com/boltrobotics/boltalog/blob/master/test/logger_test.cpp" target="_blank">logger_test.cpp</a>.

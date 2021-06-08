@@ -16,7 +16,7 @@ def <TMPL_var e.name>(header, values):
   print(header, " <TMPL_var e.name>"
     <TMPL_foreach params as p ->
         , ", <TMPL_var p.name>=", values[<TMPL_var (p.__index__ + 1)>]
-    </TMPL_foreach->, sep='')
+    </TMPL_foreach->, sep='', end='')
 </TMPL_foreach>
 
 ####################################################################################################
@@ -27,7 +27,12 @@ else:
   events_in = open(sys.argv[1])
 
 for event in events_in:
-  tokens = event.split()
+  tokens = event.split(" ", 3)
+
+  if len(tokens) < 4:
+      print(event)
+      continue;
+
   values = tokens[3].split(",")
 
   if values[0].startswith("<-TMPL_foreach namespace as n-><TMPL_var n>:<-/TMPL_foreach->"):

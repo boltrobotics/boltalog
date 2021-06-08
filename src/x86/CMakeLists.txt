@@ -25,20 +25,20 @@ add_custom_command(
   DEPENDS ${LOGGER_BASE}.cpptmpl
   )
 
-set(LOG_VIEWER_BASE "${BOLTALOG_TMPL_DIR}/log-viewer")
+set(VIEWER_BASE "${BOLTALOG_TMPL_DIR}/log-viewer")
 
 add_custom_command(
-  OUTPUT ${LOG_VIEWER_BASE}.pyct2
-  COMMAND ctpp2c ${LOG_VIEWER_BASE}.pytmpl ${LOG_VIEWER_BASE}.pyct2
+  OUTPUT ${VIEWER_BASE}.pyct2
+  COMMAND ctpp2c ${VIEWER_BASE}.pytmpl ${VIEWER_BASE}.pyct2
   WORKING_DIRECTORY ${BOLTALOG_TMPL_DIR}
-  COMMENT "Generating ${LOG_VIEWER_BASE}.pyct2 from ${LOG_VIEWER_BASE}.pytmpl" VERBATIM
-  DEPENDS ${LOG_VIEWER_BASE}.pytmpl
+  COMMENT "Generating ${VIEWER_BASE}.pyct2 from ${VIEWER_BASE}.pytmpl" VERBATIM
+  DEPENDS ${VIEWER_BASE}.pytmpl
   )
 
 if (NOT TARGET boltalog-templates)
   add_custom_target(
     boltalog-templates
-    DEPENDS ctpp2c ${LOGGER_BASE}.hppct2 ${LOGGER_BASE}.cppct2 ${LOG_VIEWER_BASE}.pyct2
+    DEPENDS ctpp2c ${LOGGER_BASE}.hppct2 ${LOGGER_BASE}.cppct2 ${VIEWER_BASE}.pyct2
     )
 endif ()
 

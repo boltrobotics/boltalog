@@ -302,7 +302,10 @@ int Logger::<TMPL_var e.name>Impl(
 #if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
     "%6lu.%03lu %c [0]: "
 #endif
-    "<TMPL_var e.id>"
+    "<TMPL_foreach namespace as n->
+    <TMPL_var n>:
+    <-/TMPL_foreach->
+    <TMPL_var e.id>"
     <TMPL_if DEFINED(params)->
 
     <TMPL_foreach params as p->

@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 # Copyright (C) 2019 Sergey Kapustin <kapucin@gmail.com>
 
 # This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,9 +14,9 @@ import sys
 <TMPL_foreach events as e>
 def <TMPL_var e.name>(header, values):
   print(header, " <TMPL_var e.name>"
-  <TMPL_foreach params as p->
-    , ", <TMPL_var p.name>:", values[<TMPL_var (p.__index__ + 1)>]
-  </TMPL_foreach->, sep='')
+    <TMPL_foreach params as p ->
+        , ", <TMPL_var p.name>=", values[<TMPL_var (p.__index__ + 1)>]
+    </TMPL_foreach->, sep='')
 </TMPL_foreach>
 
 ####################################################################################################
@@ -28,8 +30,11 @@ for event in events_in:
   tokens = event.split()
   values = tokens[3].split(",")
 
-  <TMPL_foreach events as e->
-    <TMPL_if !(e.__first__)>elif values[0] == "<TMPL_var (e.__index__ + 1)>":
-    <TMPL_else>if values[0] == "<TMPL_var (e.__index__ + 1)>":
-    </TMPL_if-><TMPL_var e.name>(" ".join(tokens[0:3]), values)
-  </TMPL_foreach>
+  if values[0].startswith("<-TMPL_foreach namespace as n-><TMPL_var n>:<-/TMPL_foreach->"):
+    log_id = values[0].split(":")[-1]
+
+    <TMPL_foreach events as e->
+        <TMPL_if !(e.__first__)>elif log_id == "<TMPL_var (e.__index__ + 1)>":
+        <TMPL_else>if log_id == "<TMPL_var (e.__index__ + 1)>":
+        </TMPL_if-><TMPL_var e.name>(" ".join(tokens[0:3]), values)
+    </TMPL_foreach>

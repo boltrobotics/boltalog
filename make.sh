@@ -55,7 +55,7 @@ if [ -z ${PROJECTS_HOME} ]; then
   PROJECTS_HOME="${PWD}/.."
 fi
 if [ -z ${XTRA_HOME} ]; then
-  XTRA_HOME=${PROJECTS_HOME}/xtra
+  XTRA_HOME=${PROJECTS_HOME}/other
 fi
 
 # Bolt Robotics projects

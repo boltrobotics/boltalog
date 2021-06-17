@@ -1,9 +1,5 @@
 setup_dep(utility $ENV{UTILITY_HOME} SUB_DIR "") 
 setup_dep(devices $ENV{DEVICES_HOME} SUB_DIR "")
-setup_dep(spdlog $ENV{SPDLOG_HOME} SUB_DIR "")
-
-####################################################################################################
-# boltalog test {
 
 include(logger)
 add_logger(INC_DIR ${PROJECT_SOURCE_DIR}/test SRC_DIR ${PROJECT_SOURCE_DIR}/test)
@@ -19,5 +15,3 @@ build_tests(
 
 set(DOXYGEN_WARN NO)
 build_doc(DEP ${PROJECT_NAME}-tests SUFFIX "-docs")
-
-# } boltalog test

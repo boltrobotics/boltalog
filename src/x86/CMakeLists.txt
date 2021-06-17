@@ -1,6 +1,4 @@
 include(x86_project)
-setup_x86()
-
 include(ctpp2)
 
 ####################################################################################################
@@ -11,7 +9,7 @@ set(LOGGER_BASE "${BOLTALOG_TMPL_DIR}/logger")
 
 add_custom_command(
   OUTPUT ${LOGGER_BASE}.hppct2
-  COMMAND echo ${ctpp2_C} ${LOGGER_BASE}.hpptmpl ${LOGGER_BASE}.hppct2
+  COMMAND ${ctpp2_C} ${LOGGER_BASE}.hpptmpl ${LOGGER_BASE}.hppct2
   WORKING_DIRECTORY ${BOLTALOG_TMPL_DIR}
   COMMENT "Generating ${LOGGER_BASE}.hppct2 from ${LOGGER_BASE}.hpptmpl" VERBATIM
   DEPENDS ${LOGGER_BASE}.hpptmpl

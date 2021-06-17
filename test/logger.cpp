@@ -287,7 +287,7 @@ int Logger::event1Impl(
 #if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
     "%6lu.%03lu %c [0]: "
 #endif
-    "1"
+    "test:log:1"
     ",%" PRId32 """,%" PRId8 "" BOLTALOG_EOL(),
 #if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
     SEC(), (MILLIS() % 1000), shortLogLevel(levels_[1]),
@@ -308,7 +308,7 @@ int Logger::event2Impl(
 #if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
     "%6lu.%03lu %c [0]: "
 #endif
-    "2"
+    "test:log:2"
     ",%" PRIu16 """,%" ".6f" "" BOLTALOG_EOL(),
 #if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
     SEC(), (MILLIS() % 1000), shortLogLevel(levels_[2]),
@@ -335,7 +335,7 @@ int Logger::event3Impl(
 #if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
     "%6lu.%03lu %c [0]: "
 #endif
-    "3"
+    "test:log:3"
     ",%" PRIu64 """,%" PRId16 """,%" "s" """,%" PRIu8 """,%" "s" "" BOLTALOG_EOL(),
 #if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
     SEC(), (MILLIS() % 1000), shortLogLevel(levels_[3]),
@@ -371,7 +371,7 @@ int Logger::event4Impl(
 #if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
     "%6lu.%03lu %c [0]: "
 #endif
-    "4"
+    "test:log:4"
     ",%" PRIu8 """,%" PRId64 """,%" PRIu16 """,%" PRId32 """,%" PRIu32 """,%" PRId16 """,%" PRIu64 """,%" PRId8 """,%" ".6f" """,%" "s" """,%" "s" """,%" "s" "" BOLTALOG_EOL(),
 #if BTR_AVR > 0 || BTR_ARD > 0 || BTR_STM32 > 0
     SEC(), (MILLIS() % 1000), shortLogLevel(levels_[4]),

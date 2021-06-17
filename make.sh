@@ -51,11 +51,10 @@ shift $(($OPTIND - 1))
 # Dependency paths
 
 if [ -z ${PROJECTS_HOME} ]; then
-  # Assume the script is invoked from within its project.
-  PROJECTS_HOME="${PWD}/.."
+  export PROJECTS_HOME="${PWD}/.."
 fi
 if [ -z ${XTRA_HOME} ]; then
-  XTRA_HOME=${PROJECTS_HOME}/other
+  export XTRA_HOME=${PROJECTS_HOME}/other
 fi
 
 # Bolt Robotics projects

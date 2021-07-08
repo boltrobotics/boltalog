@@ -1,14 +1,14 @@
 include(ctpp2_model)
 
 function (setup_logger model_path)
-  cmake_parse_arguments(p "" "COMMON_SRC_DIR;VM;TMPL_NAME;VIEWER_NAME" "" ${ARGN})
+  cmake_parse_arguments(p "" "SRC_DIR;VM;TMPL_NAME;VIEWER_NAME" "" ${ARGN})
 
   set(VM "boltalog-autogen")
   set(TMPL_DIR "${ROOT_SOURCE_DIR}/template")
   set(CT2_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 
-  if (NOT p_COMMON_SRC_DIR)
-    set(p_COMMON_SRC_DIR ${CMAKE_BINARY_DIR}/src/common)
+  if (NOT p_SRC_DIR)
+    set(p_SRC_DIR ${CMAKE_BINARY_DIR}/src/common)
   endif ()
 
   if (NOT p_TMPL_NAME)
@@ -29,7 +29,7 @@ function (setup_logger model_path)
     endif ()
 
     # Generate logger.hpp and logger.cpp. Exports TMPL_DIR, CT2_DIR
-    build_model(${model_path} ${VM} ${p_TMPL_NAME} ${p_COMMON_SRC_DIR})
+    build_model(${model_path} ${VM} ${p_TMPL_NAME} ${p_SRC_DIR})
 
     # Generate log-viewer.py
     #
@@ -67,7 +67,7 @@ function (setup_logger model_path)
 
   endif (model_path)
 
-  set(LOG_SRCS ${p_COMMON_SRC_DIR}/${p_TMPL_NAME}.cpp PARENT_SCOPE)
-  set(LOG_INC_DIR ${p_COMMON_SRC_DIR} PARENT_SCOPE)
+  set(LOG_SRCS ${p_SRC_DIR}/${p_TMPL_NAME}.cpp PARENT_SCOPE)
+  set(LOG_INC_DIR ${p_SRC_DIR} PARENT_SCOPE)
 
 endfunction (setup_logger)

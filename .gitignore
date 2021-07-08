@@ -1,12 +1,13 @@
 # Generated files
-#test/logger.cpp
-#test/logger.hpp
-#test/log_viewer.py
 template/*ct2
 
 # Cmake
 build-*
 doc/html*
+
+# GDB
+.gdb_history
+gdb.txt
 
 # Mac
 .DS_Store

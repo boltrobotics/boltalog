@@ -2,13 +2,14 @@
 
 help()
 {
-  echo -e "Usage: `basename $0` [-x] [-s] [-a] [-d] [-t] [-p _projects_home_] [-h]"
+  echo -e "Usage: `basename $0` [-x] [-s] [-a] [-d] [-t] [-p _projects_home_] [-v] [-h]"
   echo -e "  -x - build x86"
   echo -e "  -s - build stm32"
   echo -e "  -a - build avr"
   echo -e "  -d - pull dependencies"
   echo -e "  -t - enable unit tests"
   echo -e "  -p - absolute path to projects home"
+  echo -e "  -v - verbose output"
   echo -e "  -h - this help"
 }
 
@@ -31,7 +32,7 @@ AVR=0
 DEPS=0
 TESTS=""
 
-while getopts "xsadtp:h" Option
+while getopts "xsadtp:vh" Option
 do
   case $Option in
     x) X86=1;;
@@ -40,6 +41,7 @@ do
     d) DEPS=1;;
     t) TESTS="-DENABLE_TESTS=ON";;
     p) PROJECTS_HOME=${OPTARG};;
+    v) VERBOSE="-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON";;
     h) help; exit 0;;
     \?) help; exit 22;;
   esac
@@ -101,7 +103,7 @@ if [ ${X86} -eq 1 ]; then
   (cd ${BOLTALOG_HOME} \
     && mkdir -p "build-x86" \
     && cd "build-x86" \
-    && cmake -DBTR_X86=1 ${TESTS} "$@" .. \
+    && cmake -DBTR_X86=1 ${TESTS} ${VERBOSE} "$@" .. \
     && make)
 fi
 
@@ -109,7 +111,7 @@ if [ ${STM32} -eq 1 ]; then
   (cd ${BOLTALOG_HOME} \
     && mkdir -p "build-stm32" \
     && cd "build-stm32" \
-    && cmake -DBTR_STM32=1 "$@" .. \
+    && cmake -DBTR_STM32=1 ${VERBOSE} "$@" .. \
     && make)
 fi
 
@@ -117,6 +119,6 @@ if [ ${AVR} -eq 1 ]; then
   (cd ${BOLTALOG_HOME} \
     && mkdir -p "build-avr" \
     && cd "build-avr" \
-    && cmake -DBTR_AVR=1 "$@" .. \
+    && cmake -DBTR_AVR=1 ${VERBOSE} "$@" .. \
     && make)
 fi

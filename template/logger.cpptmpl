@@ -224,26 +224,24 @@ Logger* Logger::instance()
 
 #endif // BTR_X86, BTR_ARD, BTR_AVR, BTR_STM32
 
-int Logger::level(int event_id, int log_level)
+int Logger::level(uint32_t event_id, int log_level)
 {
+  int rc = -1;
 #if BTR_LOG_ENABLED > 0
-  int prev_event_id = -1;
-
-  if (event_id < (int)(sizeof(levels_) / sizeof(int))) {
-    prev_event_id = levels_[event_id];
+  if (event_id < (sizeof(levels_) / sizeof(uint32_t))) {
     levels_[event_id] = log_level;
+    rc = 0;
   }
-  return prev_event_id;
 #else
   (void) event_id; (void) log_level;
-  return -1;
 #endif // BTR_LOG_ENABLED > 0
+  return rc;
 }
 
-bool Logger::filter(int event_id) const
+bool Logger::filter(uint32_t event_id) const
 {
 #if BTR_LOG_ENABLED > 0
-  if (event_id < (int)(sizeof(levels_) / sizeof(int)) && levels_[event_id] >= levels_[0]) {
+  if (event_id < (sizeof(levels_) / sizeof(uint32_t)) && levels_[event_id] >= levels_[0]) {
     return true;
   } else {
     return false;

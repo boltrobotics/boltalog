@@ -159,15 +159,15 @@ public:
    *
    * @param event_id
    * @param log_level
-   * @return the previous level of the event or -1 when given event didn't exist
+   * @return 0 on success or -1 when a given event ID doesn't exist
    */
-  int level(int event_id, int log_level);
+  int level(uint32_t event_id, int log_level);
 
   /**
    * @param event_id - the event ID
    * @return true if event is allowed to pass through, false otherwise
    */
-  bool filter(int event_id) const;
+  bool filter(uint32_t event_id) const;
 
   /**
    * @return one letter log level
@@ -205,7 +205,7 @@ private:
 
 // ATTRIBUTES
 
-  int levels_[<TMPL_var (COUNT() + 1)>];
+  uint32_t  levels_[<TMPL_var (COUNT() + 1)>];
 #if BTR_X86 > 0
   std::shared_ptr<spdlog::logger> backend_;
 #elif BTR_ARD > 0

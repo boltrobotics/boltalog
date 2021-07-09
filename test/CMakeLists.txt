@@ -13,9 +13,9 @@ find_test_srcs()
 add_compile_options("-mcmodel=large")
 
 build_exe(
-  SRCS ${SOURCES} ${LOG_SRCS}
+  SRCS ${SOURCES} ${AUTOGEN_LOG_SRCS}
   SUFFIX "-tests"
-  INC_DIRS ${utility_INC_DIR} ${devices_INC_DIR} ${LOG_INC_DIR}
+  INC_DIRS ${utility_INC_DIR} ${devices_INC_DIR} ${AUTOGEN_LOG_INC_DIR}
   DEPS ${PROJECT_NAME}-autogen ${PROJECT_NAME}-logging
   PIC OFF
   TEST ON)

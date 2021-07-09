@@ -31,6 +31,7 @@ STM32=0
 AVR=0
 DEPS=0
 TESTS=""
+VERBOSE=""
 
 while getopts "xsadtp:vh" Option
 do

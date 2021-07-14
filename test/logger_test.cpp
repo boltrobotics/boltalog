@@ -12,7 +12,7 @@
 #include <spdlog/sinks/basic_file_sink.h>
 
 // PROJECT INCLUDES
-#include "logger.hpp"
+#include "boltalog_logger.hpp"
 #include "utility/shared_ptr.hpp"
 #include "boltalog/defines.hpp"
 

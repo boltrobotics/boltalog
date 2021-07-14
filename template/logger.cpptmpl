@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Sergey Kapustin <kapucin@gmail.com>
+// Copyright (C) ${YEAR} Sergey Kapustin <kapucin@gmail.com>
 
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,7 +11,7 @@
 // SYSTEM INCLUDES
 
 // PROJECT INCLUDES
-#include "logger.hpp" // class implemented
+#include "${MODEL_NAME}.hpp" // class implemented
 #include "boltalog/defines.hpp"
 #include "utility/defines.hpp"
 #include "utility/misc.hpp"

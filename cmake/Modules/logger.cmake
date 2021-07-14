@@ -1,22 +1,15 @@
 include(ctpp2_model)
 
 function (setup_logger model_path)
-  cmake_parse_arguments(p "" "SRC_DIR;VM;TMPL_NAME;VIEWER_NAME" "" ${ARGN})
+  cmake_parse_arguments(p "" "SRC_DIR" "" ${ARGN})
 
   set(VM "boltalog-autogen")
   set(TMPL_DIR "$ENV{BOLTALOG_HOME}/template")
+  set(TMPL_NAME "logger")
   set(CT2_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 
   if (NOT p_SRC_DIR)
     set(p_SRC_DIR ${CMAKE_BINARY_DIR}/src/common)
-  endif ()
-
-  if (NOT p_TMPL_NAME)
-    set(p_TMPL_NAME "logger")
-  endif ()
-
-  if (NOT p_VIEWER_NAME)
-    set(p_VIEWER_NAME "log-viewer")
   endif ()
 
   if (model_path)
@@ -28,15 +21,18 @@ function (setup_logger model_path)
       set(model_path ${MODEL_ABS_PATH})
     endif ()
 
-    # Generate logger.hpp and logger.cpp
-    build_model(${model_path} ${VM} ${p_TMPL_NAME} ${p_SRC_DIR})
+    get_filename_component(MODEL_NAME ${model_path} NAME_WE)
 
-    # Generate log-viewer.py
+    # Generate logger.hpp and logger.cpp
+    build_model(${model_path} ${VM} ${TMPL_NAME} ${p_SRC_DIR})
+
+    # Generate log viewer python script
     #
-    set(TMPL_PATH ${TMPL_DIR}/${p_VIEWER_NAME}.pytmpl)
-    set(CT2_PATH ${CT2_DIR}/${p_VIEWER_NAME}.pyct2)
+    set(VIEWER_NAME "${MODEL_NAME}-viewer")
+    set(TMPL_PATH ${TMPL_DIR}/log-viewer.pytmpl)
+    set(CT2_PATH ${CT2_DIR}/${VIEWER_NAME}.pyct2)
     set(SCT_DIR ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/scripts)
-    set(SCT_PATH ${SCT_DIR}/${p_VIEWER_NAME}.py)
+    set(SCT_PATH ${SCT_DIR}/${VIEWER_NAME}.py)
 
     if (NOT EXISTS ${SCT_DIR}})
       file(MAKE_DIRECTORY ${SCT_DIR})
@@ -61,13 +57,14 @@ function (setup_logger model_path)
 
     # For boltalog tests, the target is boltalog-logging; for boltabus, it is boltabus-logging
     #
-    add_custom_target(${PROJECT_NAME}-logging
-      DEPENDS ${p_TMPL_NAME}-tmpl ${CT2_PATH} ${SCT_PATH}
+    add_custom_target(
+      ${PROJECT_NAME}-logging
+      DEPENDS ${PROJECT_NAME}-${MODEL_NAME}-model ${CT2_PATH} ${SCT_PATH}
       )
 
   endif (model_path)
 
-  set(AUTOGEN_LOG_SRCS ${p_SRC_DIR}/${p_TMPL_NAME}.cpp PARENT_SCOPE)
+  set(AUTOGEN_LOG_SRCS ${p_SRC_DIR}/${MODEL_NAME}.cpp PARENT_SCOPE)
   set(AUTOGEN_LOG_INC_DIR ${p_SRC_DIR} PARENT_SCOPE)
 
 endfunction (setup_logger)

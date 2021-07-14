@@ -1,8 +1,10 @@
+include(init)
+
 setup_dep(utility $ENV{UTILITY_HOME} SUB_DIR "") 
 setup_dep(devices $ENV{DEVICES_HOME} SUB_DIR "")
 
 include(logger)
-setup_logger(${ROOT_SOURCE_DIR}/model/logger.mdl SRC_DIR ${CMAKE_BINARY_DIR}/test)
+setup_logger(${ROOT_SOURCE_DIR}/model/boltalog_logger.mdl SRC_DIR ${CMAKE_BINARY_DIR}/test)
 
 include(x86_project)
 find_test_srcs()

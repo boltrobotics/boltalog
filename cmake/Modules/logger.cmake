@@ -55,12 +55,12 @@ function (setup_logger model_path)
       DEPENDS ${VM} ${CT2_PATH} ${model_path} 
       )
 
-    # For boltalog tests, the target is boltalog-logging; for boltabus, it is boltabus-logging
-    #
-    add_custom_target(
-      ${PROJECT_NAME}-logging
-      DEPENDS ${PROJECT_NAME}-${MODEL_NAME}-model ${CT2_PATH} ${SCT_PATH}
-      )
+    if (NOT TARGET ${MODEL_NAME}-logging)
+      add_custom_target(
+        ${MODEL_NAME}-logging
+        DEPENDS ${MODEL_NAME}-model ${CT2_PATH} ${SCT_PATH}
+        )
+    endif ()
 
   endif (model_path)
 

@@ -12,14 +12,14 @@ generated code supports AVR / STM32 / x86 platforms.
 
 ## Dependencies
 
-The dependencies and their location is defined in [make.sh]({{ gh }}/make.sh). For better version
+The dependencies and their location is defined in [make.sh](make.sh). For better version
 control, install them manually.
 
 <a name="Example"></a>
 ## Example
 
-An example <a href="{{ gh }}//model/boltalog_logger.mdl"> log model</a> and instructions to
-generate the API are part of unit testing build. See <a href="{{ gh }}/test/CMakeLists.txt">
+An example <a href="model/boltalog_logger.mdl"> log model</a> and instructions to
+generate the API are part of unit testing build. See <a href="test/CMakeLists.txt">
 test/CMakeLists.txt</a>:
 
 ```cmake
@@ -33,7 +33,7 @@ setup_logger(
 <a name="Model"></a>
 ## Log Model
 
-<a href="{{ gh }}//model/boltalog_logger.mdl">Log model</a> is specified using JSON format:
+<a href="/model/boltalog_logger.mdl">Log model</a> is specified using JSON format:
 
 ```javascript
 {
@@ -161,7 +161,7 @@ event4, u8:8, d64:64, u16:16, d32:32, u32:32, d16:16, u64:64, d8:8, dbl:8.800000
 ## Program Code
 
 An example of program code that uses the generated API is given in
-<a href="{{ gh }}/test/logger_test.cpp">logger_test.cpp</a>.
+<a href="test/logger_test.cpp">logger_test.cpp</a>.
 Excerpt:
 
 ```cpp

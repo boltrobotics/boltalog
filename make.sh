@@ -68,9 +68,6 @@ fi
 if [ -z ${UTILITY_HOME} ]; then
   export UTILITY_HOME=${PROJECTS_HOME}/utility
 fi
-if [ -z ${DEVICES_HOME} ]; then
-  export DEVICES_HOME=${PROJECTS_HOME}/devices
-fi
 if [ -z ${BOLTALOG_HOME} ]; then
   export BOLTALOG_HOME=${PROJECTS_HOME}/boltalog
 fi

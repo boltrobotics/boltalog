@@ -13,8 +13,8 @@
 // PROJECT INCLUDES
 #include "${MODEL_NAME}.hpp" // class implemented
 #include "boltalog/defines.hpp"
-#include "utility/defines.hpp"
-#include "utility/misc.hpp"
+#include "utility/common/defines.hpp"
+#include "utility/common/misc.hpp"
 
 namespace btr
 {
@@ -38,7 +38,7 @@ uint32_t* status()
 
 #if BTR_LOG_ENABLED > 0
 
-#include "devices/defines.hpp"
+#include "utility/common/defines.hpp"
 
 #if BTR_X86 > 0
 #define BOLTALOG_EOL() ""
@@ -53,16 +53,16 @@ uint32_t* status()
 
 #elif BTR_AVR > 0
 #define BOLTALOG_EOL() "\r\n"
-#include "devices/time.hpp"
-#include "devices/usart.hpp"
+#include "utility/common/time.hpp"
+#include "utility/common/usart.hpp"
 #include <avr/pgmspace.h>
 #include <string.h>
 
 #elif BTR_STM32 > 0
 #define BOLTALOG_EOL() "\r\n"
-#include "devices/time.hpp"
-#include "devices/usart.hpp"
-#include "devices/stm32/usb.hpp"
+#include "utility/common/time.hpp"
+#include "utility/common/usart.hpp"
+#include "utility/stm32/usb.hpp"
 #include <string.h>
 #define PROGMEM
 #endif // x86, ard, avr, stm32

@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.16)
 project(boltalog)
 
 set(ROOT_SOURCE_DIR ${PROJECT_SOURCE_DIR})
-set(CMAKE_MODULE_PATH
-  ${ROOT_SOURCE_DIR}/cmake/Modules
-  $ENV{CMAKEHELPERS_HOME}/cmake/Modules)
+set(CMAKE_MODULE_PATH $ENV{CMAKEHELPERS_HOME}/cmake/Modules)
   
 include(main_project)

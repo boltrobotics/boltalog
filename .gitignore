@@ -1,27 +1,17 @@
-# Generated files
-template/*ct2
-
 # Cmake
 build-*
+template/*ct2
 doc/html*
 
 # GDB
 .gdb_history
 gdb.txt
 
+# Submodules
+#vendor
+
 # Mac
 .DS_Store
-
-# Jekyll
-_site
-.jekyll
-.jekyll-metadata
-.bundle
-.sass-cache
-Gemfile
-Gemfile.lock
-node_modules
-package.json
 
 # Prerequisites
 *.d

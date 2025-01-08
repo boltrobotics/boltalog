@@ -7,10 +7,9 @@ include(ctpp2)
 if (NOT TARGET ${PROJECT_NAME}-autogen)
   build_exe(
     SRCS ${MAIN_SRC}
-    LIBS ${ctpp2_LIB}
+    LIBS ${ctpp2_LIB_NAME}
     SUFFIX "-autogen"
     INC_DIRS ${ctpp2_INC_DIR}
-    DEPS ctpp2_LIB_DEP
     PIC ON)
 endif ()
 
